@@ -1,7 +1,9 @@
 pacman::p_load(dashboardthemes)
 my_theme <- shinyDashboardThemeDIY(
   
-  ### general
+  
+  # General -----------------------------------------------------------------
+  
   appFontFamily = "Arial"
   ,appFontColor = "rgb(0,0,0)"
   ,primaryFontColor = "white"
@@ -11,7 +13,9 @@ my_theme <- shinyDashboardThemeDIY(
   ,dangerFontColor = "rgb(0,0,0)"
   ,bodyBackColor = "rgb(248,248,248)"
   
-  ### header
+
+  # Header ------------------------------------------------------------------
+
   ,logoBackColor = "#154734"
   
   ,headerButtonBackColor = "#154734"
@@ -31,7 +35,9 @@ my_theme <- shinyDashboardThemeDIY(
   ,headerBoxShadowColor = "#aaaaaa"
   ,headerBoxShadowSize = "2px 2px 2px"
   
-  ### sidebar
+
+  # Sidebar -----------------------------------------------------------------
+  
   ,sidebarBackColor = cssGradientThreeColors(
     direction = "down"
     ,colorStart = "#154734"
@@ -89,7 +95,9 @@ my_theme <- shinyDashboardThemeDIY(
   ,sidebarTabBorderWidthHover = 1
   ,sidebarTabRadiusHover = "0px 20px 20px 0px"
   
-  ### boxes
+
+  # Boxes -------------------------------------------------------------------
+  
   ,boxBackColor = "rgb(255,255,255)"
   ,boxBorderRadius = 5
   ,boxShadowSize = "0px 1px 1px"
@@ -110,7 +118,9 @@ my_theme <- shinyDashboardThemeDIY(
   ,tabBoxHighlightColor = "rgba(44,222,235,1)"
   ,tabBoxBorderRadius = 5
   
-  ### inputs
+
+  # Inputs ------------------------------------------------------------------
+  
   ,buttonBackColor = '#288965'
   ,buttonTextColor = "rgb(0,0,0)"
   ,buttonBorderColor = "rgb(200,200,200)"
@@ -126,7 +136,9 @@ my_theme <- shinyDashboardThemeDIY(
   ,textboxBackColorSelect = "rgb(245,245,245)"
   ,textboxBorderColorSelect = "rgb(200,200,200)"
   
-  ### tables
+
+  # Tables ------------------------------------------------------------------
+  
   ,tableBackColor = "rgb(255,255,255)"
   ,tableBorderColor = "rgb(240,240,240)"
   ,tableBorderTopSize = 1

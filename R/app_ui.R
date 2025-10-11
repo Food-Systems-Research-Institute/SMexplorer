@@ -94,7 +94,7 @@ app_ui <- function(request) {
       # Body ---------------------------------------------------------------
       dashboardBody(
         # Formatting from my_theme.R CSS
-        my_theme,
+        # my_theme,
         tabItems(
           tabItem(
             tabName = 'map_tab',
