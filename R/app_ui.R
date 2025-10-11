@@ -6,16 +6,19 @@
 #' @import shinydashboard
 #' @noRd
 #' 
-source('R/my_theme.R')
+# source('R/my_theme.R')
 app_ui <- function(request) {
   tagList(
+    golem_add_external_resources(),
     dashboardPage(
+      skin = 'green',
       dashboardHeader(
-        title = "SMExplorer"
+        title = "SM Explorer"
       ),
-      
+
       # Sidebar -----------------------------------------------------------
       dashboardSidebar(
+        
         sidebarMenu(
           id = 'tabs',
           
@@ -24,8 +27,9 @@ app_ui <- function(request) {
           conditionalPanel(
             condition = "input.tabs == 'map_tab'",
             div(
-              style = "text-align: center; width: 100%; white-space: normal; 
+              style = "text-align: center; width: 100%; white-space: normal;
                 overflow-wrap: break-word; padding: 10px",
+              # class = 'body-header-1',
               HTML(
                 "<p>Use the input panel on the right to choose a metric by either
                 searching or using the dropdown. Push the 'Update Map' button to

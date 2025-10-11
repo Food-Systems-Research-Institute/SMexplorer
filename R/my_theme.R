@@ -4,7 +4,7 @@ my_theme <- shinyDashboardThemeDIY(
   
   # General -----------------------------------------------------------------
   
-  appFontFamily = "Arial"
+  appFontFamily = "Times New Roman"
   ,appFontColor = "rgb(0,0,0)"
   ,primaryFontColor = "white"
   ,infoFontColor = "rgb(0,0,0)"

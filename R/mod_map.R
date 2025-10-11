@@ -43,10 +43,12 @@ mod_map_ui <- function(id) {
         width = 400,
         height = "auto",
         
-        h2('Select Metrics', style = 'text-align: center; font-weight: bold;'),
-        style = "z-index: 5001; background-color: rgba(255,255,255,0.8); 
+        style = "z-index: 5001; background-color: rgba(255,255,255,0.8);
           padding: 15px; border-radius: 8px; max-width: 300; 
-          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",        
+        
+        h2('Select Metrics'),
+
         
         # Search metric -----
         selectizeInput(
@@ -66,16 +68,15 @@ mod_map_ui <- function(id) {
           width = '100%'
         ),
         
-        
         fluidRow(
           column(
             width = 6,
             
             # Metric Info Button -----
-            actionBttn(
+            actionButton(
               ns('show_metric_info'),
               'Metric Info',
-              style = 'jelly',
+              class = 'action-button',
               block = TRUE,
               color = 'primary',
               icon = icon('info')
@@ -91,37 +92,30 @@ mod_map_ui <- function(id) {
           column(
             width = 6,
             
-            # Full Sceen Button -----
-            actionBttn(
+            # Full Screen Button -----
+            actionButton(
               ns('full_screen'),
               'Full Screen',
-              block = TRUE,
-              style = 'jelly',
-              color = 'primary',
+              class = 'action-button',
+              # color = 'primary',
               icon = icon('expand'),
               onclick = "openFullscreen(document.getElementById('map_container'))"
             ),
             
-            tags$style(HTML(paste0(
-              "#", ns("full_screen"), " { ",
-              "background-color: #154734 !important; ",
-              "color: white !important; ",
-              "} "
-            )))
+            # tags$style(HTML(paste0(
+            #   "#", ns("full_screen"), " { ",
+            #   "background-color: #154734 !important; ",
+            #   "color: white !important; ",
+            #   "} "
+            # )))
           )
         ),
         
-        # Gap between buttons
-        HTML("<div style='height: 10px;'></div>"),
-        
-        
         # Update Map Button -----
-        actionBttn(
+        actionButton(
           ns('update_map'),
           'Update Map',
-          block = TRUE,
-          style = 'jelly',
-          color = 'primary',
+          class = 'action-button',
           icon = icon('arrows-rotate')
         ),
         
@@ -131,50 +125,6 @@ mod_map_ui <- function(id) {
           "color: white !important; ",
           "} "
         ))),
-        
-        
-        # Metric Info Button -----
-        # actionBttn(
-        #   ns('show_metric_info'),
-        #   'Metric Info',
-        #   block = TRUE,
-        #   style = 'jelly',
-        #   color = 'primary',
-        #   icon = icon('info')
-        # ),
-        # 
-        # tags$style(HTML(paste0(
-        #   "#", ns("show_metric_info"), " { ",
-        #   "background-color: #154734 !important; ",
-        #   "color: white !important; ",
-        #   "} "
-        # ))),
-        # 
-        # 
-        # # Gap between buttons
-        # # HTML("<div style='height: 10px;'></div>"),
-        # 
-        # 
-        # # Fullscreen Button -----
-        # actionBttn(
-        #   ns('full_screen'),
-        #   'Full Screen',
-        #   block = TRUE,
-        #   style = 'jelly',
-        #   color = 'primary',
-        #   icon = icon('expand'),
-        #   onclick = "openFullscreen(document.getElementById('map_container'))"
-        # ),
-        # 
-        # tags$style(HTML(paste0(
-        #   "#", ns("full_screen"), " { ",
-        #   "background-color: #154734 !important; ",
-        #   "color: white !important; ",
-        #   "} "
-        # ))),
-        # 
-        # # Gap between buttons
-        # HTML("<div style='height: 10px;'></div>"),
         
         
         # Metric Info 

@@ -12,3 +12,5 @@ $run_dev.*
 ^app\.R$
 ^rsconnect$
 ^\.rscignore$
+^codecov\.yml$
+^\.github$
