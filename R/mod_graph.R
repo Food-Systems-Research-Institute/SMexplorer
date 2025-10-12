@@ -23,10 +23,14 @@ mod_graph_ui <- function(id) {
   tagList(
     
     fluidRow(
+      # style = 'padding: 0px !important;',
       
       # Left Column -----
       column(
         width = 7,
+        # style = 'padding: 0px !important;',
+        # style = 'margin-right: -10px !important;',
+        
         ## plotlyOutput -----
         uiOutput(ns('graph_box')),
         

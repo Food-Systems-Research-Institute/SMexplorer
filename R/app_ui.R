@@ -12,8 +12,30 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     dashboardPage(
       skin = 'green',
-      dashboardHeader(
-        title = "SM Explorer"
+      shinydashboardPlus::dashboardHeader(
+        title = "SM Explorer",
+        rightUi = tags$li(
+          class = "dropdown",
+          tags$li(
+            tags$a(
+              href = "https://www.github.com/Food-Systems-Research-Institute/SMexplorer",
+              target = "_blank",
+              icon("github"),
+              style = "display: flex; align-items: center; height: 50px;"
+            )
+          ),
+          tags$li(
+            tags$a(
+              href = "https://www.uvm.edu/ovpr/food-systems-research",
+              target = "_blank",
+              tags$img(
+                src = "www/fsri_spirit_marker.png",
+                height = "20px"
+              ),
+              style = "display: flex; align-items: center; height: 50px;"
+            )
+          )
+        )
       ),
 
       # Sidebar -----------------------------------------------------------

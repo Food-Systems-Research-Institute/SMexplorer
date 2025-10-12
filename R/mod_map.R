@@ -68,6 +68,7 @@ mod_map_ui <- function(id) {
           width = '100%'
         ),
         
+        # Metric info and full screen buttons
         fluidRow(
           column(
             width = 6,
@@ -78,16 +79,8 @@ mod_map_ui <- function(id) {
               'Metric Info',
               class = 'action-button',
               block = TRUE,
-              color = 'primary',
               icon = icon('info')
-            ),
-        
-            tags$style(HTML(paste0(
-              "#", ns("show_metric_info"), " { ",
-              "background-color: #154734 !important; ",
-              "color: white !important; ",
-              "} "
-            )))
+            )
           ),
           column(
             width = 6,
@@ -97,19 +90,11 @@ mod_map_ui <- function(id) {
               ns('full_screen'),
               'Full Screen',
               class = 'action-button',
-              # color = 'primary',
               icon = icon('expand'),
               onclick = "openFullscreen(document.getElementById('map_container'))"
             ),
-            
-            # tags$style(HTML(paste0(
-            #   "#", ns("full_screen"), " { ",
-            #   "background-color: #154734 !important; ",
-            #   "color: white !important; ",
-            #   "} "
-            # )))
           )
-        ),
+        ), # fluidRow
         
         # Update Map Button -----
         actionButton(
@@ -119,18 +104,10 @@ mod_map_ui <- function(id) {
           icon = icon('arrows-rotate')
         ),
         
-        tags$style(HTML(paste0(
-          "#", ns("update_map"), " { ",
-          "background-color: #154734 !important; ",
-          "color: white !important; ",
-          "} "
-        ))),
-        
-        
-        # Metric Info 
+        # Show Metric Info ----
         uiOutput(ns('metric_info'))
         
-    ), # end div
+    ), # end absolute panel div
     
     # JS function for full screen button
     tags$scrip(HTML(js))
@@ -202,6 +179,10 @@ mod_map_server <- function(id){
       # Initial Map -----
       leaflet(init_data) %>% 
         addProviderTiles(
+          providers$OpenStreetMap.Mapnik, 
+          group = 'OpenStreetMap'
+        ) %>%
+        addProviderTiles(
           providers$Stadia.AlidadeSmooth, 
           group = 'Stadia AlidadeSmooth'
         ) %>%
@@ -253,6 +234,7 @@ mod_map_server <- function(id){
         # ) %>%
         addLayersControl(
           baseGroups = c(
+            'OpenStreetMap',
             'Stadia AlidadeSmooth',
             'Stadia.StamenTerrain',
             'Stadia.StamenWatercolor',
