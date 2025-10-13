@@ -2018,8 +2018,7 @@
       "NeedsCompilation": "yes",
       "Author": "David Meyer [aut, cre] (<https://orcid.org/0000-0002-5196-3048>), Evgenia Dimitriadou [aut, cph], Kurt Hornik [aut] (<https://orcid.org/0000-0003-4198-9911>), Andreas Weingessel [aut], Friedrich Leisch [aut], Chih-Chung Chang [ctb, cph] (libsvm C++-code), Chih-Chen Lin [ctb, cph] (libsvm C++-code)",
       "Maintainer": "David Meyer <David.Meyer@R-project.org>",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "ellipsis": {
       "Package": "ellipsis",
@@ -3327,7 +3326,8 @@
         "testthat"
       ],
       "NeedsCompilation": "no",
-      "Repository": "CRAN"
+      "Repository": "CRAN",
+      "Encoding": "UTF-8"
     },
     "isoband": {
       "Package": "isoband",
@@ -4226,7 +4226,8 @@
       "NeedsCompilation": "no",
       "Author": "Tyler Rinker [aut, cre, ctb], Dason Kurkiewicz [aut, ctb], Keith Hughitt [ctb], Albert Wang [ctb], Garrick Aden-Buie [ctb], Albert Wang [ctb], Lukas Burk [ctb]",
       "Maintainer": "Tyler Rinker <tyler.rinker@gmail.com>",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "patchwork": {
       "Package": "patchwork",
@@ -4639,8 +4640,7 @@
       "SystemRequirements": "libpng",
       "URL": "http://www.rforge.net/png/",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "praise": {
       "Package": "praise",
@@ -4863,8 +4863,7 @@
       "NeedsCompilation": "yes",
       "Author": "David Meyer [aut, cre], Christian Buchta [aut]",
       "Maintainer": "David Meyer <David.Meyer@R-project.org>",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "ps": {
       "Package": "ps",
@@ -5079,8 +5078,7 @@
       "NeedsCompilation": "yes",
       "Author": "Robert J. Hijmans [cre, aut] (<https://orcid.org/0000-0001-5872-2872>), Jacob van Etten [ctb], Michael Sumner [ctb], Joe Cheng [ctb], Dan Baston [ctb], Andrew Bevan [ctb], Roger Bivand [ctb], Lorenzo Busetto [ctb], Mort Canty [ctb], Ben Fasoli [ctb], David Forrest [ctb], Aniruddha Ghosh [ctb], Duncan Golicher [ctb], Josh Gray [ctb], Jonathan A. Greenberg [ctb], Paul Hiemstra [ctb], Kassel Hingee [ctb], Alex Ilich [ctb], Institute for Mathematics Applied Geosciences [cph], Charles Karney [ctb], Matteo Mattiuzzi [ctb], Steven Mosher [ctb], Babak Naimi [ctb], Jakub Nowosad [ctb], Edzer Pebesma [ctb], Oscar Perpinan Lamigueiro [ctb], Etienne B. Racine [ctb], Barry Rowlingson [ctb], Ashton Shortridge [ctb], Bill Venables [ctb], Rafael Wueest [ctb]",
       "Maintainer": "Robert J. Hijmans <r.hijmans@gmail.com>",
-      "Repository": "CRAN",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "rcmdcheck": {
       "Package": "rcmdcheck",
@@ -5734,46 +5732,6 @@
       "Author": "Kevin Ushey [aut, cre], JJ Allaire [aut], Hadley Wickham [aut], Gary Ritchie [aut], RStudio [cph]",
       "Repository": "CRAN"
     },
-    "rstudiovim": {
-      "Package": "rstudiovim",
-      "Version": "0.0.0.9000",
-      "Source": "GitHub",
-      "Title": "Vim configuration for RStudio",
-      "Authors@R": "person(\"David\", \"Foord\", , \"david.foord@outlook.com\", role = c(\"aut\", \"cre\"))",
-      "Description": "Execute Vim commands from a .vimrc file to load your Vim configuration.",
-      "License": "MIT + file LICENSE",
-      "Encoding": "UTF-8",
-      "Roxygen": "list(markdown = TRUE)",
-      "RoxygenNote": "7.3.1",
-      "Imports": [
-        "Rcpp",
-        "rstudioapi"
-      ],
-      "URL": "https://github.com/davidfoord1/rstudiovim, https://davidfoord1.github.io/rstudiovim/",
-      "BugReports": "https://github.com/davidfoord1/rstudiovim/issues",
-      "Suggests": [
-        "knitr",
-        "rmarkdown",
-        "testthat (>= 3.0.0)"
-      ],
-      "Config/testthat/edition": "3",
-      "LinkingTo": [
-        "Rcpp"
-      ],
-      "VignetteBuilder": "knitr",
-      "Depends": [
-        "R (>= 2.10)"
-      ],
-      "LazyData": "true",
-      "Author": "David Foord [aut, cre]",
-      "Maintainer": "David Foord <david.foord@outlook.com>",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "davidfoord1",
-      "RemoteRepo": "rstudiovim",
-      "RemoteRef": "main",
-      "RemoteSha": "23450a2d9f9f3c27d5f0a8690ae31696454f3d98"
-    },
     "rversions": {
       "Package": "rversions",
       "Version": "3.0.0",
@@ -6348,6 +6306,45 @@
       "Maintainer": "Winston Chang <winston@posit.co>",
       "Repository": "CRAN"
     },
+    "shinydashboardPlus": {
+      "Package": "shinydashboardPlus",
+      "Version": "2.0.6",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Add More 'AdminLTE2' Components to 'shinydashboard'",
+      "Authors@R": "c( person(\"David\", \"Granjon\", email = \"dgranjon@ymail.com\", role = c(\"aut\", \"cre\")), person(family = \"RinteRface\", role = \"cph\"), person(family = \"Almasaeed Studio\", role = c(\"ctb\", \"cph\"), comment = \"AdminLTE2 theme for Bootstrap 3\"), person(\"Guang\", \"Yang\", role = c(\"ctb\", \"cph\"), comment = \"ygdashboard original template\"), person(\"Winston\", \"Chang\", role = c(\"ctb\", \"cph\"), comment = \"Functions from shinydashboard\"), person(\"Victor\", \"Perrier\", email = \"victor.perrier@dreamrs.fr\", role = \"ctb\", comment = \"improved the shinydashboardPlusGallery\"))",
+      "Maintainer": "David Granjon <dgranjon@ymail.com>",
+      "Description": "Extend 'shinydashboard' with 'AdminLTE2' components.  'AdminLTE2' is a free 'Bootstrap 3' dashboard template available at <https://adminlte.io>. Customize boxes, add timelines and a lot more.",
+      "License": "GPL (>= 2) | file LICENSE",
+      "Imports": [
+        "shiny",
+        "htmltools",
+        "shinydashboard",
+        "fresh",
+        "waiter (>= 0.2.3)",
+        "lifecycle"
+      ],
+      "Suggests": [
+        "styler (>= 1.2.0)",
+        "shinyAce",
+        "shinyWidgets",
+        "shinyEffects",
+        "shinyjqui",
+        "knitr",
+        "rmarkdown",
+        "jsonlite",
+        "bslib"
+      ],
+      "URL": "https://github.com/RinteRface/shinydashboardPlus, https://shinydashboardPlus.rinterface.com/",
+      "BugReports": "https://github.com/RinteRface/shinydashboardPlus/issues",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2",
+      "VignetteBuilder": "knitr",
+      "RdMacros": "lifecycle",
+      "NeedsCompilation": "no",
+      "Author": "David Granjon [aut, cre], RinteRface [cph], Almasaeed Studio [ctb, cph] (AdminLTE2 theme for Bootstrap 3), Guang Yang [ctb, cph] (ygdashboard original template), Winston Chang [ctb, cph] (Functions from shinydashboard), Victor Perrier [ctb] (improved the shinydashboardPlusGallery)",
+      "Repository": "CRAN"
+    },
     "snakecase": {
       "Package": "snakecase",
       "Version": "0.11.1",
@@ -6475,8 +6472,7 @@
       "NeedsCompilation": "yes",
       "Author": "Edzer Pebesma [aut, cre], Roger Bivand [aut], Barry Rowlingson [ctb], Virgilio Gomez-Rubio [ctb], Robert Hijmans [ctb], Michael Sumner [ctb], Don MacQueen [ctb], Jim Lemon [ctb], Finn Lindgren [ctb], Josh O'Brien [ctb], Joseph O'Rourke [ctb], Patrick Hausmann [ctb]",
       "Maintainer": "Edzer Pebesma <edzer.pebesma@uni-muenster.de>",
-      "Repository": "CRAN",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "spelling": {
       "Package": "spelling",
@@ -6701,11 +6697,11 @@
     },
     "terra": {
       "Package": "terra",
-      "Version": "1.8-70",
+      "Version": "1.8-60",
       "Source": "Repository",
       "Type": "Package",
       "Title": "Spatial Data Analysis",
-      "Date": "2025-09-26",
+      "Date": "2025-07-18",
       "Depends": [
         "R (>= 3.5.0)"
       ],
@@ -6801,11 +6797,11 @@
     },
     "textshaping": {
       "Package": "textshaping",
-      "Version": "1.0.3",
+      "Version": "1.0.4",
       "Source": "Repository",
       "Title": "Bindings to the 'HarfBuzz' and 'Fribidi' Libraries for Text Shaping",
       "Authors@R": "c( person(\"Thomas Lin\", \"Pedersen\", , \"thomas.pedersen@posit.co\", role = c(\"cre\", \"aut\"), comment = c(ORCID = \"0000-0002-5147-4711\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"), comment = c(ROR = \"03wc8by49\")) )",
-      "Description": "Provides access to the text shaping functionality in the 'HarfBuzz' library and the bidirectional algorithm in the 'Fribidi' library.  'textshaping' is a low-level utility package mainly for graphic devices that expands upon the font tool-set provided by the 'systemfonts' package.",
+      "Description": "Provides access to the text shaping functionality in the 'HarfBuzz' library and the bidirectional algorithm in the 'Fribidi' library. 'textshaping' is a low-level utility package mainly for graphic devices that expands upon the font tool-set provided by the 'systemfonts' package.",
       "License": "MIT + file LICENSE",
       "URL": "https://github.com/r-lib/textshaping",
       "BugReports": "https://github.com/r-lib/textshaping/issues",
@@ -6816,7 +6812,7 @@
         "lifecycle",
         "stats",
         "stringi",
-        "systemfonts (>= 1.1.0)",
+        "systemfonts (>= 1.3.0)",
         "utils"
       ],
       "Suggests": [
@@ -7206,7 +7202,8 @@
       "URL": "https://www.rforge.net/uuid",
       "BugReports": "https://github.com/s-u/uuid/issues",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "vctrs": {
       "Package": "vctrs",
@@ -7367,7 +7364,8 @@
       ],
       "RoxygenNote": "6.1.1",
       "NeedsCompilation": "no",
-      "Repository": "CRAN"
+      "Repository": "CRAN",
+      "Encoding": "UTF-8"
     },
     "whoami": {
       "Package": "whoami",
@@ -7607,10 +7605,9 @@
         "R (>= 2.10.0)"
       ],
       "License": "GPL (>= 2)",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "NeedsCompilation": "no",
-      "Author": "David B. Dahl [aut], David Scott [aut, cre], Charles Roosen [aut], Arni Magnusson [aut], Jonathan Swinton [aut], Ajay Shah [ctb], Arne Henningsen [ctb], Benno Puetz [ctb], Bernhard Pfaff [ctb], Claudio Agostinelli [ctb], Claudius Loehnert [ctb], David Mitchell [ctb], David Whiting [ctb], Fernando da Rosa [ctb], Guido Gay [ctb], Guido Schulz [ctb], Ian Fellows [ctb], Jeff Laake [ctb], John Walker [ctb], Jun Yan [ctb], Liviu Andronic [ctb], Markus Loecher [ctb], Martin Gubri [ctb], Matthieu Stigler [ctb], Robert Castelo [ctb], Seth Falcon [ctb], Stefan Edwards [ctb], Sven Garbade [ctb], Uwe Ligges [ctb]",
-      "Encoding": "UTF-8"
+      "Author": "David B. Dahl [aut], David Scott [aut, cre], Charles Roosen [aut], Arni Magnusson [aut], Jonathan Swinton [aut], Ajay Shah [ctb], Arne Henningsen [ctb], Benno Puetz [ctb], Bernhard Pfaff [ctb], Claudio Agostinelli [ctb], Claudius Loehnert [ctb], David Mitchell [ctb], David Whiting [ctb], Fernando da Rosa [ctb], Guido Gay [ctb], Guido Schulz [ctb], Ian Fellows [ctb], Jeff Laake [ctb], John Walker [ctb], Jun Yan [ctb], Liviu Andronic [ctb], Markus Loecher [ctb], Martin Gubri [ctb], Matthieu Stigler [ctb], Robert Castelo [ctb], Seth Falcon [ctb], Stefan Edwards [ctb], Sven Garbade [ctb], Uwe Ligges [ctb]"
     },
     "xts": {
       "Package": "xts",
@@ -7664,7 +7661,8 @@
       "URL": "https://github.com/vubiostat/r-yaml/",
       "BugReports": "https://github.com/vubiostat/r-yaml/issues",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "zip": {
       "Package": "zip",
