@@ -391,7 +391,7 @@ mod_graph_server <- function(id){
               y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
             )
           )) +
-          geom_point(size = 2.5, alpha = 0.65) +
+          geom_point(size = 1.5, alpha = 0.7) +
           labs(
             x = x_label,
             y = y_label,

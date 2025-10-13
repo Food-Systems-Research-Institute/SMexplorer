@@ -180,24 +180,24 @@ mod_map_server <- function(id){
       leaflet(init_data) %>% 
         addProviderTiles(
           providers$OpenStreetMap.Mapnik, 
-          group = 'OpenStreetMap'
+          group = 'OpenStreetMap.Mapnik'
         ) %>%
         addProviderTiles(
-          providers$Stadia.AlidadeSmooth, 
-          group = 'Stadia AlidadeSmooth'
+          providers$OpenStreetMap.HOT, 
+          group = 'OpenStreetMap.HOT'
         ) %>%
         addProviderTiles(
-          providers$Stadia.StamenTerrain, 
-          group = 'Stadia.StamenTerrain'
-        ) %>%
+          providers$CartoDB.Positron, 
+          group = 'CartoDB.Positron'
+        ) %>% 
         addProviderTiles(
-          providers$Stadia.Outdoors, 
-          group = 'Stadia.Outdoors'
-        ) %>%
+          providers$CartoDB.DarkMatter, 
+          group = 'CartoDB.DarkMatter'
+        ) %>% 
         addProviderTiles(
-          providers$Stadia.StamenWatercolor, 
-          group = 'Stadia.StamenWatercolor'
-        ) %>%
+          providers$USGS.USImageryTopo, 
+          group = 'USGS.USImageryTopo'
+        ) %>% 
         addProviderTiles(
           providers$USGS.USImagery, 
           group = 'USGS.USImagery'
@@ -234,12 +234,12 @@ mod_map_server <- function(id){
         # ) %>%
         addLayersControl(
           baseGroups = c(
-            'OpenStreetMap',
-            'Stadia AlidadeSmooth',
-            'Stadia.StamenTerrain',
-            'Stadia.StamenWatercolor',
-            'Stadia.Outdoors',
-            'USGS.USImagery'
+            'CartoDB.Positron',
+            'CartoDB.DarkMatter',
+            'OpenStreetMap.HOT',
+            'OpenStreetMap.Mapnik',
+            'USGS.USImagery',
+            'USGS.USImageryTopo'
           ), 
           overlayGroups = c('Counties'),
           options = layersControlOptions(collapsed = TRUE),
@@ -385,7 +385,7 @@ mod_map_server <- function(id){
           weight = 1, 
           smoothFactor = 0.5,
           opacity = 1.0, 
-          fillOpacity = 0.75,
+          fillOpacity = 0.8,
           fillColor = ~pal(updated_dat$value),
           highlightOptions = highlightOptions(
             color = "white",
