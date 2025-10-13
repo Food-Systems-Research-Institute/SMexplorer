@@ -47,7 +47,7 @@ mod_map_ui <- function(id) {
           padding: 15px; border-radius: 8px; max-width: 300; 
           box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",        
         
-        h2('Select Metrics'),
+        h3('Select Metrics'),
 
         
         # Search metric -----
@@ -284,16 +284,19 @@ mod_map_server <- function(id){
               ~ str_to_sentence(.x)
             ))
           
-          HTML(
-            '<h4><b>Metric: </b>', input$metric, '</h4>',
-            '<p><b>Definition:</b> ', meta$definition, '<br>',
-            '<b>Dimension:</b> ', meta$dimension, '<br>',
-            '<b>Index:</b> ', meta$index, '<br>',
-            '<b>Indicator:</b> ', meta$indicator, '<br>',
-            '<b>Resolution:</b> ', meta$resolution, '<br>',
-            '<b>Updates:</b> ', meta$updates, '<br>',
-            '<b>Source: </b><a href="', meta$url, '">', meta$source, '</a><br>',
-            '<b>Citation:</b> ', meta$citation, '</p>'
+          div(
+            class = 'button-box',
+            HTML(
+              '<h4><b>Metric: </b>', input$metric, '</h4>',
+              '<p><b>Definition:</b> ', meta$definition, '<br>',
+              '<b>Dimension:</b> ', meta$dimension, '<br>',
+              '<b>Index:</b> ', meta$index, '<br>',
+              '<b>Indicator:</b> ', meta$indicator, '<br>',
+              '<b>Resolution:</b> ', meta$resolution, '<br>',
+              '<b>Updates:</b> ', meta$updates, '<br>',
+              '<b>Source: </b><a href="', meta$url, '">', meta$source, '</a><br>',
+              '<b>Citation:</b> ', meta$citation, '</p>'
+            )
           )
           
         })

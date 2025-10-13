@@ -520,8 +520,8 @@ mod_graph_server <- function(id){
         if (input$search_x != '') {
           meta_x <- sm_data$metadata %>% 
             filter(metric == input$search_x)
-          html_output <- paste0(
-            html_output, 
+          html_output_x <- paste0(
+            html_output,
             '<h4>X-Axis: ', input$search_x, '</h4>',
             '<p><b>Definition:</b> ', meta_x$definition, '<br>',
             '<b>Dimension:</b> ', meta_x$dimension, '<br>',
@@ -538,10 +538,10 @@ mod_graph_server <- function(id){
         if (input$search_y != '') {
           meta_y <- sm_data$metadata %>% 
             filter(metric == input$search_y)
-          html_output <- paste0(
+          html_output_y <- paste0(
             html_output,
             '<br>',
-            '<h4>X-Axis: ', input$search_y, '</h4>',
+            '<h4>Y-Axis: ', input$search_y, '</h4>',
             '<p><b>Definition:</b> ', meta_y$definition, '<br>',
             '<b>Dimension:</b> ', meta_y$dimension, '<br>',
             '<b>Index:</b> ', meta_y$index, '<br>',
@@ -554,6 +554,16 @@ mod_graph_server <- function(id){
         }
         
         # Return HTML output
+        # div(
+        #   div(
+        #     class = 'button-box',
+        #     HTML(html_output_x),
+        #   ),
+        #   div(
+        #     class = 'button-box',
+        #     HTML(html_output_y),
+        #   )
+        # )
         HTML(html_output)
         
       } # end ifelse for HTML output
