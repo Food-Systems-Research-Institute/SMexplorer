@@ -138,9 +138,9 @@ h1, h2, h3, h4 {
   border-width: 1px;
 }
 
-.action-button {
+.btn.action-button {
   color: #000000;
-  background-color: #fff !important;
+  background-color: var(--theme-green) !important;
   border: 1px solid #000000 !important;
   border-radius: 3px;
   border-width: 1px,
@@ -159,7 +159,7 @@ h1, h2, h3, h4 {
 
 /*
 .action-button:active {
-  background-color: var(--theme-off-green) !important;*/
+  background-color: var(--theme-off-green) !important;
   background-color: '#fff';
   color: #fff !important;
   border: 1.25px solid #000000 !important;

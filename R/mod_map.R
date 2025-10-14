@@ -118,35 +118,19 @@ mod_map_ui <- function(id) {
     
 #' map Server Functions
 #'
+#' @param app_data Pre-loaded application data from load_app_data()
+#'
 #' @noRd
-mod_map_server <- function(id){
+mod_map_server <- function(id, app_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    # Load data ONCE at module initialization -----
-    load('data/dat.rda')
-    load('data/counties_2021.rda')
-    load('data/counties_2024.rda')
-    load('data/js.rda')
-    load('data/sm_data.rda')
-    source('R/filter_fips.R')
+    # Use pre-loaded data instead of loading here
+    sm_data <- app_data$sm_data
+    metric_options <- app_data$metric_options
 
-    # Calculate metric options ONCE -----
-    metric_options <- sm_data$metrics %>%
-        inner_join(sm_data$metadata, by = 'variable_name') %>%
-        # Pulling out some problematic layers for now, revisit this []
-        filter(str_detect(metric, '^Acid|^Acre', negate = TRUE)) %>%
-        pull(metric) %>%
-        unique()
-
-    # Reorder metrics, put NAICS last
-    metric_options <- c(
-      sort(metric_options[!grepl("NAICS", metric_options)]),
-      sort(metric_options[grepl("NAICS", metric_options)])
-    )
-
-    # Update UI with metric options once on initialization -----
-    updateSelectInput(
+    # Metric Dropdown -----
+    updateSelectizeInput(
       session,
       'metric',
       choices = metric_options
@@ -154,63 +138,30 @@ mod_map_server <- function(id){
 
     # Render initial map -----
     output$map_plot <- renderLeaflet({
-      
-      # Baseline data to make map
-      init_data <- sm_data$ne_counties_2024 %>% 
+
+      # Baseline data to make map (simplified)
+      init_data <- sm_data$ne_counties_2024 %>%
         left_join(sm_data$fips_key, by = 'fips')
-      
-      # Prep popup and palette
-      custom_popup <- ~paste0(
-        "<div style='text-align: center;'><b>", county_name, "</b></div>",
-        "<strong>Land Area:</strong> ", round(aland / 1000000, 1), " sq km<br>",
-        "<strong>Water Area:</strong> ", round(awater / 1000000, 1), " sq km<br>"
-      )
-      # county_palette <- colorFactor(
-      #   "viridis",
-      #   initial_dat$county_name
-      # )
-      
-      
-      # centroids <- st_centroid(initial_dat)
-      # centroid_coords <- data.frame(
-      #   county_name = centroids$county_name,
-      #   lng = st_coordinates(centroids)[, 1],
-      #   lat = st_coordinates(centroids)[, 2]
-      # )
-      
+
+      # Simplified popup for faster rendering
+      custom_popup <- ~paste0("<b>", county_name, "</b>")
+
       # Initial Map -----
-      leaflet(init_data) %>% 
+      leaflet(init_data) %>%
         addProviderTiles(
-          providers$OpenStreetMap.Mapnik, 
+          providers$CartoDB.Positron,
+          group = 'CartoDB.Positron'
+        ) %>%
+        addProviderTiles(
+          providers$OpenStreetMap.Mapnik,
           group = 'OpenStreetMap.Mapnik'
         ) %>%
-        addProviderTiles(
-          providers$OpenStreetMap.HOT, 
-          group = 'OpenStreetMap.HOT'
-        ) %>%
-        addProviderTiles(
-          providers$CartoDB.Positron, 
-          group = 'CartoDB.Positron'
-        ) %>% 
-        addProviderTiles(
-          providers$CartoDB.DarkMatter, 
-          group = 'CartoDB.DarkMatter'
-        ) %>% 
-        addProviderTiles(
-          providers$USGS.USImageryTopo, 
-          group = 'USGS.USImageryTopo'
-        ) %>% 
-        addProviderTiles(
-          providers$USGS.USImagery, 
-          group = 'USGS.USImagery'
-        ) %>% 
         addPolygons(
           color = "black",
-          weight = 1, 
-          smoothFactor = 0.5,
-          opacity = 1.0, 
-          fillOpacity = 0.8,
-          # fillColor = ~county_palette(initial_dat$county_name),
+          weight = 1,
+          smoothFactor = 0.8,
+          opacity = 0.7,
+          fillOpacity = 0.5,
           fillColor = 'lightgray',
           highlightOptions = highlightOptions(
             color = "white",
@@ -221,33 +172,17 @@ mod_map_server <- function(id){
           popupOptions = popupOptions(closeButton = FALSE),
           label = ~county_name,
           group = 'Counties'
-        ) %>% 
-        # addLabelOnlyMarkers(
-        #   data = centroid_coords,
-        #   label = ~county_name,
-        #   lng = ~lng,
-        #   lat = ~lat,
-        #   labelOptions = labelOptions(
-        #     noHide = TRUE, 
-        #     direction = "auto", 
-        #     textsize = "10px",
-        #     textOnly = TRUE
-        #   )
-        # ) %>%
+        ) %>%
         addLayersControl(
           baseGroups = c(
             'CartoDB.Positron',
-            'CartoDB.DarkMatter',
-            'OpenStreetMap.HOT',
-            'OpenStreetMap.Mapnik',
-            'USGS.USImagery',
-            'USGS.USImageryTopo'
-          ), 
+            # 'CartoDB.DarkMatter',
+            'OpenStreetMap.Mapnik'
+          ),
           overlayGroups = c('Counties'),
           options = layersControlOptions(collapsed = TRUE),
           position = 'topleft'
         )
-        # addFullscreenControl()
     })
     
     

@@ -23,13 +23,10 @@ mod_graph_ui <- function(id) {
   tagList(
     
     fluidRow(
-      # style = 'padding: 0px !important;',
       
       # Left Column -----
       column(
         width = 7,
-        # style = 'padding: 0px !important;',
-        # style = 'margin-right: -10px !important;',
         
         ## plotlyOutput -----
         uiOutput(ns('graph_box')),
@@ -134,21 +131,8 @@ mod_graph_ui <- function(id) {
             )
           )),
           
-          ### LOESS checkbox -----
-          # tags$style(HTML("
-          #   .custom-checkbox .icheckbox_square-green {
-          #     background-color: #f0f0f0;
-          #     border-color: #28a745;
-          #   }
-          #   .custom-checkbox .icheckbox_square-green.checked {
-          #     background-color: #28a745;
-          #     border-color: #28a745;
-          #   }
-          #   .custom-checkbox .awesome-checkbox-label {
-          #     color: #28a745;
-          #   }
-          # ")),
           
+          ### LOESS checkbox -----
           awesomeCheckbox(
             inputId = ns("loess"),
             label = "Add LOESS Curve", 
@@ -156,19 +140,8 @@ mod_graph_ui <- function(id) {
             status = "primary"
           ),
           
-          # tags$style(HTML(paste0(
-          #   "#", ns("loess"), " { ",
-          #   "background-color: #154734 !important; ",
-          #   "color: white !important; ",
-          #   "width: 50%; ",
-          #   "margin-left: auto; ",
-          #   "margin-right: auto; ",
-          #   "display: block; ",
-          #   "} "
-          # ))),
           
-          
-          ### cor checkbox -----
+          ### Correlation checkbox -----
           awesomeCheckbox(
             inputId = ns("cor_check"),
             label = "Add Correlation", 
@@ -204,8 +177,6 @@ mod_graph_server <- function(id){
     ns <- session$ns
     
      # Load data -----
-    # load('data/dat.rda')
-    # load('data/aggregated_meta.rda')
     load('data/sm_data.rda')
     
     
@@ -228,13 +199,13 @@ mod_graph_server <- function(id){
       )
         
       # Update search fields
-      updateSelectInput(
+      updateSelectizeInput(
         session, 
         'search_x', 
         choices = metric_options,
         selected = character(0)
       )
-      updateSelectInput(
+      updateSelectizeInput(
         session, 
         'search_y', 
         choices = metric_options,
@@ -272,6 +243,7 @@ mod_graph_server <- function(id){
       # Filter to selected variables
       # have to join with metadata to search by metric
       # Also join to fips to get county name
+      # TODO: Do this ahead of time to avoid joining in reactive
       dat <- sm_data$metadata %>% 
         select(
           variable_name,
