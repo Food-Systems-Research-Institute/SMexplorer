@@ -110,7 +110,7 @@ mod_map_ui <- function(id) {
     ), # end absolute panel div
     
     # JS function for full screen button
-    tags$scrip(HTML(js))
+    tags$script(HTML(js))
       
     )
   )
@@ -118,40 +118,42 @@ mod_map_ui <- function(id) {
     
 #' map Server Functions
 #'
-#' @noRd 
+#' @noRd
 mod_map_server <- function(id){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
+
+    # Load data ONCE at module initialization -----
+    load('data/dat.rda')
+    load('data/counties_2021.rda')
+    load('data/counties_2024.rda')
+    load('data/js.rda')
+    load('data/sm_data.rda')
+    source('R/filter_fips.R')
+
+    # Calculate metric options ONCE -----
+    metric_options <- sm_data$metrics %>%
+        inner_join(sm_data$metadata, by = 'variable_name') %>%
+        # Pulling out some problematic layers for now, revisit this []
+        filter(str_detect(metric, '^Acid|^Acre', negate = TRUE)) %>%
+        pull(metric) %>%
+        unique()
+
+    # Reorder metrics, put NAICS last
+    metric_options <- c(
+      sort(metric_options[!grepl("NAICS", metric_options)]),
+      sort(metric_options[grepl("NAICS", metric_options)])
+    )
+
+    # Update UI with metric options once on initialization -----
+    updateSelectInput(
+      session,
+      'metric',
+      choices = metric_options
+    )
+
+    # Render initial map -----
     output$map_plot <- renderLeaflet({
-      
-      # Prep -----
-      load('data/dat.rda')
-      load('data/counties_2021.rda')
-      load('data/counties_2024.rda')
-      load('data/js.rda')
-      load('data/sm_data.rda')
-      source('R/filter_fips.R')
-      
-      # Metric options -----
-      metric_options <- sm_data$metrics %>%
-          inner_join(sm_data$metadata, by = 'variable_name') %>% 
-          # Pulling out some problematic layers for now, revisit this []
-          filter(str_detect(metric, '^Acid|^Acre', negate = TRUE)) %>% 
-          pull(metric) %>% 
-          unique()
-      
-      # Reorder metrics, put NAICS last
-      metric_options <- c(
-        sort(metric_options[!grepl("NAICS", metric_options)]),
-        sort(metric_options[grepl("NAICS", metric_options)])
-      )
-      
-      # Update UI with metric options
-      updateSelectInput(
-        session, 
-        'metric', 
-        choices = metric_options
-      )
       
       # Baseline data to make map
       init_data <- sm_data$ne_counties_2024 %>% 
@@ -207,7 +209,7 @@ mod_map_server <- function(id){
           weight = 1, 
           smoothFactor = 0.5,
           opacity = 1.0, 
-          fillOpacity = 0.5,
+          fillOpacity = 0.8,
           # fillColor = ~county_palette(initial_dat$county_name),
           fillColor = 'lightgray',
           highlightOptions = highlightOptions(
@@ -286,6 +288,7 @@ mod_map_server <- function(id){
           
           div(
             class = 'button-box',
+            style = 'background-color: #fff !important;',
             HTML(
               '<h4><b>Metric: </b>', input$metric, '</h4>',
               '<p><b>Definition:</b> ', meta$definition, '<br>',

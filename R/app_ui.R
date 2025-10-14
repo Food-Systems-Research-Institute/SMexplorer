@@ -49,13 +49,18 @@ app_ui <- function(request) {
           conditionalPanel(
             condition = "input.tabs == 'map_tab'",
             div(
-              style = "text-align: center; width: 100%; white-space: normal;
-                overflow-wrap: break-word; padding: 10px",
-              # class = 'body-header-1',
-              HTML(
-                "<p>Use the input panel on the right to choose a metric by either
+              # style = "
+              #   text-align: center; 
+              #   width: 100%; 
+              #   white-space: normal;
+              #   overflow-wrap: break-word; 
+              #   padding: 10px;
+              # ",
+              class = 'sidebar-conditional-text',
+              tags$p(
+                "Use the input panel on the right to choose a metric by either
                 searching or using the dropdown. Push the 'Update Map' button to
-                view a metric.</p>"
+                view a metric."
               )
             )
           ),
