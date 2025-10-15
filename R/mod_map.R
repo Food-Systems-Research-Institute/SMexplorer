@@ -74,11 +74,11 @@ mod_map_ui <- function(id) {
             width = 6,
             
             # Metric Info Button -----
-            actionButton(
+            actionBttn(
               ns('show_metric_info'),
               'Metric Info',
-              class = 'action-button',
-              block = TRUE,
+              # class = 'action-button',
+              # block = TRUE,
               icon = icon('info')
             )
           ),
@@ -86,10 +86,10 @@ mod_map_ui <- function(id) {
             width = 6,
             
             # Full Screen Button -----
-            actionButton(
+            actionBttn(
               ns('full_screen'),
               'Full Screen',
-              class = 'action-button',
+              # class = 'action-button',
               icon = icon('expand'),
               onclick = "openFullscreen(document.getElementById('map_container'))"
             ),
@@ -97,10 +97,10 @@ mod_map_ui <- function(id) {
         ), # fluidRow
         
         # Update Map Button -----
-        actionButton(
+        actionBttn(
           ns('update_map'),
           'Update Map',
-          class = 'action-button',
+          style = 'unite',
           icon = icon('arrows-rotate')
         ),
         
@@ -149,12 +149,16 @@ mod_map_server <- function(id, app_data){
       # Initial Map -----
       leaflet(init_data) %>%
         addProviderTiles(
-          providers$CartoDB.Positron,
-          group = 'CartoDB.Positron'
-        ) %>%
-        addProviderTiles(
           providers$OpenStreetMap.Mapnik,
           group = 'OpenStreetMap.Mapnik'
+        ) %>%
+        addProviderTiles(
+          providers$USGS.USImagery,
+          group = 'USGS.USImagery'
+        ) %>%
+        addProviderTiles(
+          providers$CartoDB.Positron,
+          group = 'CartoDB.Positron'
         ) %>%
         addPolygons(
           color = "black",
@@ -176,8 +180,8 @@ mod_map_server <- function(id, app_data){
         addLayersControl(
           baseGroups = c(
             'CartoDB.Positron',
-            # 'CartoDB.DarkMatter',
-            'OpenStreetMap.Mapnik'
+            'OpenStreetMap.Mapnik',
+            'USGS.USImagery'
           ),
           overlayGroups = c('Counties'),
           options = layersControlOptions(collapsed = TRUE),

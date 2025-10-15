@@ -49,13 +49,6 @@ app_ui <- function(request) {
           conditionalPanel(
             condition = "input.tabs == 'map_tab'",
             div(
-              # style = "
-              #   text-align: center; 
-              #   width: 100%; 
-              #   white-space: normal;
-              #   overflow-wrap: break-word; 
-              #   padding: 10px;
-              # ",
               class = 'sidebar-conditional-text',
               tags$p(
                 "Use the input panel on the right to choose a metric by either
@@ -66,7 +59,7 @@ app_ui <- function(request) {
           ),
           
           ## graph_tab -----
-          menuItem("Bivariate Graphs", tabName = "graph_tab", icon = icon("chart-simple")),
+          menuItem("Metric Comparisons", tabName = "graph_tab", icon = icon("chart-simple")),
           conditionalPanel(
             condition = "input.tabs == 'graph_tab'",
             div(
@@ -78,18 +71,12 @@ app_ui <- function(request) {
                 over points to see values by county. You can also click on a 
                 point to see more information on taht county in a new box</p>"
               )
-            # div(
-            #   style = "display: flex; justify-content: center; align-items: center; height: 50px;",
-            #   selectInput("select_x_var", "Choose x variable")
-            # )
-            # div(
-            #   style = "display: flex; justify-content: center; align-items: center; height: 50px;",
-            #   actionButton("show_graph", "Create Graphs")
-            # )
             )
           ),
           
           ## tree_tab -----
+          # This was a janky data visualization. Not sure if worth resurrecting
+          # Replace this with a nicer network visualization.
           # menuItem("Metrics Framework", tabName = "tree_tab", icon = icon("sitemap")),
           # conditionalPanel(
           #   condition = "input.tabs == 'tree_tab'",
@@ -104,7 +91,7 @@ app_ui <- function(request) {
           # ),
           
           ## table_tab -----
-          menuItem("Metadata Table", tabName = "table_tab", icon = icon("table")),
+          menuItem("Data Sources", tabName = "table_tab", icon = icon("table")),
           conditionalPanel(
             condition = "input.tabs == 'table_tab'",
             div(

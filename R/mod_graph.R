@@ -54,7 +54,7 @@ mod_graph_ui <- function(id) {
           ### Choose Scale -----
           selectInput(
             inputId = ns('choose_scale'),
-            label = 'Choose a Scale:',
+            label = 'Choose a Resolution:',
             choices = c('County', 'State'),
             selected = 'County',
             width = '100%',
@@ -64,80 +64,81 @@ mod_graph_ui <- function(id) {
           ### Search X -----
           selectizeInput(
             inputId = ns('search_x'),
-            label = 'Select Metric for X-Axis:',
+            label = 'Metric One:',
             choices = NULL,
             selected = NULL,
             width = '100%',
             multiple = FALSE
           ),
           
+          ## Was there ever a search_x button?
           # format search x button
-          tags$head(
-            tags$style(
-              HTML(
-                '
-                .selectize-input {
-                  word-wrap: break-word;
-                  word-break: break-word;
-                  max-width: 100%; 
-                    overflow: hidden; 
-                    text-overflow: ellipsis; 
-                    white-space: nowrap; 
-                }
-                
-                .selectize-dropdown {
-                  word-wrap: break-word;
-                  word-break: break-word;
-                  max-width: 100px !important; 
-                    overflow: hidden; 
-                    text-overflow: ellipsis; 
-                }
-                '
-              )
-            )
-          ),
+          # tags$head(
+          #   tags$style(
+          #     HTML(
+          #       '
+          #       .selectize-input {
+          #         word-wrap: break-word;
+          #         word-break: break-word;
+          #         max-width: 100%; 
+          #           overflow: hidden; 
+          #           text-overflow: ellipsis; 
+          #           white-space: nowrap; 
+          #       }
+          #       
+          #       .selectize-dropdown {
+          #         word-wrap: break-word;
+          #         word-break: break-word;
+          #         max-width: 100px !important; 
+          #           overflow: hidden; 
+          #           text-overflow: ellipsis; 
+          #       }
+          #       '
+          #     )
+          #   )
+          # ),
           
           ### Search Y -----
           selectizeInput(
             inputId = ns('search_y'),
-            label = 'Select Metric for Y-Axis:',
+            label = 'Metric Two:',
             choices = NULL,
             selected = NULL,
             width = '100%',
             multiple = FALSE
           ),
           
-          # Format search y button
-          tags$head(tags$style(
-            HTML(
-              '
-                .selectize-input {
-                  word-wrap: break-word;
-                  word-break: break-word;
-                  max-width: 100%; 
-                    overflow: hidden; 
-                    text-overflow: ellipsis; 
-                    white-space: nowrap; 
-                }
-                
-                .selectize-dropdown {
-                  word-wrap: break-word;
-                  word-break: break-word;
-                  max-width: 100px !important; 
-                    overflow: hidden; 
-                    text-overflow: ellipsis; 
-                }
-              '
-            )
-          )),
+          ## Format search y button
+          # tags$head(tags$style(
+          #   HTML(
+          #     '
+          #       .selectize-input {
+          #         word-wrap: break-word;
+          #         word-break: break-word;
+          #         max-width: 100%; 
+          #           overflow: hidden; 
+          #           text-overflow: ellipsis; 
+          #           white-space: nowrap; 
+          #       }
+          #       
+          #       .selectize-dropdown {
+          #         word-wrap: break-word;
+          #         word-break: break-word;
+          #         max-width: 100px !important; 
+          #           overflow: hidden; 
+          #           text-overflow: ellipsis; 
+          #       }
+          #     '
+          #   )
+          # )),
           
           
           ### LOESS checkbox -----
           awesomeCheckbox(
             inputId = ns("loess"),
             label = "Add LOESS Curve", 
-            value = FALSE,
-            status = "primary"
+            value = FALSE
+            # status = "primary"
           ),
           
           
