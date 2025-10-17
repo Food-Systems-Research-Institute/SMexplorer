@@ -15,6 +15,7 @@
 #' @import shinyWidgets
 #' @import dplyr
 #' @import shinycssloaders
+#' @import stringr
 mod_map_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -50,6 +51,15 @@ mod_map_ui <- function(id) {
         h3('Select Metrics'),
 
         
+        # Select resolution -----
+        selectInput(
+          inputId = ns('resolution'),
+          label = 'Select resolution:',
+          choices = c('County', 'State'),
+          selected = NULL,
+          width = '100%'
+        ),
+        
         # Search metric -----
         selectizeInput(
           inputId = ns('metric'),
@@ -60,6 +70,7 @@ mod_map_ui <- function(id) {
           multiple = FALSE
         ),
         
+        # Select year -----
         selectInput(
           inputId = ns("year"),
           label = "Select Year:",
@@ -125,6 +136,19 @@ mod_map_server <- function(id, app_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
+    # Load module data ----
+    load('data/neast_county_metrics.rda')
+    load('data/neast_state_metrics.rda')
+    
+    load('data/neast_counties_2021.rda')
+    load('data/neast_counties_2024.rda')
+    
+    load('data/neast_county_spatial_2021.rda')
+    load('data/neast_county_spatial_2024.rda')
+    load('data/neast_state_spatial.rda')
+    
+    # load('data/neast_states.rda') # What is this
+    
     # Use pre-loaded data instead of loading here
     sm_data <- app_data$sm_data
     metric_options <- app_data$metric_options
@@ -139,15 +163,8 @@ mod_map_server <- function(id, app_data){
     # Render initial map -----
     output$map_plot <- renderLeaflet({
 
-      # Baseline data to make map (simplified)
-      init_data <- sm_data$ne_counties_2024 %>%
-        left_join(sm_data$fips_key, by = 'fips')
-
-      # Simplified popup for faster rendering
-      custom_popup <- ~paste0("<b>", county_name, "</b>")
-
       # Initial Map -----
-      leaflet(init_data) %>%
+      leaflet(neast_county_spatial_2024) %>%
         addProviderTiles(
           providers$OpenStreetMap.Mapnik,
           group = 'OpenStreetMap.Mapnik'
@@ -174,7 +191,7 @@ mod_map_server <- function(id, app_data){
           ),
           popup = custom_popup,
           popupOptions = popupOptions(closeButton = FALSE),
-          label = ~county_name,
+          label = ~name,
           group = 'Counties'
         ) %>%
         addLayersControl(
@@ -193,10 +210,10 @@ mod_map_server <- function(id, app_data){
     # Update year field -----
     observeEvent(input$metric, {
       req(input$metric)
-      year_options <- sm_data$metadata %>%
+      year_options <- metadata %>%
         dplyr::filter(metric == input$metric) %>% 
-        pull(year) %>% 
-        str_split_1(', ') %>% 
+        dplyr::pull(year) %>% 
+        stringr::str_split_1(', ') %>% 
         sort(decreasing = TRUE)
 
       updateSelectInput(
@@ -212,24 +229,22 @@ mod_map_server <- function(id, app_data){
     show_metric_info <- reactiveVal(FALSE)
     observeEvent(input$show_metric_info, {
       
+      # What does this even do
       show_metric_info(!show_metric_info())
       
       if (show_metric_info()) {
         output$metric_info <- renderUI({
           req(input$metric, input$year)
           
-          meta <- sm_data$metadata %>% 
-            filter(metric == input$metric) %>% 
-            mutate(across(
-              c(metric, dimension, index, indicator, resolution), 
-              ~ str_to_sentence(.x)
-            ))
+          meta <- app_data$metadata %>% 
+            filter(metric == input$metric)
           
           div(
             class = 'button-box',
             style = 'background-color: #fff !important;',
+            tags$h4('Metric:', input$metric),
             HTML(
-              '<h4><b>Metric: </b>', input$metric, '</h4>',
+              # '<h4><b>Metric: </b>', input$metric, '</h4>',
               '<p><b>Definition:</b> ', meta$definition, '<br>',
               '<b>Dimension:</b> ', meta$dimension, '<br>',
               '<b>Index:</b> ', meta$index, '<br>',
@@ -257,44 +272,39 @@ mod_map_server <- function(id, app_data){
       req(input$metric, input$year)
 
       # Get corresponding variable_name
-      chosen_variable <- sm_data$metadata %>% 
+      # TODO: Could just use smaller lookup table here if indeed we need it
+      chosen_variable <- app_data$metadata %>% 
         filter(metric == input$metric) %>% 
         pull(variable_name)
       
-      # Filter dataset based on user choices
-      # Also join to metadata to get axis names and metric names
-      updated_dat <- sm_data$metrics %>% 
-        dplyr::filter(
-          variable_name == chosen_variable,
-          year == input$year
-        ) %>% 
-        mutate(value = as.numeric(value)) %>% 
-        left_join(select(sm_data$metadata, -year), by = 'variable_name')
-      
-      # Get resolution of metric
-      res <- sm_data$metadata %>% 
-        filter(variable_name == chosen_variable) %>% 
-        pull(resolution)
-      
       # Join with counties or states depending on resolution
-      # Also choose county map depending on year (CT Discrancies)
-      if (res == 'county') {
+      # Also choose county map depending on year (CT discrepancies)
+      if (input$resolution == 'County') {
+        # Ideally would join starting with sf object. Rethink this at some point
+        updated_metrics <- neast_county_metrics %>% 
+            dplyr::filter(
+              variable_name == chosen_variable,
+              year == input$year
+            )
         if (input$year >= 2023) {
-          updated_dat <- updated_dat %>%
-            dplyr::right_join(sm_data$ne_counties_2024, by = 'fips')
+          updated_metrics <- updated_metrics %>% 
+            dplyr::right_join(neast_county_spatial_2024, by = 'fips')
         } else if (input$year <= 2022) {
-          updated_dat <- updated_dat %>%
-            dplyr::right_join(sm_data$ne_counties_2021, by = 'fips')
+          updated_metrics <- updated_metrics %>% 
+            dplyr::right_join(neast_county_spatial_2021, by = 'fips')
         }
-      } else if (res == 'state') {
-        updated_dat <- updated_dat %>% 
-          dplyr::right_join(sm_data$ne_states_2024, by = 'fips')
+      } else if (input$resolution == 'State') {
+        # Join, starting with spatial to keep it as sf object
+        updated_metrics <- neast_state_spatial %>% 
+          left_join(
+            neast_state_metrics %>% 
+            dplyr::filter(
+              variable_name == chosen_variable,
+              year == input$year
+            )
+          )
       }
-      
-      # Add county name
-      updated_dat <- updated_dat %>% 
-        left_join(sm_data$fips_key, by = 'fips')
-      
+     
       # Popups and palette
       custom_popup <- function(county_name,
                                state_name,
@@ -309,20 +319,24 @@ mod_map_server <- function(id, app_data){
           "<strong>", variable_name, ":</strong> ", round(value, 2)
         )
       }
+      browser()
       pal <- colorNumeric(
         palette = "YlGn",
-        domain = updated_dat$value,
+        domain = updated_metrics$value,
         reverse = FALSE
       )
       
       # Make sure updated_dat is an sf object after joins
-      updated_dat <- st_as_sf(updated_dat)
+      if (!'sf' %in% class(updated_metrics)) {
+        updated_metrics <- st_as_sf(updated_metrics)
+      }
 
       
       # LeafletProxy -----
+      browser()
       leafletProxy(
         ns("map_plot"), 
-        data = updated_dat
+        data = updated_metrics
       ) %>%
         clearGroup('Counties') %>%
         addPolygons(
@@ -331,7 +345,7 @@ mod_map_server <- function(id, app_data){
           smoothFactor = 0.5,
           opacity = 1.0, 
           fillOpacity = 0.8,
-          fillColor = ~pal(updated_dat$value),
+          fillColor = ~pal(updated_metrics$value),
           highlightOptions = highlightOptions(
             color = "white",
             weight = 2,
