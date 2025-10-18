@@ -12,6 +12,8 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     dashboardPage(
       skin = 'green',
+      
+      # Header ---------------------------------------------------------------
       shinydashboardPlus::dashboardHeader(
         title = "SM Explorer",
         rightUi = tags$li(
@@ -40,39 +42,40 @@ app_ui <- function(request) {
 
       # Sidebar -----------------------------------------------------------
       dashboardSidebar(
+        width = '175px',
         
         sidebarMenu(
           id = 'tabs',
           
           ## map_tab -----
           menuItem("Interactive Map", tabName = "map_tab", icon = icon("map")),
-          conditionalPanel(
-            condition = "input.tabs == 'map_tab'",
-            div(
-              class = 'sidebar-conditional-text',
-              tags$p(
-                "Use the input panel on the right to choose a metric by either
-                searching or using the dropdown. Push the 'Update Map' button to
-                view a metric."
-              )
-            )
-          ),
+          # conditionalPanel(
+          #   condition = "input.tabs == 'map_tab'",
+          #   div(
+          #     class = 'sidebar-conditional-text',
+          #     tags$p(
+          #       "Use the input panel on the right to choose a metric by either
+          #       searching or using the dropdown. Push the 'Update Map' button to
+          #       view a metric."
+          #     )
+          #   )
+          # ),
           
           ## graph_tab -----
           menuItem("Metric Comparisons", tabName = "graph_tab", icon = icon("chart-simple")),
-          conditionalPanel(
-            condition = "input.tabs == 'graph_tab'",
-            div(
-              style = "text-align: center; width: 100%; white-space: normal; 
-                overflow-wrap: break-word; padding: 10px",
-              HTML(
-                "<p>Use the input panel on the right to choose two sustainability
-                metrics to compare. Once the graph is created, you can hover 
-                over points to see values by county. You can also click on a 
-                point to see more information on taht county in a new box</p>"
-              )
-            )
-          ),
+          # conditionalPanel(
+          #   condition = "input.tabs == 'graph_tab'",
+          #   div(
+          #     style = "text-align: center; width: 100%; white-space: normal; 
+          #       overflow-wrap: break-word; padding: 10px",
+          #     HTML(
+          #       "<p>Use the input panel on the right to choose two sustainability
+          #       metrics to compare. Once the graph is created, you can hover 
+          #       over points to see values by county. You can also click on a 
+          #       point to see more information on taht county in a new box</p>"
+          #     )
+          #   )
+          # ),
           
           ## tree_tab -----
           # This was a janky data visualization. Not sure if worth resurrecting
@@ -91,28 +94,27 @@ app_ui <- function(request) {
           # ),
           
           ## table_tab -----
-          menuItem("Data Sources", tabName = "table_tab", icon = icon("table")),
-          conditionalPanel(
-            condition = "input.tabs == 'table_tab'",
-            div(
-              style = "text-align: center; width: 100%; white-space: normal; 
-                overflow-wrap: break-word; padding: 10px",
-              HTML(
-                "<p>Explore metrics using this interactive table. You can 
-                search by column or across all columns, reorder columns, and 
-                scroll through pages.</p>
-                <p>You can also hit the arrow on the left side of each row to 
-                see more details, including a URL to the source of the data.</p>"
-              )
-            )
-          )
+          menuItem("Data Sources", tabName = "table_tab", icon = icon("table"))
+          # conditionalPanel(
+          #   condition = "input.tabs == 'table_tab'",
+          #   div(
+          #     style = "text-align: center; width: 100%; white-space: normal; 
+          #       overflow-wrap: break-word; padding: 10px",
+          #     HTML(
+          #       "<p>Explore metrics using this interactive table. You can 
+          #       search by column or across all columns, reorder columns, and 
+          #       scroll through pages.</p>
+          #       <p>You can also hit the arrow on the left side of each row to 
+          #       see more details, including a URL to the source of the data.</p>"
+          #     )
+          #   )
+          # )
+          
         )
       ),
       
       # Body ---------------------------------------------------------------
       dashboardBody(
-        # Formatting from my_theme.R CSS
-        # my_theme,
         tabItems(
           tabItem(
             tabName = 'map_tab',

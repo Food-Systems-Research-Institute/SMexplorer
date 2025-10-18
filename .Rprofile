@@ -19,6 +19,3 @@ try(
       SMexplorer::run_app()
     }
 )
-
-# To help remember
-theme_green <- '#154734'

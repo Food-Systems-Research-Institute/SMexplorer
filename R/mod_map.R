@@ -23,11 +23,7 @@ mod_map_ui <- function(id) {
     div(
       id = 'map_container',
       
-      # Leaflet output -----
-      withSpinner(
-        type = 6,
-        color = '#154734',
-        caption = HTML('Loading Map...'),
+      with_spinner(
         leafletOutput(ns('map_plot'), height = '90vh', width = '100%')
       ),
       
@@ -51,33 +47,61 @@ mod_map_ui <- function(id) {
         h3('Select Metrics'),
 
         
-        # Select resolution -----
-        selectInput(
-          inputId = ns('resolution'),
-          label = 'Select resolution:',
-          choices = c('County', 'State'),
-          selected = NULL,
-          width = '100%'
+        div(
+          class = 'button-box',
+          
+          # Top row
+          fluidRow(
+            column(
+              width = 6,
+              # Select resolution -----
+              selectInput(
+                inputId = ns('resolution'),
+                label = 'Select resolution:',
+                choices = c('County', 'State'),
+                selected = 'County'
+              )
+            ),
+            column(
+              width = 6,
+              # Select dimension -----
+              selectInput(
+                inputId = ns('dimension'),
+                label = 'Select dimension:',
+                choices = c('Economics', 'Environment', 'Production', 'Health', 'Social'),
+                selected = 'Economics'
+              )
+            )
+          ), # end top row
+          
+          # Bottom row
+          fluidRow(
+            column(
+              width = 6,
+              # Select metric -----
+              selectizeInput(
+                inputId = ns('metric'),
+                label = 'Select metric:',
+                choices = NULL,
+                selected = NULL,
+                width = '100%'
+              )
+            ),
+            column(
+              width = 6,
+              # Select year -----
+              selectInput(
+                inputId = ns("year"),
+                label = "Select year:",
+                choices = NULL,
+                selected = NULL,
+                width = '100%'
+              )
+            )
+          )
         ),
         
-        # Select metric -----
-        selectizeInput(
-          inputId = ns('metric'),
-          label = 'Select Metric:',
-          choices = NULL,
-          selected = NULL,
-          width = '100%',
-          multiple = FALSE
-        ),
         
-        # Select year -----
-        selectInput(
-          inputId = ns("year"),
-          label = "Select Year:",
-          choices = NULL,
-          selected = NULL,
-          width = '100%'
-        ),
         
         # Metric info and full screen buttons
         fluidRow(
@@ -132,35 +156,33 @@ mod_map_ui <- function(id) {
 #' @param app_data Pre-loaded application data from load_app_data()
 #'
 #' @noRd
-mod_map_server <- function(id, app_data){
+mod_map_server <- function(id, app_data, parent_input){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    # Load module data ----
-    load('data/neast_county_metrics.rda')
-    load('data/neast_state_metrics.rda')
-    
-    load('data/neast_counties_2021.rda')
-    load('data/neast_counties_2024.rda')
-    
-    load('data/neast_county_spatial_2021.rda')
-    load('data/neast_county_spatial_2024.rda')
-    load('data/neast_state_spatial.rda')
-    
-    load('data/metadata.rda')
-    
-    # load('data/neast_states.rda') # What is this
-    
-    # Use pre-loaded data instead of loading here
-    sm_data <- app_data$sm_data
-    metric_options <- app_data$metric_options
+    # Load module data lazily when map tab is active ----
+    map_data_loaded <- reactiveVal(FALSE)
 
-    # Metric Dropdown -----
-    updateSelectizeInput(
-      session,
-      'metric',
-      choices = metric_options
-    )
+    observe({
+      req(parent_input$tabs == "map_tab")
+
+      # Only load once
+      if (!map_data_loaded()) {
+        load('data/neast_county_metrics.rda', envir = parent.frame())
+        load('data/neast_state_metrics.rda', envir = parent.frame())
+
+        load('data/neast_counties_2021.rda', envir = parent.frame())
+        load('data/neast_counties_2024.rda', envir = parent.frame())
+
+        load('data/neast_county_spatial_2021.rda', envir = parent.frame())
+        load('data/neast_county_spatial_2024.rda', envir = parent.frame())
+        load('data/neast_state_spatial.rda', envir = parent.frame())
+
+        load('data/metadata.rda', envir = parent.frame())
+
+        map_data_loaded(TRUE)
+      }
+    })
 
     # Render initial map -----
     output$map_plot <- renderLeaflet({
@@ -218,16 +240,17 @@ mod_map_server <- function(id, app_data){
     # Update metric field -----
     # Based on resolution input
     observeEvent(input$resolution, {
-      req(input$resolution)
+      req(input$resolution, input$dimension)
       metric_options <- metadata %>%
         dplyr::filter(stringr::str_detect(Resolution, input$resolution)) %>% 
         dplyr::pull(Metric) %>% 
         sort()
 
-      updateSelectInput(
+      updateSelectizeInput(
         session,
         "metric",
-        choices = metric_options
+        choices = c('', metric_options),
+        server = TRUE
       )
     })
     
@@ -238,9 +261,8 @@ mod_map_server <- function(id, app_data){
       req(input$metric)
       year_options <- metadata %>%
         dplyr::filter(Metric == input$metric) %>% 
-        dplyr::pull(Year) %>% 
-        stringr::str_split_1(', ') %>% 
-        sort(decreasing = TRUE)
+        dplyr::pull(`Year Vector`) %>% 
+        unlist()
 
       updateSelectInput(
         session,
@@ -269,14 +291,14 @@ mod_map_server <- function(id, app_data){
           div(
             class = 'button-box',
             style = 'background-color: #fff !important;',
-            tags$h4('Metric:', input$metric),
+            tags$p(tags$strong('Metric:'), meta$Metric), tags$br(),
             tags$p(tags$strong('Definition:'), meta$Definition), tags$br(),
             tags$p(tags$strong('Units:'), meta$Units), tags$br(),
             tags$p(tags$strong('Dimension:'), meta$Dimension), tags$br(),
-            tags$p(tags$strong('Index:'), meta$Index), tags$br(),
+            # tags$p(tags$strong('Index:'), meta$Index), tags$br(),
             tags$p(tags$strong('Indicator:'), meta$Indicator), tags$br(),
             tags$p(tags$strong('Resolution:'), meta$Resolution), tags$br(),
-            tags$p(tags$strong('Updates:'), meta$Updates), tags$br(),
+            # tags$p(tags$strong('Updates:'), meta$Updates), tags$br(),
             tags$p(tags$strong('Source:'), tags$a(meta$Source)), tags$br(),
             tags$p(tags$strong('Citation:'), meta$Citation), tags$br()
           )

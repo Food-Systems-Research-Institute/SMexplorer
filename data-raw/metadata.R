@@ -1,8 +1,13 @@
 pacman::p_load(
   dplyr,
-  snakecase
+  snakecase,
+  stringr,
+  purrr
 )
-pacman::p_load_current_gh('Food-Systems-Research-Institute/SMdata')
+pacman::p_load_current_gh(
+ 'Food-Systems-Research-Institute/SMdata',
+ 'ChrisDonovan307/projecter'
+)
 
 metadata <- SMdata::metadata %>% 
   mutate(across(
@@ -36,5 +41,12 @@ metadata <- metadata %>%
   )
 get_str(metadata)
 
-usethis::use_data(metadata, overwrite = TRUE)
+# New column with years as a vector, so we don't have to split by comma later
+metadata <- metadata %>% 
+  mutate(`Year Vector` = str_split(Year, ', ') %>% 
+           map(as.integer) %>% 
+           map(~ sort(.x, decreasing = TRUE)))
+get_str(metadata)
 
+# Save
+usethis::use_data(metadata, overwrite = TRUE)

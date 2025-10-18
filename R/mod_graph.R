@@ -51,115 +51,58 @@ mod_graph_ui <- function(id) {
           solidHeader = TRUE,
           collapsible = TRUE,
           
-          ### Choose Scale -----
+          ### Choose Resolution -----
           selectInput(
-            inputId = ns('choose_scale'),
-            label = 'Choose a Resolution:',
+            inputId = ns('select_resolution'),
+            label = 'Choose resolution:',
             choices = c('County', 'State'),
-            selected = 'County',
-            width = '100%',
-            multiple = FALSE
+            selected = NULL,
+            width = '100%'
           ),
           
           ### Search X -----
           selectizeInput(
             inputId = ns('search_x'),
-            label = 'Metric One:',
+            label = 'Metric one:',
             choices = NULL,
             selected = NULL,
-            width = '100%',
-            multiple = FALSE
+            width = '100%'
           ),
-          
-          ## Was there ever a search_x button?
-          # format search x button
-          # tags$head(
-          #   tags$style(
-          #     HTML(
-          #       '
-          #       .selectize-input {
-          #         word-wrap: break-word;
-          #         word-break: break-word;
-          #         max-width: 100%; 
-          #           overflow: hidden; 
-          #           text-overflow: ellipsis; 
-          #           white-space: nowrap; 
-          #       }
-          #       
-          #       .selectize-dropdown {
-          #         word-wrap: break-word;
-          #         word-break: break-word;
-          #         max-width: 100px !important; 
-          #           overflow: hidden; 
-          #           text-overflow: ellipsis; 
-          #       }
-          #       '
-          #     )
-          #   )
-          # ),
+         
           
           ### Search Y -----
           selectizeInput(
             inputId = ns('search_y'),
-            label = 'Metric Two:',
+            label = 'Metric two:',
             choices = NULL,
             selected = NULL,
-            width = '100%',
-            multiple = FALSE
+            width = '100%'
           ),
           
-          ## Format search y button
-          # tags$head(tags$style(
-          #   HTML(
-          #     '
-          #       .selectize-input {
-          #         word-wrap: break-word;
-          #         word-break: break-word;
-          #         max-width: 100%; 
-          #           overflow: hidden; 
-          #           text-overflow: ellipsis; 
-          #           white-space: nowrap; 
-          #       }
-          #       
-          #       .selectize-dropdown {
-          #         word-wrap: break-word;
-          #         word-break: break-word;
-          #         max-width: 100px !important; 
-          #           overflow: hidden; 
-          #           text-overflow: ellipsis; 
-          #       }
-          #     '
-          #   )
-          # )),
-          
-          
-          ### LOESS checkbox -----
-          awesomeCheckbox(
-            inputId = ns("loess"),
-            label = "Add LOESS Curve", 
-            value = FALSE
-            # status = "primary"
+
+          conditionalPanel(
+            condition = "input.select_resolution == 'County'",
+            ns = ns,
+            ### Cor checkbox -----
+            awesomeCheckbox(
+              inputId = ns("cor_check"),
+              label = "Add correlation",
+              value = FALSE
+            ),
+            ### LOESS checkbox -----
+            awesomeCheckbox(
+              inputId = ns("loess"),
+              label = "Add LOESS curve",
+              value = FALSE
+            )
           ),
           
-          
-          ### Correlation checkbox -----
-          awesomeCheckbox(
-            inputId = ns("cor_check"),
-            label = "Add Correlation", 
-            value = FALSE,
-            status = "primary"
-          ),
-          
-          tags$style(HTML(paste0(
-            "#", ns("cor_check"), " { ",
-            "background-color: #154734 !important; ",
-            "color: white !important; ",
-            "width: 50%; ",
-            "margin-left: auto; ",
-            "margin-right: auto; ",
-            "display: block; ",
-            "} "
-          )))
+          actionBttn(
+            ns('update_graph'),
+            'Compare Metrics',
+            style = 'unite',
+            icon = icon('arrows-rotate')
+          )
           
         ), # End select metrics box
         
@@ -173,48 +116,63 @@ mod_graph_ui <- function(id) {
 #' graph Server Functions
 #'
 #' @noRd 
-mod_graph_server <- function(id){
+mod_graph_server <- function(id, parent_input){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-    
-     # Load data -----
-    load('data/sm_data.rda')
-    
-    
+
+    # Lazy loading -----
+    graph_data_loaded <- reactiveVal(FALSE)
+
+    observe({
+      req(parent_input$tabs == "graph_tab")
+
+      # Only load once
+      if (!graph_data_loaded()) {
+        load('data/sm_data.rda', envir = parent.frame())
+        load('data/neast_county_metrics.rda', envir = parent.frame())
+        load('data/neast_state_metrics.rda', envir = parent.frame())
+        graph_data_loaded(TRUE)
+      }
+    })
+
+
     # Metric options -----
     observe({
-      chosen_scale <- tolower(input$choose_scale)
+      req(input$select_resolution)
       
+      chosen_resolution <- tolower(input$select_resolution)
       metric_options <- sm_data$metrics %>%
         inner_join(sm_data$metadata, by = 'variable_name') %>%
-        filter(resolution == chosen_scale) %>%
+        filter(resolution == chosen_resolution) %>%
         pull(metric) %>%
         unique() %>%
         sort()
       
-      # Reorder metrics, put NAICS last
-      metric_options <- c(
-        sort(metric_options[!grepl("NAICS", metric_options)]),
-        sort(metric_options[!grepl("NAICS", metric_options)]),
-        sort(metric_options[grepl("NAICS", metric_options)])
-      )
+      # # Reorder metrics, put NAICS last
+      # metric_options <- c(
+      #   sort(metric_options[!grepl("NAICS", metric_options)]),
+      #   sort(metric_options[!grepl("NAICS", metric_options)]),
+      #   sort(metric_options[grepl("NAICS", metric_options)])
+      # )
         
       # Update search fields
       updateSelectizeInput(
         session, 
         'search_x', 
-        choices = metric_options,
-        selected = character(0)
+        choices = c('', metric_options),
+        selected = NULL,
+        server = TRUE
       )
       updateSelectizeInput(
         session, 
         'search_y', 
-        choices = metric_options,
-        selected = character(0)
+        choices = c('', metric_options),
+        selected = NULL,
+        server = TRUE
       )
     })
-    
-    
+
+
     # Filter Data -----
     rval_data <- reactive({
       req(input$search_x, input$search_y)
@@ -318,7 +276,7 @@ mod_graph_server <- function(id){
     })
     
     
-    # Plotly -----
+    # Plotly Graph -----
     output$graph <- renderPlotly({
       if (input$search_x == "" || input$search_y == "") {
         # Empty plot if no variables selected
@@ -339,7 +297,8 @@ mod_graph_server <- function(id){
               showline = TRUE,
               range = c(0, 10)
             )
-          )
+          ) %>% 
+          event_register('plotly_click')
       } else {
 
         # Get the filtered data and variables from the reactive function
@@ -350,18 +309,28 @@ mod_graph_server <- function(id){
         # Generate x and y labels
         x_label <- snakecase::to_title_case(xvar)
         y_label <- snakecase::to_title_case(yvar)
-        
+
         # Create the ggplot
         plot <- plot_dat %>%
           ggplot(aes(
-            x = !!sym(xvar), 
+            x = !!sym(xvar),
             y = !!sym(yvar),
             color = state_name,
             key = county_name,
-            text = paste0(
-              '<b>', county_name, ', ', state_name, '</b>\n',
-              x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
-              y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
+            # Popup - this sucks but it works. Can't use function because we 
+            # need to call it within aes()
+            text = ifelse(
+              !is.na(county_name),
+              paste0(
+                '<b>', county_name, ', ', state_name, '</b>\n',
+                x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
+                y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
+              ),
+              paste0(
+                '<b>', state_name, '</b>\n',
+                x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
+                y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
+              )
             )
           )) +
           geom_point(size = 1.5, alpha = 0.7) +
@@ -470,9 +439,7 @@ mod_graph_server <- function(id){
         status = 'primary',
         solidHeader = TRUE,
         collapsible = TRUE,
-        
         htmlOutput(ns('metric_info'))
-        
       )
     })
     
@@ -481,7 +448,7 @@ mod_graph_server <- function(id){
       
       # If no inputs, display message saying to select metric
       if (input$search_x == '' && input$search_y == '') {
-        HTML('<p>Select metrics above to see details.</p>')
+        tags$p('Select metrics above to see details.')
         
       # Else if one or both are selected, display info
       } else if (input$search_x != '' || input$search_y != '') {
@@ -493,7 +460,7 @@ mod_graph_server <- function(id){
         if (input$search_x != '') {
           meta_x <- sm_data$metadata %>% 
             filter(metric == input$search_x)
-          html_output_x <- paste0(
+          html_output <- paste0(
             html_output,
             '<h4>X-Axis: ', input$search_x, '</h4>',
             '<p><b>Definition:</b> ', meta_x$definition, '<br>',
@@ -511,7 +478,7 @@ mod_graph_server <- function(id){
         if (input$search_y != '') {
           meta_y <- sm_data$metadata %>% 
             filter(metric == input$search_y)
-          html_output_y <- paste0(
+          html_output <- paste0(
             html_output,
             '<br>',
             '<h4>Y-Axis: ', input$search_y, '</h4>',
@@ -544,7 +511,12 @@ mod_graph_server <- function(id){
     
     # Output cor_box -----
     output$cor_box <- renderUI({
-      req(input$cor_check == TRUE, input$search_x, input$search_y)
+      req(
+        input$cor_check == TRUE, 
+        input$search_x, 
+        input$search_y,
+        input$select_resolution
+      )
       
       box(
         title = 'Pearson Correlation',
@@ -568,6 +540,7 @@ mod_graph_server <- function(id){
             }"
           ))
         )
+        
       )
     })
     
