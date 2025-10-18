@@ -41,11 +41,11 @@ mod_map_ui <- function(id) {
         left = "auto",
         right = 20, # 5px within map
         bottom = "auto",
-        width = 400,
+        width = 500,
         height = "auto",
         
         style = "z-index: 5001; background-color: rgba(255,255,255,0.8);
-          padding: 15px; border-radius: 8px; max-width: 300; 
+          padding: 15px; border-radius: 8px; max-width: 500; 
           box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",        
         
         h3('Select Metrics'),
@@ -60,7 +60,7 @@ mod_map_ui <- function(id) {
           width = '100%'
         ),
         
-        # Search metric -----
+        # Select metric -----
         selectizeInput(
           inputId = ns('metric'),
           label = 'Select Metric:',
@@ -147,6 +147,8 @@ mod_map_server <- function(id, app_data){
     load('data/neast_county_spatial_2024.rda')
     load('data/neast_state_spatial.rda')
     
+    load('data/metadata.rda')
+    
     # load('data/neast_states.rda') # What is this
     
     # Use pre-loaded data instead of loading here
@@ -191,7 +193,7 @@ mod_map_server <- function(id, app_data){
           ),
           popup = custom_popup,
           popupOptions = popupOptions(closeButton = FALSE),
-          label = ~name,
+          label = ~county_name,
           group = 'Counties'
         ) %>%
         addLayersControl(
@@ -203,16 +205,40 @@ mod_map_server <- function(id, app_data){
           overlayGroups = c('Counties'),
           options = layersControlOptions(collapsed = TRUE),
           position = 'topleft'
+        ) %>% 
+        # leaflet.extras::addResetMapButton() %>% 
+        # Default view to Gulf of Maine, puts map on left, panel on right
+        leaflet::setView(
+          lng = -67.44604,
+          lat = 42.58503,
+          zoom = 6
         )
     })
     
+    # Update metric field -----
+    # Based on resolution input
+    observeEvent(input$resolution, {
+      req(input$resolution)
+      metric_options <- metadata %>%
+        dplyr::filter(stringr::str_detect(Resolution, input$resolution)) %>% 
+        dplyr::pull(Metric) %>% 
+        sort()
+
+      updateSelectInput(
+        session,
+        "metric",
+        choices = metric_options
+      )
+    })
     
     # Update year field -----
+    # Based on metric input
+    # TODO: avoid this str split here. get years better
     observeEvent(input$metric, {
       req(input$metric)
       year_options <- metadata %>%
-        dplyr::filter(metric == input$metric) %>% 
-        dplyr::pull(year) %>% 
+        dplyr::filter(Metric == input$metric) %>% 
+        dplyr::pull(Year) %>% 
         stringr::str_split_1(', ') %>% 
         sort(decreasing = TRUE)
 
@@ -227,6 +253,7 @@ mod_map_server <- function(id, app_data){
     # Metric Info -----
     # Show Metric Button -----
     show_metric_info <- reactiveVal(FALSE)
+    # TODO: Why is this an if else? Should it just appear on observeEvent?
     observeEvent(input$show_metric_info, {
       
       # What does this even do
@@ -236,24 +263,22 @@ mod_map_server <- function(id, app_data){
         output$metric_info <- renderUI({
           req(input$metric, input$year)
           
-          meta <- app_data$metadata %>% 
-            filter(metric == input$metric)
+          meta <- metadata %>% 
+            filter(Metric == input$metric)
           
           div(
             class = 'button-box',
             style = 'background-color: #fff !important;',
             tags$h4('Metric:', input$metric),
-            HTML(
-              # '<h4><b>Metric: </b>', input$metric, '</h4>',
-              '<p><b>Definition:</b> ', meta$definition, '<br>',
-              '<b>Dimension:</b> ', meta$dimension, '<br>',
-              '<b>Index:</b> ', meta$index, '<br>',
-              '<b>Indicator:</b> ', meta$indicator, '<br>',
-              '<b>Resolution:</b> ', meta$resolution, '<br>',
-              '<b>Updates:</b> ', meta$updates, '<br>',
-              '<b>Source: </b><a href="', meta$url, '">', meta$source, '</a><br>',
-              '<b>Citation:</b> ', meta$citation, '</p>'
-            )
+            tags$p(tags$strong('Definition:'), meta$Definition), tags$br(),
+            tags$p(tags$strong('Units:'), meta$Units), tags$br(),
+            tags$p(tags$strong('Dimension:'), meta$Dimension), tags$br(),
+            tags$p(tags$strong('Index:'), meta$Index), tags$br(),
+            tags$p(tags$strong('Indicator:'), meta$Indicator), tags$br(),
+            tags$p(tags$strong('Resolution:'), meta$Resolution), tags$br(),
+            tags$p(tags$strong('Updates:'), meta$Updates), tags$br(),
+            tags$p(tags$strong('Source:'), tags$a(meta$Source)), tags$br(),
+            tags$p(tags$strong('Citation:'), meta$Citation), tags$br()
           )
           
         })
@@ -273,9 +298,9 @@ mod_map_server <- function(id, app_data){
 
       # Get corresponding variable_name
       # TODO: Could just use smaller lookup table here if indeed we need it
-      chosen_variable <- app_data$metadata %>% 
-        filter(metric == input$metric) %>% 
-        pull(variable_name)
+      chosen_variable <- metadata %>% 
+        filter(Metric == input$metric) %>% 
+        pull('Variable Name')
       
       # Join with counties or states depending on resolution
       # Also choose county map depending on year (CT discrepancies)
@@ -319,7 +344,7 @@ mod_map_server <- function(id, app_data){
           "<strong>", variable_name, ":</strong> ", round(value, 2)
         )
       }
-      browser()
+      
       pal <- colorNumeric(
         palette = "YlGn",
         domain = updated_metrics$value,
@@ -333,7 +358,6 @@ mod_map_server <- function(id, app_data){
 
       
       # LeafletProxy -----
-      browser()
       leafletProxy(
         ns("map_plot"), 
         data = updated_metrics
@@ -361,7 +385,8 @@ mod_map_server <- function(id, app_data){
           "bottomleft",
           pal = pal,
           values = ~value,
-          title = ~axis_name[1],
+          # title = ~`Axis Name`[1], # Not working because we don't have it handy
+          title = 'Metric Values',
           labFormat = labelFormat(prefix = " "),
           # labFormat = labelFormat(prefix = "$"),
           opacity = 1

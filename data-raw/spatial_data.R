@@ -86,6 +86,23 @@ wrangled_layers <- imap(layers_simple, \(layer, name) {
 get_str(wrangled_layers)
 map(wrangled_layers, get_size)
 
+# Combine with fips key get put state_name into county files
+get_str(SMdata::fips_key)
+fips_key <- SMdata::fips_key %>% 
+  select(-state_code)
+wrangled_layers <- imap(wrangled_layers, ~ {
+  if (str_detect(.y, 'county')) {
+    .x %>% 
+      left_join(fips_key)
+  } else {
+    .x
+  }
+})
+get_str(wrangled_layers)
+
+
+# Save --------------------------------------------------------------------
+
 # Split list
 list2env(wrangled_layers, envir = .GlobalEnv)
 str(neast_county_spatial_2024)
