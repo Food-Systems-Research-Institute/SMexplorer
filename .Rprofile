@@ -7,7 +7,7 @@ options(
 source("renv/activate.R")
 
 # Shortcut to vim configuration
-# try(vim <- function() rstudiovim::rsvim_exec_file(rstudiovim::rsvim_default_path()))
+try(vim <- function() rstudiovim::rsvim_exec_file(rstudiovim::rsvim_default_path()))
 
 # Load package
 devtools::load_all()

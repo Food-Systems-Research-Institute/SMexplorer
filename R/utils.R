@@ -1,6 +1,6 @@
 #' With Spinner 
 #'
-#' @description A utils function
+#' @description Wrap a UI element in a formatted spinner
 #'
 #' @return The return value, if any, from executing the utility.
 #' @importFrom shiny tags

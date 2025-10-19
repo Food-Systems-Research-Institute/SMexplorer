@@ -159,11 +159,13 @@ mod_map_ui <- function(id) {
 mod_map_server <- function(id, app_data, parent_input){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-
+    
     # Load module data lazily when map tab is active ----
     map_data_loaded <- reactiveVal(FALSE)
+    initial_map <- reactiveVal(NULL)
 
     observe({
+      # Load map data when user goes to map tab
       req(parent_input$tabs == "map_tab")
 
       # Only load once
@@ -180,100 +182,121 @@ mod_map_server <- function(id, app_data, parent_input){
 
         load('data/metadata.rda', envir = parent.frame())
 
+        # Build initial map once data is loaded
+        initial_map(create_base_map(neast_county_spatial_2024))
+
+        # Set indicator to true so it doesn't happen again
         map_data_loaded(TRUE)
       }
     })
 
+    
     # Render initial map -----
     output$map_plot <- renderLeaflet({
-
-      # Initial Map -----
-      leaflet(neast_county_spatial_2024) %>%
-        addProviderTiles(
-          providers$OpenStreetMap.Mapnik,
-          group = 'OpenStreetMap.Mapnik'
-        ) %>%
-        addProviderTiles(
-          providers$USGS.USImagery,
-          group = 'USGS.USImagery'
-        ) %>%
-        addProviderTiles(
-          providers$CartoDB.Positron,
-          group = 'CartoDB.Positron'
-        ) %>%
-        addPolygons(
-          color = "black",
-          weight = 1,
-          smoothFactor = 0.8,
-          opacity = 0.7,
-          fillOpacity = 0.5,
-          fillColor = 'lightgray',
-          highlightOptions = highlightOptions(
-            color = "white",
-            weight = 2,
-            bringToFront = TRUE
-          ),
-          popup = custom_popup,
-          popupOptions = popupOptions(closeButton = FALSE),
-          label = ~county_name,
-          group = 'Counties'
-        ) %>%
-        addLayersControl(
-          baseGroups = c(
-            'CartoDB.Positron',
-            'OpenStreetMap.Mapnik',
-            'USGS.USImagery'
-          ),
-          overlayGroups = c('Counties'),
-          options = layersControlOptions(collapsed = TRUE),
-          position = 'topleft'
-        ) %>% 
-        # leaflet.extras::addResetMapButton() %>% 
-        # Default view to Gulf of Maine, puts map on left, panel on right
-        leaflet::setView(
-          lng = -67.44604,
-          lat = 42.58503,
-          zoom = 6
-        )
+      req(initial_map())
+      initial_map()
     })
-    
-    # Update metric field -----
-    # Based on resolution input
-    observeEvent(input$resolution, {
-      req(input$resolution, input$dimension)
-      metric_options <- metadata %>%
-        dplyr::filter(stringr::str_detect(Resolution, input$resolution)) %>% 
-        dplyr::pull(Metric) %>% 
-        sort()
 
+    
+    # Data filters -----
+    # Filter to metrics
+    available_metrics <- reactive({
+      req(input$resolution, input$dimension, map_data_loaded())
+      
+      metadata %>%
+        dplyr::filter(
+          stringr::str_detect(Resolution, input$resolution),
+          Dimension == input$dimension
+        ) %>%
+        dplyr::pull(Metric) %>%
+        sort()
+    }) %>% bindCache(input$resolution, input$dimension)
+
+    # Get years for metric
+    available_years <- reactive({
+      req(input$metric, map_data_loaded())
+
+      metadata %>%
+        dplyr::filter(Metric == input$metric) %>%
+        dplyr::pull(`Year Vector`) %>%
+        unlist()
+    }) %>% 
+      bindCache(input$metric)
+
+    # Get variable name
+    selected_variable <- reactive({
+      req(input$metric, map_data_loaded())
+      metadata %>%
+        dplyr::filter(Metric == input$metric) %>%
+        dplyr::pull(`Variable Name`)
+    }) %>% 
+      bindCache(input$metric)
+
+    # Get spatial base and join with metric data
+    map_data <- reactive({
+      req(
+        input$metric, 
+        input$year, 
+        input$resolution,
+        selected_variable(), 
+        map_data_loaded()
+      )
+
+      if (input$resolution == 'County') {
+        # Choose spatial base by year (CT county boundary changes)
+        spatial_base <- if (input$year >= 2023) {
+          neast_county_spatial_2024
+        } else {
+          neast_county_spatial_2021
+        }
+        # Join spatial base with metric data - retain sf class with left join
+        spatial_base %>%
+          dplyr::left_join(
+            neast_county_metrics %>%
+              dplyr::filter(
+                variable_name == selected_variable(),
+                year == input$year
+              ),
+            by = 'fips'
+          )
+      } else {
+        # State level
+        neast_state_spatial %>%
+          dplyr::left_join(
+            neast_state_metrics %>%
+              dplyr::filter(
+                variable_name == selected_variable(),
+                year == input$year
+              ),
+            by = 'fips'
+          )
+      }
+    }) %>% 
+      # Cache so we don't have to reload
+      bindCache(input$metric, input$year, input$resolution)
+
+    # Update dropdowns -----
+    # Update metric choices when resolution or dimension changes
+    observe({
       updateSelectizeInput(
         session,
         "metric",
-        choices = c('', metric_options),
+        choices = available_metrics(),
         server = TRUE
       )
     })
-    
-    # Update year field -----
-    # Based on metric input
-    # TODO: avoid this str split here. get years better
-    observeEvent(input$metric, {
-      req(input$metric)
-      year_options <- metadata %>%
-        dplyr::filter(Metric == input$metric) %>% 
-        dplyr::pull(`Year Vector`) %>% 
-        unlist()
 
+    # Update year choices when metric changes
+    observe({
       updateSelectInput(
         session,
         "year",
-        choices = year_options
+        choices = available_years()
       )
     })
     
     
     # Metric Info -----
-    # Show Metric Button -----
     show_metric_info <- reactiveVal(FALSE)
     # TODO: Why is this an if else? Should it just appear on observeEvent?
     observeEvent(input$show_metric_info, {
@@ -295,10 +318,8 @@ mod_map_server <- function(id, app_data, parent_input){
             tags$p(tags$strong('Definition:'), meta$Definition), tags$br(),
             tags$p(tags$strong('Units:'), meta$Units), tags$br(),
             tags$p(tags$strong('Dimension:'), meta$Dimension), tags$br(),
-            # tags$p(tags$strong('Index:'), meta$Index), tags$br(),
             tags$p(tags$strong('Indicator:'), meta$Indicator), tags$br(),
             tags$p(tags$strong('Resolution:'), meta$Resolution), tags$br(),
-            # tags$p(tags$strong('Updates:'), meta$Updates), tags$br(),
             tags$p(tags$strong('Source:'), tags$a(meta$Source)), tags$br(),
             tags$p(tags$strong('Citation:'), meta$Citation), tags$br()
           )
@@ -314,103 +335,75 @@ mod_map_server <- function(id, app_data, parent_input){
     })
     
     
-    # Update Map (Prep) -----
+    # Update Map -----
     observeEvent(input$update_map, {
-      req(input$metric, input$year)
+      req(map_data())
 
-      # Get corresponding variable_name
-      # TODO: Could just use smaller lookup table here if indeed we need it
-      chosen_variable <- metadata %>% 
-        filter(Metric == input$metric) %>% 
-        pull('Variable Name')
-      
-      # Join with counties or states depending on resolution
-      # Also choose county map depending on year (CT discrepancies)
-      if (input$resolution == 'County') {
-        # Ideally would join starting with sf object. Rethink this at some point
-        updated_metrics <- neast_county_metrics %>% 
-            dplyr::filter(
-              variable_name == chosen_variable,
-              year == input$year
-            )
-        if (input$year >= 2023) {
-          updated_metrics <- updated_metrics %>% 
-            dplyr::right_join(neast_county_spatial_2024, by = 'fips')
-        } else if (input$year <= 2022) {
-          updated_metrics <- updated_metrics %>% 
-            dplyr::right_join(neast_county_spatial_2021, by = 'fips')
-        }
-      } else if (input$resolution == 'State') {
-        # Join, starting with spatial to keep it as sf object
-        updated_metrics <- neast_state_spatial %>% 
-          left_join(
-            neast_state_metrics %>% 
-            dplyr::filter(
-              variable_name == chosen_variable,
-              year == input$year
-            )
-          )
-      }
-     
-      # Popups and palette
-      custom_popup <- function(county_name,
-                               state_name,
-                               variable_name,
-                               value) {
-        # If the metric is at state level, county_name will be NA
-        # In this case, use state name instead
-        area_name <- ifelse(is.na(county_name), state_name, county_name)
-        paste0(
-          "<div style='text-align: center;'>",
-          "<b>", area_name, "</b><br>",
-          "<strong>", variable_name, ":</strong> ", round(value, 2)
+      ## Data validation -----
+      # Make sure data has real values (not all NA)
+      validation <- validate_map_data(
+        data = map_data(),
+        metric_name = input$metric,
+        year = input$year,
+        resolution = input$resolution
+      )
+
+      # Show notification if there's a message
+      if (!is.null(validation$message)) {
+        showNotification(
+          HTML(validation$message),
+          type = validation$type,
+          duration = if (validation$type == "error") 8 else 5
         )
       }
-      
-      pal <- colorNumeric(
-        palette = "YlGn",
-        domain = updated_metrics$value,
-        reverse = FALSE
-      )
-      
-      # Make sure updated_dat is an sf object after joins
-      if (!'sf' %in% class(updated_metrics)) {
-        updated_metrics <- st_as_sf(updated_metrics)
+
+      # Stop if validation failed
+      if (!validation$valid) {
+        return()
       }
 
+      # Create color palette
+      pal <- colorNumeric(
+        palette = "YlGn",
+        domain = map_data()$value,
+        reverse = FALSE
+      )
+
+      # Get popup and label formulas based on resolution
+      formulas <- get_map_formulas(input$resolution, input$metric)
+
       
-      # LeafletProxy -----
+      # Leaflet Proxy -----
       leafletProxy(
-        ns("map_plot"), 
-        data = updated_metrics
+        ns("map_plot"),
+        data = map_data()
       ) %>%
         clearGroup('Counties') %>%
+        clearGroup('States') %>%
         addPolygons(
           color = "black",
-          weight = 1, 
+          weight = 1,
           smoothFactor = 0.5,
-          opacity = 1.0, 
+          opacity = 1.0,
           fillOpacity = 0.8,
-          fillColor = ~pal(updated_metrics$value),
+          fillColor = ~pal(value),
           highlightOptions = highlightOptions(
             color = "white",
             weight = 2,
             bringToFront = TRUE
           ),
-          popup = ~custom_popup(county_name, state_name, variable_name, value),
+          label = formulas$label,
+          popup = formulas$popup,
           popupOptions = popupOptions(closeButton = FALSE),
-          label = ~county_name,
-          group = 'Counties'
-        ) %>% 
-        clearControls() %>% 
+          group = formulas$group
+        ) %>%
+        clearControls() %>%
         addLegend(
           "bottomleft",
           pal = pal,
           values = ~value,
-          # title = ~`Axis Name`[1], # Not working because we don't have it handy
-          title = 'Metric Values',
+          title = 'Values',
           labFormat = labelFormat(prefix = " "),
-          # labFormat = labelFormat(prefix = "$"),
           opacity = 1
         )
     })

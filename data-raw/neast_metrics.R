@@ -29,7 +29,7 @@ metrics <- map(metrics, ~ {
     filter(
       str_detect(
         variable_name, 
-        '^lq|NAICS', 
+        '^lq|NAICS|MeasuredIn|soilOrganicCarbon|nProducersAreaOperated.|availableWaterStorage', 
         negate = TRUE
       )
     )
@@ -37,14 +37,37 @@ metrics <- map(metrics, ~ {
 get_str(metrics, 3)
 map(metrics, get_size)
 
-# # Check
-# var_names <- map(metrics, ~ {
-#   .x$variable_name %>% 
-#     unique()
-# }) %>% 
-#   unlist() %>% 
-#   unique()
-# str(var_names)
+# Remove any metric that is all NA
+bad_vars <- map(metrics, \(df) {
+  vars <- unique(df$variable_name)
+  bad_vars <- map(vars, \(var) {
+    vec <- df %>% 
+      filter(variable_name == var) %>% 
+      pull(value)
+    if (all(is.na(vec))) {
+      return(var)
+    } else {
+      return(NULL)
+    }
+  }) %>% 
+    keep(is.character) %>% 
+    unlist()
+  return(bad_vars)
+}) 
+bad_vars <- bad_vars %>% unlist() %>% unique()
+bad_vars
+
+# Save these to also remove from metadata
+saveRDS(bad_vars, 'dev/bad_vars.rds')
+
+# Remove bad vars from metrics  
+metrics <- map(metrics, ~ {
+  clean_df <- .x %>% 
+    filter(!variable_name %in% bad_vars)
+  return(clean_df)
+})
+get_str(metrics, 3)
+map(metrics, get_size)
 
 list2env(metrics, envir = .GlobalEnv)
 
