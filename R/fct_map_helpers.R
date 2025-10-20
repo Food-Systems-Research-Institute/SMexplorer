@@ -39,7 +39,7 @@ create_base_map <- function(spatial_data, resolution = 'County') {
         'OpenStreetMap.Mapnik',
         'USGS.USImagery'
       ),
-      overlayGroups = 'Counties',
+      overlayGroups = 'Boundaries',
       options = leaflet::layersControlOptions(collapsed = TRUE),
       position = 'topleft'
     ) %>%
@@ -63,7 +63,8 @@ create_base_map <- function(spatial_data, resolution = 'County') {
       popup = initial_popup,
       popupOptions = leaflet::popupOptions(closeButton = FALSE),
       # label = label_col,
-      group = 'Counties'
+      # group = 'Counties'
+      group = 'Boundaries'
     )
 }
 
@@ -114,19 +115,15 @@ custom_popup <- function(county_name, state_name, variable_name, value, metric) 
 #'
 #' @examples
 get_map_formulas <- function(resolution, metric) {
-  # metric_label <- metric_lookup %>% 
-  #   filter(Metric == metric)
   if (resolution == 'County') {
     list(
       popup = ~custom_popup(county_name, state_name, variable_name, value, metric),
-      label = ~county_name,
-      group = 'Counties'
+      label = ~county_name
     )
   } else {
     list(
       popup = ~custom_popup(NA, state_name, variable_name, value, metric),
-      label = ~state_name,
-      group = 'States'
+      label = ~state_name
     )
   }
 }

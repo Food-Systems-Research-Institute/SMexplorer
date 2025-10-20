@@ -380,6 +380,7 @@ mod_map_server <- function(id, app_data, parent_input){
       ) %>%
         clearGroup('Counties') %>%
         clearGroup('States') %>%
+        clearGroup('Boundaries') %>%
         addPolygons(
           color = "black",
           weight = 1,
@@ -395,7 +396,7 @@ mod_map_server <- function(id, app_data, parent_input){
           label = formulas$label,
           popup = formulas$popup,
           popupOptions = popupOptions(closeButton = FALSE),
-          group = formulas$group
+          group = 'Boundaries'
         ) %>%
         clearControls() %>%
         addLegend(
