@@ -384,7 +384,7 @@ mod_map_server <- function(id, app_data, parent_input){
         addPolygons(
           color = "black",
           weight = 1,
-          smoothFactor = 0.5,
+          smoothFactor = 1.0,
           opacity = 1.0,
           fillOpacity = 0.8,
           fillColor = ~pal(value),

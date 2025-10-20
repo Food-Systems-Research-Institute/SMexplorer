@@ -51,19 +51,17 @@ create_base_map <- function(spatial_data, resolution = 'County') {
     leaflet::addPolygons(
       color = "black",
       weight = 1,
-      smoothFactor = 0.8,
+      smoothFactor = 1,
       opacity = 0.7,
       fillOpacity = 0.5,
       fillColor = 'lightgray',
       highlightOptions = leaflet::highlightOptions(
-        color = "white",
-        weight = 2,
+        color = color_palette[['theme_green']],
+        weight = 3,
         bringToFront = TRUE
       ),
       popup = initial_popup,
       popupOptions = leaflet::popupOptions(closeButton = FALSE),
-      # label = label_col,
-      # group = 'Counties'
       group = 'Boundaries'
     )
 }
