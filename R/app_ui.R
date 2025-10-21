@@ -47,6 +47,9 @@ app_ui <- function(request) {
         sidebarMenu(
           id = 'tabs',
           
+          ## welcome_tab -----
+          menuItem('Welcome Page', tabName = 'welcome_tab', icon = icon('house')),
+          
           ## map_tab -----
           menuItem("Interactive Map", tabName = "map_tab", icon = icon("map")),
           # conditionalPanel(
@@ -93,6 +96,9 @@ app_ui <- function(request) {
           #   )
           # ),
           
+          ## details_tab -----
+          menuItem("Details", tabName = "details_tab", icon = icon("circle-info")),
+          
           ## table_tab -----
           menuItem("Data Sources", tabName = "table_tab", icon = icon("table"))
           # conditionalPanel(
@@ -109,13 +115,16 @@ app_ui <- function(request) {
           #     )
           #   )
           # )
-          
         )
       ),
       
       # Body ---------------------------------------------------------------
       dashboardBody(
         tabItems(
+          tabItem(
+            tabName = 'welcome_tab',
+            mod_welcome_ui('welcome')
+          ),
           tabItem(
             tabName = 'map_tab',
             mod_map_ui('map_plot')
@@ -131,6 +140,10 @@ app_ui <- function(request) {
           tabItem(
             tabName = 'table_tab',
             mod_table_ui('table')
+          ),
+          tabItem(
+            tabName = 'details_tab',
+            mod_details_ui('details')
           )
         )
       )

@@ -4,7 +4,7 @@
 \alias{custom_popup}
 \title{Custom Popup}
 \usage{
-custom_popup(county_name, state_name, variable_name, value)
+custom_popup(county_name, state_name, variable_name, value, metric)
 }
 \arguments{
 \item{county_name}{}
@@ -14,6 +14,8 @@ custom_popup(county_name, state_name, variable_name, value)
 \item{variable_name}{}
 
 \item{value}{}
+
+\item{metric}{User `input$metric`, passed through `get_map_formulas()`.}
 }
 \description{
 Formatting for leaflet popup based on map_data inputs. Note that

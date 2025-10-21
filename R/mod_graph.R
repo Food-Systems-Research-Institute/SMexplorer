@@ -6,15 +6,19 @@
 #'
 #' @noRd 
 #'
-#' @importFrom shiny NS tagList 
-#' @import plotly
-#' @import dplyr
-#' @import tidyr
-#' @import purrr
-#' @import stringr
-#' @import snakecase
-#' @import reactable
-#' @import broom
+#' @importFrom shiny NS tagList fluidRow column uiOutput selectInput selectizeInput conditionalPanel moduleServer reactiveVal observe req reactive renderUI updateSelectizeInput HTML tags div
+#' @importFrom plotly renderPlotly plotlyOutput plot_ly layout event_register ggplotly event_data
+#' @importFrom ggplot2 ggplot aes geom_point labs theme_classic geom_smooth sym
+#' @importFrom dplyr inner_join filter pull select right_join left_join mutate across where
+#' @importFrom tidyr pivot_wider unnest
+#' @importFrom purrr map
+#' @importFrom stringr str_subset
+#' @importFrom snakecase to_title_case
+#' @importFrom reactable reactableOutput reactable colDef
+#' @importFrom broom tidy
+#' @importFrom shinydashboard box
+#' @importFrom shinyWidgets awesomeCheckbox actionBttn
+#' @importFrom stats cor.test
 source('R/filter_metrics.R')
 source('R/data_pipeline_functions.R')
 source('R/filter_fips.R')

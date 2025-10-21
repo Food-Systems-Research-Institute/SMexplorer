@@ -2,11 +2,12 @@
 
 :root {
   --theme-green: #154734;
-  --theme-off-green: #243f3f;
+  --theme-off-green: #72826d;
   --theme-selection: #2a2e2d;
   --theme-lighter-grey: #545756;
 }
 
+/* old off green #243f3f */
 
 body {
   font-family: 'Lora', sans-serif !important;
@@ -140,7 +141,7 @@ h1, h2, h3, h4 {
 
 .btn.action-button {
   color: #fff;
-  background-color: var(--theme-green) !important;
+  background-color: var(--theme-off-green) !important;
   border: 1px solid #000000 !important;
   border-radius: 3px;
   border-width: 1px,
@@ -191,7 +192,7 @@ input[type="checkbox"] {
 /* Why does it still look like there is a blue border? */
 
 .awesome-checkbox input:checked + label::before {
-  background-color: var(--theme-green) !important;
+  background-color: var(--theme-off-green) !important;
   border-color: #000000;
 }
 
@@ -202,13 +203,13 @@ input[type="checkbox"] {
 }
 
 
-/* Awesome bttn ------------------------------------------ */
+/* Action bttn ------------------------------------------ */
 .bttn-unite {
   font-size: 16px !important;
   padding: 5px !important;
-  
+
   border-radius: 3px !important;
-  background-color: var(--theme-green) !important; 
+  background-color: var(--theme-off-green) !important;
   color: white !important;
   border: 1px solid #000000 !important;
 
@@ -232,7 +233,7 @@ input[type="checkbox"] {
 }
 
 .bttn-unite:hover::before {
-  background: var(--theme-off-green) !important; /* comes in from left in animation */
+  background: var(--theme-green) !important; /* comes in from left in animation */
 }
 
 .bttn-unite:hover::after {

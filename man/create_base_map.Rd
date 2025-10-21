@@ -4,13 +4,15 @@
 \alias{create_base_map}
 \title{Create Base Map}
 \usage{
-create_base_map(spatial_data)
+create_base_map(spatial_data, resolution = "County")
 }
 \arguments{
-\item{spatial_data}{}
+\item{spatial_data}{Spatial data (sf object) with county or state boundaries}
+
+\item{resolution}{Resolution level - 'County' or 'State' (default: 'County')}
 }
 \value{
-Rendered leaflet map with tiles, county polygons
+Rendered leaflet map with tiles, polygons
 }
 \description{
 Create base map from spatial layer to be displayed before user

@@ -4,16 +4,16 @@
 \alias{get_map_formulas}
 \title{Get Popup and Label Formulas}
 \usage{
-get_map_formulas(resolution)
+get_map_formulas(resolution, metric)
 }
 \arguments{
 \item{resolution}{Either 'County' or 'State'}
 }
 \value{
-List with popup_formula and label_formula
+List with popup_formula, label_formula, and group name
 }
 \description{
-Returns appropriate popup and label formulas based on resolution.
+Returns appropriate popup, label formulas, and group name based on resolution.
 County data has county_name column, state data does not - this function
 handles that difference.
 }

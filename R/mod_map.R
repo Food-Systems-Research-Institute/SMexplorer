@@ -112,9 +112,9 @@ mod_map_ui <- function(id) {
             actionBttn(
               ns('show_metric_info'),
               'Metric Info',
-              # class = 'action-button',
+              class = 'action-button',
               # block = TRUE,
-              icon = icon('info')
+              icon = icon('circle-info')
             )
           ),
           column(

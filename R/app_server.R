@@ -7,8 +7,10 @@
 app_server <- function(input, output, session) {
   app_data <- load_app_data()
 
+  mod_welcome_server('welcome')
   mod_map_server('map_plot', app_data, parent_input = input)
   mod_graph_server('graph', parent_input = input)
+  mod_details_server('details')
   mod_table_server('table')
-  mod_tree_server("tree")
+  # mod_tree_server("tree")
 }
