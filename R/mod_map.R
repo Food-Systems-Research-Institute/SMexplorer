@@ -6,16 +6,12 @@
 #'
 #' @noRd 
 #'
-#' @importFrom shiny NS tagList 
-#' 
 #' @import leaflet
-#' @import mapview
-#' @import sf
-#' @import leaflet.extras
-#' @import shinyWidgets
-#' @import dplyr
-#' @import shinycssloaders
-#' @import stringr
+#' @importFrom shiny NS tagList
+#' @importFrom shinyWidgets actionBttn
+#' @importFrom dplyr filter pull left_join %>%
+#' @importFrom shinycssloaders with_spinner
+#' @importFrom stringr str_detect
 mod_map_ui <- function(id) {
   ns <- NS(id)
   tagList(

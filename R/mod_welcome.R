@@ -22,7 +22,11 @@ mod_welcome_server <- function(id){
     ns <- session$ns
  
     output$welcome_text <- renderUI({
-      tags$p('Welcome! This page is under construction and will be here soon.')
+      tags$p(
+        'Welcome! This page is under construction and will be here soon.',
+        'Really it\'s only here to buy time for other pages to load before you click on them though.',
+        'Navigate to other pages using the sidebar on the left.'
+      )
     })
   })
 }

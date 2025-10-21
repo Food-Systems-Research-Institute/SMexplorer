@@ -17,3 +17,31 @@ with_spinner <- function(ui_element,
     caption = shiny::tags$p(caption)
   ) 
 }
+
+#' Modal Construction
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+modal_construction <- function(tab) {
+  showModal(modalDialog(
+    tagList(
+      tags$div(
+        class = 'button-box',
+        tags$p(
+          "This page is under construction! Head to the",
+          tags$a(
+            'FSRI GitHub Page', 
+            href = 'https://www.github.com/Food-Systems-Research-Institute/SMexplorer/issues',
+            target = '_blank'
+          ),
+          "for issues and pull requests."
+        )
+      )
+    ),
+    title = "Under Construction",
+    easyClose = TRUE
+  ))
+  
+}
