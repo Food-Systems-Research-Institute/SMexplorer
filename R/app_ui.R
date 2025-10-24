@@ -49,7 +49,7 @@ app_ui <- function(request) {
           
           ## Tabs -----
           # welcome_tab
-          menuItem('Welcome Page', tabName = 'welcome_tab', icon = icon('house')),
+          menuItem('Home', tabName = 'welcome_tab', icon = icon('house')),
           
           # map_tab
           menuItem("Interactive Map", tabName = "map_tab", icon = icon("map")),

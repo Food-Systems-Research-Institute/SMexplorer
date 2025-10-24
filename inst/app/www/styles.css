@@ -19,6 +19,20 @@ h1, h2, h3, h4 {
   font-weight: bold;
 }
   
+/* box for the links on welcome page */
+.link-box {
+  border: 2px solid #000000;
+  border-radius: 4px;
+  padding: 10px 10px 10px 10px; /* insides */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  margin: 0 auto 10px auto; /* outsides: top side bottom side */
+  width: 100%;
+  background-color: #fff;
+}
+
 /* Header ------------------------------------------ */
 /* Main title */
 .main-header .logo {
