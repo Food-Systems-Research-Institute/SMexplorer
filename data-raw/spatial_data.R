@@ -100,6 +100,9 @@ wrangled_layers <- imap(wrangled_layers, ~ {
 })
 get_str(wrangled_layers)
 
+# Project into 4326 WGS84
+wrangled_layers <- map(wrangled_layers, ~ st_transform(.x, crs = 4326))
+
 
 # Save --------------------------------------------------------------------
 

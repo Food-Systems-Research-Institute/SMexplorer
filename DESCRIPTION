@@ -7,34 +7,28 @@ Description: This is the description.
 License: GPL (>= 3)
 Imports: 
     broom,
-    bs4Dash,
     bslib,
-    collapsibleTree,
     config,
     conflicted,
     dashboardthemes,
     dplyr,
-    DT,
-    fresh,
     ggplot2,
     golem,
     leaflet,
     leaflet.extras,
-    mapview,
     pkgload,
     plotly,
     reactable,
     sf,
-    shinipsum,
     shiny,
     shinycssloaders,
     shinydashboard,
     shinyWidgets,
     snakecase,
-    spelling,
     tidyr
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    spelling
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
