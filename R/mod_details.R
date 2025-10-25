@@ -12,6 +12,7 @@
 #' @importFrom ggplot2 ggplot aes geom_line geom_point labs theme_classic
 #' @importFrom dplyr filter inner_join pull select arrange desc slice
 #' @importFrom shinyWidgets actionBttn
+#' @importFrom shinycssloaders showPageSpinner hidePageSpinner
 mod_details_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -28,7 +29,9 @@ mod_details_ui <- function(id) {
           solidHeader = TRUE,
           status = 'primary',
           collapsible = TRUE,
-          plotlyOutput(ns('time_series_plot'))
+          with_spinner(
+            plotlyOutput(ns('time_series_plot'))
+          )
         )
       ),
 

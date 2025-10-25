@@ -4,6 +4,8 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @import shinydashboard
+#' @importFrom shinyjs useShinyjs
+#' @importFrom shinycssloaders showPageSpinner
 #' @noRd
 #' 
 # source('R/my_theme.R')
@@ -80,6 +82,7 @@ app_ui <- function(request) {
       
       # Body ---------------------------------------------------------------
       dashboardBody(
+        shinyjs::useShinyjs(),
         tabItems(
           tabItem(
             tabName = 'welcome_tab',

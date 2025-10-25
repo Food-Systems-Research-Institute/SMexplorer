@@ -10,17 +10,16 @@
 #' @importFrom shiny NS tagList
 #' @importFrom shinyWidgets actionBttn
 #' @importFrom dplyr filter pull left_join %>%
-#' @importFrom shinycssloaders with_spinner
 #' @importFrom stringr str_detect
+#' @importFrom shinycssloaders showPageSpinner hidePageSpinner
 mod_map_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    
     div(
       id = 'map_container',
       
       with_spinner(
-        leafletOutput(ns('map_plot'), height = '90vh', width = '100%')
+        leafletOutput(ns('map_plot'), height = '90vh', width = '100%'),
       ),
       
       # Absolute Panel -----
@@ -139,12 +138,12 @@ mod_map_ui <- function(id) {
         uiOutput(ns('metric_info'))
         
     ), # end absolute panel div
-    
+      
     # JS function for full screen button
     tags$script(HTML(js))
-      
-    )
-  )
+        
+    ) # end full div
+  ) # end tag list
 }
     
 #' map Server Functions

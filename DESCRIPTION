@@ -5,24 +5,29 @@ Authors@R:
     person("Christopher", "Donovan", , "christopher.donovan@uvm.edu", role = c("aut", "cre"))
 Description: This is the description.
 License: GPL (>= 3)
-Imports: 
+Imports:
     broom,
     bslib,
     config,
     conflicted,
     dashboardthemes,
+    DBI,
     dplyr,
+    duckdb,
     ggplot2,
     golem,
     leaflet,
     leaflet.extras,
     pkgload,
     plotly,
+    purrr,
     reactable,
+    rlang,
     sf,
     shiny,
     shinycssloaders,
     shinydashboard,
+    shinyjs,
     shinyWidgets,
     snakecase,
     tidyr

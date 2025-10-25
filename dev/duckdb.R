@@ -8,7 +8,9 @@ pacman::p_load(
   dbplyr,
   arrow,
   RSQLite,
-  fst
+  fst,
+  qs,
+  sfarrow
 )
 
 str(neast_county_metrics)
@@ -46,7 +48,8 @@ dbWriteTable(con2, 'test', dat)
 dbGetQuery(con2, 'select * from test')
 
 
-# Reading -----------------------------------------------------------------
+# Benchmarking ------------------------------------------------------------
+## Reading -----------------------------------------------------------------
 
 results <- microbenchmark(
   read.csv('dev/neast_county_metrics.csv'),
@@ -70,7 +73,7 @@ str(df)
 
 
 
-# Filter ------------------------------------------------------------------
+## Filter ------------------------------------------------------------------
 
 # Compare in memory to pulling from db or parquet
 results <- microbenchmark(
@@ -84,25 +87,7 @@ results
 
 
 
-# Save to DB --------------------------------------------------------------
-
-
-# Try saving multiple to DB
-
-dbDisconnect(con)
-dbDisconnect(con2)
-
-con <- dbConnect(duckdb::duckdb(), dbdir = 'dev/appdata.duckdb')
-dbWriteTable(con, 'neast_county_metrics', neast_county_metrics)
-dbWriteTable(con, 'neast_state_metrics', neast_state_metrics)
-dbWriteTable(con, 'metadata', metadata)
-
-# Check
-dbListTables(con)
-dbGetQuery(con, 'select * from metadata')
-
-
-# Metadata ----------------------------------------------------------------
+## Metadata ----------------------------------------------------------------
 
 
 write_parquet(metadata, 'dev/metadata.parquet')
@@ -119,3 +104,56 @@ results <- microbenchmark(
 results
 
 # duck is fastest, parquet close, both 10x better than others
+
+
+
+# Spatial -----------------------------------------------------------------
+
+
+saveRDS(neast_county_spatial_2024, 'dev/neast_county_spatial.rds')
+qsave(neast_county_spatial_2024, 'dev/neast_county_spatial.qs')
+
+microbenchmark(
+  'rds' = readRDS('dev/neast_county_spatial.rds'),
+  'qs' = qread('dev/neast_county_spatial.qs'),
+  'rda' = load('data/neast_county_spatial_2024.rda'),
+  times = 5
+)
+# qs is 5 times faster than rds, 60 times faster than rda
+
+
+
+# Plan --------------------------------------------------------------------
+
+# metrics and metadata should be saved as table to duckdb in data
+# also fips key probably
+# 3 polygon files (counties 2021, 2024, and states) save to qs in data
+
+
+
+## Save to DB --------------------------------------------------------------
+
+
+# Try saving multiple to DB
+library(duckdb)
+
+dbDisconnect(con)
+dbDisconnect(con2)
+
+con <- dbConnect(duckdb::duckdb(), dbdir = 'data/appdata.duckdb')
+dbWriteTable(con, 'neast_county_metrics', neast_county_metrics)
+dbWriteTable(con, 'neast_state_metrics', neast_state_metrics)
+dbWriteTable(con, 'metadata', metadata)
+
+# Check
+dbListTables(con)
+dbGetQuery(con, 'select * from metadata')
+
+
+dbDisconnect(con)
+
+
+
+## Save spatial ------------------------------------------------------------
+
+

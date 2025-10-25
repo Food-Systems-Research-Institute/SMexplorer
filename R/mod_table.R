@@ -22,7 +22,9 @@ mod_table_ui <- function(id) {
         style = 'text-align: left !important;'
       ),
       style = 'background: #fff !important;',
-      reactable::reactableOutput(ns('metrics_table'))
+      with_spinner(
+        reactable::reactableOutput(ns('metrics_table'))
+      )
     )
   )
 }
@@ -121,10 +123,6 @@ mod_table_server <- function(id){
               strong('Latest Year: '),
               as.character(metadata[index, 'Year'])
             ),
-            # tags$p(
-            #   strong('Updates: '),
-            #   str_to_title(as.character(metadata[index, 'Updates']))
-            # ),
             tags$p(
               strong('URL: '),
               tags$a(

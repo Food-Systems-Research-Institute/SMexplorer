@@ -6,7 +6,8 @@ pacman::p_load(
   tigris,
   purrr,
   stringr,
-  dplyr
+  dplyr,
+  qs
 )
 
 pacman::p_load_current_gh(
@@ -106,14 +107,32 @@ wrangled_layers <- map(wrangled_layers, ~ st_transform(.x, crs = 4326))
 
 # Save --------------------------------------------------------------------
 
-# Split list
-list2env(wrangled_layers, envir = .GlobalEnv)
-str(neast_county_spatial_2024)
+# # Split list
+# list2env(wrangled_layers, envir = .GlobalEnv)
+# str(neast_county_spatial_2024)
 
-# Save for use in dashboard
-usethis::use_data(
-  neast_county_spatial_2024,
+# # Save for use in dashboard
+# usethis::use_data(
+#   neast_county_spatial_2024,
+#   neast_county_spatial_2021,
+#   neast_state_spatial,
+#   overwrite = TRUE
+# )
+
+# Save spatial as qs files
+
+wrangled_layers <- list(
   neast_county_spatial_2021,
-  neast_state_spatial,
-  overwrite = TRUE
+  neast_county_spatial_2024,
+  neast_state_spatial
 )
+
+names <- c(
+  'neast_county_spatial_2021',
+  'neast_county_spatial_2024',
+  'neast_state_spatial'
+)
+
+map2(wrangled_layers, names, ~ {
+  qsave(.x, paste0('data/', .y, '.qs'))
+})

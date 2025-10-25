@@ -74,3 +74,5 @@ list2env(metrics, envir = .GlobalEnv)
 usethis::use_data(neast_metrics, overwrite = TRUE)
 usethis::use_data(neast_county_metrics, overwrite = TRUE)
 usethis::use_data(neast_state_metrics, overwrite = TRUE)
+
+saveRDS(SMdata::fips_key, 'data/fips_key.rds')

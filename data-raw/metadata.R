@@ -95,6 +95,8 @@ metadata <- metadata %>%
 
 # Save
 usethis::use_data(metadata, overwrite = TRUE)
+saveRDS(metadata, 'data/metadata.rds')
+
 
 
 # Lookup Tables -----------------------------------------------------------
@@ -104,6 +106,7 @@ metric_lookup <- metadata %>%
   select(Metric, 'Variable Name', 'Axis Name')
 get_str(metric_lookup)
 usethis::use_data(metric_lookup, overwrite = TRUE)
+saveRDS(metric_lookup, 'data/metric_lookup.rds')
 
 # Named vector for one-way metric to years
 metric_to_years <- split(metadata[['Year Vector']], metadata$Metric) %>% 

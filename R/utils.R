@@ -1,4 +1,4 @@
-#' With Spinner 
+#' With Spinner
 #'
 #' @description Wrap a UI element in a formatted spinner
 #'
@@ -9,13 +9,23 @@
 with_spinner <- function(ui_element,
                          type = 6,
                          color = color_palette['theme_green'],
-                         caption = 'Loading Map...') {
-  shinycssloaders::withSpinner(
+                         caption = 'Loading...',
+                         left_offset = NULL) {
+  spinner <- shinycssloaders::withSpinner(
     ui_element = ui_element,
     type = type,
     color = color,
     caption = shiny::tags$p(caption)
-  ) 
+  )
+
+  if (!is.null(left_offset)) {
+    shiny::tags$div(
+      style = paste0('margin-left: ', left_offset, ';'),
+      spinner
+    )
+  } else {
+    spinner
+  }
 }
 
 #' Modal Construction

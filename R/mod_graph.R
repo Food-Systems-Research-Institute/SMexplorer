@@ -19,9 +19,7 @@
 #' @importFrom shinydashboard box
 #' @importFrom shinyWidgets awesomeCheckbox actionBttn
 #' @importFrom stats cor.test
-source('R/filter_metrics.R')
-source('R/data_pipeline_functions.R')
-source('R/filter_fips.R')
+#' @importFrom glue glue
 mod_graph_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -31,23 +29,16 @@ mod_graph_ui <- function(id) {
       # Left Column -----
       column(
         width = 7,
-        
-        ## plotlyOutput -----
-        uiOutput(ns('graph_box')),
-        
-        ## Cor output -----
+        with_spinner(
+          uiOutput(ns('graph_box'))
+        ),
         uiOutput(ns('cor_box')),
-        
-        ## Click output -----
         uiOutput(ns('click_box'))
-        
       ),
       
       # Right Column -----
       column(
         width = 5,
-        
-        ## Select Metrics Box -----
         box(
           title = 'Select Metrics',
           width = 12,
@@ -55,7 +46,6 @@ mod_graph_ui <- function(id) {
           solidHeader = TRUE,
           collapsible = TRUE,
           
-          ### Choose Resolution -----
           selectInput(
             inputId = ns('select_resolution'),
             label = 'Choose resolution:',
@@ -64,7 +54,6 @@ mod_graph_ui <- function(id) {
             width = '100%'
           ),
           
-          ### Search X -----
           selectizeInput(
             inputId = ns('search_x'),
             label = 'Metric one:',
@@ -73,8 +62,6 @@ mod_graph_ui <- function(id) {
             width = '100%'
           ),
          
-          
-          ### Search Y -----
           selectizeInput(
             inputId = ns('search_y'),
             label = 'Metric two:',
@@ -83,17 +70,16 @@ mod_graph_ui <- function(id) {
             width = '100%'
           ),
           
-
           conditionalPanel(
             condition = "input.select_resolution == 'County'",
             ns = ns,
-            ### Cor checkbox -----
+            
             awesomeCheckbox(
               inputId = ns("cor_check"),
               label = "Add correlation",
               value = FALSE
             ),
-            ### LOESS checkbox -----
+            
             awesomeCheckbox(
               inputId = ns("loess"),
               label = "Add LOESS curve",
@@ -120,45 +106,23 @@ mod_graph_ui <- function(id) {
 #' graph Server Functions
 #'
 #' @noRd 
-mod_graph_server <- function(id, parent_input){
+mod_graph_server <- function(id, 
+                             con,
+                             parent_input, 
+                             global_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-
-    # Lazy loading -----
-    graph_data_loaded <- reactiveVal(FALSE)
-
-    observe({
-      req(parent_input$tabs == "graph_tab")
-
-      # Only load once
-      if (!graph_data_loaded()) {
-        load('data/sm_data.rda', envir = parent.frame())
-        load('data/neast_county_metrics.rda', envir = parent.frame())
-        load('data/neast_state_metrics.rda', envir = parent.frame())
-        graph_data_loaded(TRUE)
-      }
-    })
-
 
     # Metric options -----
     observe({
       req(input$select_resolution)
       
-      chosen_resolution <- tolower(input$select_resolution)
-      metric_options <- sm_data$metrics %>%
-        inner_join(sm_data$metadata, by = 'variable_name') %>%
-        filter(resolution == chosen_resolution) %>%
-        pull(metric) %>%
-        unique() %>%
-        sort()
+      # Get metric options given resolution
+      search_term <- paste0('RES_', input$select_resolution)
+      metric_options <- global_data$metadata$Metric[
+        global_data$metadata[[search_term]] == TRUE
+      ]
       
-      # # Reorder metrics, put NAICS last
-      # metric_options <- c(
-      #   sort(metric_options[!grepl("NAICS", metric_options)]),
-      #   sort(metric_options[!grepl("NAICS", metric_options)]),
-      #   sort(metric_options[grepl("NAICS", metric_options)])
-      # )
-        
       # Update search fields
       updateSelectizeInput(
         session, 
@@ -181,86 +145,32 @@ mod_graph_server <- function(id, parent_input){
     rval_data <- reactive({
       req(input$search_x, input$search_y)
       
-      # Get resolution of inputs 
-      res_x <- sm_data$metadata %>% 
-        filter(metric == input$search_x) %>% 
-        pull(resolution)
-      res_y <- sm_data$metadata %>% 
-        filter(metric == input$search_y) %>% 
-        pull(resolution)
+      # Lookup table to get variable names (used in db) from metric names (inputs)
+      xvar <- unique(metric_lookup$`Variable Name`[metric_lookup$Metric == input$search_x])
+      yvar <- unique(metric_lookup$`Variable Name`[metric_lookup$Metric == input$search_y])
       
-      # If they are not the same, throw an error
-      # Otherwise, filter fips by scope/resolution (inconsistent)
-      if (res_x != res_y) {
-        stop(paste(
-          'The metrics you have selected are at different spatial scales.',
-          'It is probably the case that one variable is at the county level while the other is at the state level.',
-          'Check the resolution field in the Metric Details box.'
-        ))
-      } else if (res_x == 'county' & res_y == 'county') {
-        dat <- filter_fips(sm_data$metrics, scope = 'counties')
-      } else if (res_x == 'state' & res_y == 'state') {
-        dat <- filter_fips(sm_data$metrics, scope = 'states')
-      }
+      # Query metrics
+      table <- paste0('neast_', tolower(input$select_resolution), '_metrics')
+      query <- glue::glue(
+        "SELECT *
+        FROM {table}
+        WHERE variable_name IN ('{xvar}', '{yvar}')"
+      )
+      dat <- query_db(con, query)
       
-      # Filter to selected variables
-      # have to join with metadata to search by metric
-      # Also join to fips to get county name
-      # TODO: Do this ahead of time to avoid joining in reactive
-      dat <- sm_data$metadata %>% 
-        select(
-          variable_name,
-          metric,
-          dimension,
-          index,
-          indicator,
-          axis_name,
-          units,
-          all_years = year,
-          definition,
-          updates,
-          source,
-          url,
-          citation
+      # Join with fips key to get county name and state name
+      dat <- dat %>% 
+        dplyr::left_join(
+          select(global_data$fips_key, fips, county_name, state_name),
+          by = 'fips'
         ) %>% 
-        right_join(dat, by = 'variable_name') %>% 
-        filter(metric %in% c(input$search_x, input$search_y)) %>% 
-        left_join(sm_data$fips_key, by = 'fips') %>% 
-        filter(fips != '00') # removing US totals for now
-      
-      # Get the variable names
-      xvar <- unique(dat$variable_name[dat$metric == input$search_x])
-      yvar <- unique(dat$variable_name[dat$metric == input$search_y])
-      
-      # Process data for the latest year
-      dat <- dat %>%
-        get_latest_year() %>%
-        mutate(
-          variable_name = paste0(variable_name, '_', year),
-          .keep = 'unused'
-        ) %>%
-        mutate(value = as.numeric(value)) %>% 
+        get_latest_year() %>% 
         pivot_wider(
           id_cols = c('fips', 'county_name', 'state_name'),
           names_from = 'variable_name',
           values_from = 'value'
         )
-      
-      # If there are lingering list columns, choose the second value This is the
-      # jenkiest thing I've ever seen. 
-      # NOTE: Have to get to source of problem - why are there some counties
-      # showing up with two values for NAICS vars in the same year? Something
-      # about the disclosures, but I haven't been able to fix it in sm-data yet.
-      dat <- dat %>%
-        mutate(across(where(~ is.list(.)), 
-                      ~ map(., ~ if(length(.x) > 1) .x[2] else .x), 
-                      .names = "{.col}")) %>% 
-        unnest(cols = where(~ is.list(.)))
         
-      # Reassign x and y variables after pasting year
-      xvar <- str_subset(names(dat), xvar)
-      yvar <- str_subset(names(dat), yvar)
-      
       # Return filtered data and variable names
       list(data = dat, xvar = xvar, yvar = yvar)
     })
@@ -306,13 +216,14 @@ mod_graph_server <- function(id, parent_input){
       } else {
 
         # Get the filtered data and variables from the reactive function
+        # TODO: check if we even need to do this
         plot_dat <- rval_data()$data
         xvar <- rval_data()$xvar
         yvar <- rval_data()$yvar
         
         # Generate x and y labels
-        x_label <- snakecase::to_title_case(xvar)
-        y_label <- snakecase::to_title_case(yvar)
+        x_label <- unique(metric_lookup$`Axis Name`[metric_lookup$`Variable Name` == xvar])
+        y_label <- unique(metric_lookup$`Axis Name`[metric_lookup$`Variable Name` == yvar])
 
         # Create the ggplot
         plot <- plot_dat %>%
@@ -320,11 +231,12 @@ mod_graph_server <- function(id, parent_input){
             x = !!sym(xvar),
             y = !!sym(yvar),
             color = state_name,
-            key = county_name,
+            key = fips,
             # Popup - this sucks but it works. Can't use function because we 
             # need to call it within aes()
             text = ifelse(
-              !is.na(county_name),
+              # !is.na(county_name),
+              'county_name' %in% names(plot_dat),
               paste0(
                 '<b>', county_name, ', ', state_name, '</b>\n',
                 x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
@@ -377,7 +289,16 @@ mod_graph_server <- function(id, parent_input){
       box_title <- if (is.null(point)) {
         "Select a point to see details by county"
       } else {
-        paste("Details for", point$key)
+        if (input$select_resolution == 'County') {
+          location <- global_data$fips_key$county_name[
+            global_data$fips_key$fips == point$key
+          ]
+        } else if (input$select_resolution == 'State') {
+          location <- global_data$fips_key$state_name[
+            global_data$fips_key$fips == point$key
+          ]
+        }
+        paste("Details for", location)
       }
       
       box(
@@ -387,17 +308,7 @@ mod_graph_server <- function(id, parent_input){
         solidHeader = TRUE,
         collapsible = TRUE,
         
-        uiOutput(ns('disclaimer')),
         reactableOutput(ns("click_table"))
-      )
-    })
-    
-    output$disclaimer <- renderUI({
-      point <- event_data(event = "plotly_click", priority = "event")
-      req(point)
-      HTML(
-        '<p>[Note to swap this out for a series of bar graphs highlighting 
-        the county, or maybe compare it to state and national stats?]</p>'
       )
     })
     
@@ -406,15 +317,22 @@ mod_graph_server <- function(id, parent_input){
       point <- event_data(event = "plotly_click", priority = "event")
       req(point)
       
+      # Get new DF, all info for selected county (or state)
+      table <- glue::glue('neast_{tolower(input$select_resolution)}_metrics')
+      query <- glue::glue(
+        "SELECT 
+          m.Metric,
+          m.Definition,
+          d.Year,
+          m.Units,
+          d.value
+        FROM {table} d
+        LEFT JOIN metadata m ON d.variable_name = m.\"Variable Name\"
+        WHERE fips = {point$key}"
+      )
+      dat <- query_db(con, query)
+      
       dat %>% 
-        filter(county_name == point$key) %>% 
-        select(
-          metric,
-          definition,
-          year,
-          units,
-          value
-        ) %>% 
         setNames(c(snakecase::to_title_case(names(.)))) %>% 
         reactable(
           sortable = TRUE,
@@ -432,7 +350,6 @@ mod_graph_server <- function(id, parent_input){
           style = list(fontSize = "14px"),
           compact = TRUE
         )
-      
     })
     
     # Output info_box -----
@@ -462,8 +379,8 @@ mod_graph_server <- function(id, parent_input){
         
         # Add x info if selected
         if (input$search_x != '') {
-          meta_x <- sm_data$metadata %>% 
-            filter(metric == input$search_x)
+          meta_x <- global_data$metadata %>% 
+            filter(Metric == input$search_x)
           html_output <- paste0(
             html_output,
             '<h4>X-Axis: ', input$search_x, '</h4>',
