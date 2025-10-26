@@ -267,34 +267,35 @@ input[type="checkbox"] {
 }
 
 .bttn-unite:hover { /* this doesnt last long if at all? */
-  color: white !important;
+  color: #fff !important;
   border-color: #000000 !important;
   background-color: #000000; /* right before animation */
 }
 
 .bttn-unite:hover::before {
-  background-color: var(--theme-dark-green) !important; /* comes in from left in animation */
+  background-color: var(--theme-green) !important; /* comes in from left in animation */
 }
 
 .bttn-unite:hover::after {
-  background-color: var(--theme-grey) !important; /* comes in from left in animation */
+  background-color: var(--theme-grey) !important; /* comes in from right in animation */
 }
 
 .bttn-unite:active {
-  background-color: var(--theme-off-green) !important; /* while clicking */
+  background-color: var(--theme-bright-green) !important; /* not sure? */
   border-color: #000000 !important;
 }
 
 .bttn-unite:active::before,
 .bttn-unite:active::after {
-  background: var(--theme-off-green) !important;
+  background: var(--theme-dark-green) !important; /* only while click is held down */
 }
 
 .bttn-unite:focus {
   outline: none !important;
+  background-color: var(--theme-dark-green) !important; /* after click, before clicking elsewhere */
 }
 
 .bttn-unite:focus::before,
 .bttn-unite:focus::after {
-  background: transparent !important;
+  background: var(--theme-dark-green) !important;
 }

@@ -17,11 +17,8 @@ mod_table_ui <- function(id) {
   tagList(
     div(
       class = 'button-box',
-      tags$h2(
-        'Metadata Table', 
-        style = 'text-align: left !important;'
-      ),
       style = 'background: #fff !important;',
+      uiOutput(ns('header')),
       with_spinner(
         reactable::reactableOutput(ns('metrics_table'))
       )
@@ -32,36 +29,30 @@ mod_table_ui <- function(id) {
 #' table Server Functions
 #'
 #' @noRd 
-mod_table_server <- function(id){
+mod_table_server <- function(id, parent_input, global_data) {
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     
-    # Load full metadata table
-    load('data/aggregated_meta.rda')
-    
-    # Pick out variables to display
-    metadata <- aggregated_meta %>% 
-      select(
-        metric,
-        definition,
-        dimension,
-        index,
-        indicator,
-        units,
-        year = latest_year,
-        source,
-        scope,
-        resolution,
-        url
-      )
-    
-    # Fix capitalization of column names
-    names(metadata) <- str_to_title(names(metadata))
+    # Lazy load ----
+    table_data_loaded <- reactiveVal(FALSE)
+    metadata <- reactiveVal(NULL)
+
+    observe({
+      req(parent_input$tabs == "table_tab")
+
+      if (!table_data_loaded()) {
+        metadata(readRDS('data/table_metadata.rds'))
+        table_data_loaded(TRUE)
+      }
+    })
+
     
     # Reactable -----
     output$metrics_table <- reactable::renderReactable({
+      req(metadata())
+
       reactable(
-        metadata,
+        metadata(),
         sortable = TRUE,
         resizable = TRUE,
         filterable = TRUE,
@@ -99,42 +90,57 @@ mod_table_server <- function(id){
         defaultColDef = colDef(minWidth = 100),
         # elementId = "metrics_table",
         details = function(index) {
+          data <- metadata()
           div(
             style = "padding: 15px; border: 1px solid #ddd; margin: 10px 0;
              background-color: #E0EEEE; border-radius: 10px; border-color: black;
              box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);",
-            
+
             tags$h4(
               strong("Details"),
             ),
             tags$p(
               strong('Metric Name: '),
-              as.character(metadata[index, 'Metric']),
+              as.character(data[index, 'Metric']),
             ),
             tags$p(
               strong('Definition: '),
-              as.character(metadata[index, 'Definition']),
+              as.character(data[index, 'Definition']),
             ),
             tags$p(
               strong('Source: '),
-              as.character(metadata[index, 'Source'])
+              as.character(data[index, 'Source'])
             ),
             tags$p(
               strong('Latest Year: '),
-              as.character(metadata[index, 'Year'])
+              as.character(data[index, 'Year'])
             ),
             tags$p(
               strong('URL: '),
               tags$a(
-                href = as.character(metadata[index, 'Url']),
+                href = as.character(data[index, 'URL']),
                 target = '_blank',
-                as.character(metadata[index, 'Url'])
+                as.character(data[index, 'URL'])
               )
             )
           )
         }
       )
     })
+    
+    output$header <- renderUI(
+      tagList(
+        tags$h2(
+          'Metadata', 
+          style = 'text-align: left !important;'
+        ),
+        tags$p(
+          'Use the filters at the top of the table to search through dimensions, metrics, data sources, or other metadata.',
+          'Columns can be resized, and you can sort alphabetically by clicking a column header.',
+          'Click the arrow on the left to see details about a particular metric.'
+        )
+      )
+    )
     
   })
 }

@@ -63,7 +63,7 @@ app_ui <- function(request) {
           menuItem("Details", tabName = "details_tab", icon = icon("circle-info")),
           
           # table_tab
-          menuItem("Data Sources", tabName = "table_tab", icon = icon("table"))
+          menuItem("Metadata", tabName = "table_tab", icon = icon("table"))
           # conditionalPanel(
           #   condition = "input.tabs == 'map_tab'",
           #   div(

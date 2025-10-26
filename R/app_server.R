@@ -34,8 +34,25 @@ app_server <- function(input, output, session) {
    
   # Run server functions for each module and provide inputs
   mod_welcome_server('welcome')
-  mod_map_server('map_plot', con = con, parent_input = input, global_data = global_data)
-  mod_graph_server('graph', con = con, parent_input = input, global_data = global_data)
-  mod_details_server('details', parent_input = input)
-  mod_table_server('table')
+  mod_map_server(
+    'map_plot', 
+    con = con, 
+    parent_input = input, 
+    global_data = global_data
+  )
+  mod_graph_server(
+    'graph', 
+    con = con, 
+    parent_input = input, 
+    global_data = global_data
+  )
+  mod_details_server(
+    'details', 
+    parent_input = input
+  )
+  mod_table_server(
+    'table', 
+    parent_input = input,
+    global_data = global_data
+  )
 }

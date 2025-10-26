@@ -42,8 +42,6 @@ mod_map_ui <- function(id) {
           box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",        
         
         h3('Select Metrics'),
-
-        
         div(
           class = 'button-box',
           
@@ -87,7 +85,7 @@ mod_map_ui <- function(id) {
             column(
               width = 6,
               # Select year -----
-              selectInput(
+              selectizeInput(
                 inputId = ns("year"),
                 label = "Select year:",
                 choices = NULL,
@@ -97,7 +95,6 @@ mod_map_ui <- function(id) {
             )
           )
         ),
-        
         
         
         # Metric info and full screen buttons
@@ -262,20 +259,24 @@ mod_map_server <- function(id, con, parent_input, global_data){
     # Update dropdowns -----
     # Update metric choices when resolution or dimension changes
     observe({
+      req(map_data_loaded())
       updateSelectizeInput(
         session,
         "metric",
         choices = available_metrics(),
+        selected = available_metrics()[1],
         server = TRUE
       )
     })
 
     # Update year choices when metric changes
     observe({
-      updateSelectInput(
+      updateSelectizeInput(
         session,
         "year",
-        choices = available_years()
+        choices = available_years(),
+        selected = available_years()[1],
+        server = TRUE
       )
     })
     

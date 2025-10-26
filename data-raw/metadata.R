@@ -106,6 +106,26 @@ usethis::use_data(metadata, overwrite = TRUE)
 saveRDS(metadata, 'data/metadata.rds')
 
 
+## Table Metadata ----------------------------------------------------------
+
+# Slimmer set for table mod
+table_metadata <- metadata %>% 
+  select(
+    Metric,
+    Definition,
+    Dimension,
+    Index,
+    Indicator,
+    Units,
+    Year = `Latest Year`,
+    Source,
+    Scope,
+    Resolution,
+    URL
+  )
+saveRDS(table_metadata, 'data/table_metadata.rds')
+
+
 
 # Lookup Tables -----------------------------------------------------------
 
