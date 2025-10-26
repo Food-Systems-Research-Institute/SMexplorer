@@ -304,7 +304,7 @@ mod_map_server <- function(id, app_data, parent_input){
           req(input$metric, input$year)
           
           meta <- metadata %>% 
-            filter(Metric == input$metric)
+            dplyr::filter(Metric == input$metric)
           
           div(
             class = 'button-box',

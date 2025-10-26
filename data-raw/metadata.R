@@ -93,6 +93,14 @@ bad_vars <- readRDS('dev/bad_vars.rds')
 metadata <- metadata %>% 
   filter(!`Variable Name` %in% bad_vars)
 
+# Removing duplicate median household value vars
+remove <- c(
+  which(metadata$`Variable Name` == 'medHhIncome')[-1],
+  which(metadata$`Variable Name` == 'medHhIncomePercState')[-1],
+  which(metadata$`Variable Name` == 'medianHouseholdIncome')
+)
+metadata <- metadata[-remove, ]
+
 # Save
 usethis::use_data(metadata, overwrite = TRUE)
 saveRDS(metadata, 'data/metadata.rds')
@@ -114,12 +122,6 @@ metric_to_years <- split(metadata[['Year Vector']], metadata$Metric) %>%
 head(metric_to_years)
 metric_to_years[['Acres drained by tile']]
 usethis::use_data(metric_to_years, overwrite = TRUE)
-
-# # Named vector for one-way metric to resolution
-# metric_to_resolution <- setNames(metadata$Resolution, metadata$Metric)
-# head(metric_to_resolution)
-# metric_to_resolution[['Civilian labor force']]
-# usethis::use_data(metric_to_resolution, overwrite = TRUE)
 
 # Resolution lookup table
 metric_resolution_lookup <- metadata %>% 

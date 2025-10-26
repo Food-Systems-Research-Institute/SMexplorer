@@ -49,7 +49,8 @@ mod_graph_ui <- function(id) {
           selectInput(
             inputId = ns('select_resolution'),
             label = 'Choose resolution:',
-            choices = c('County', 'State'),
+            # TODO: Fix issues with state so we can choose that also
+            choices = c('County'),
             selected = NULL,
             width = '100%'
           ),
@@ -141,9 +142,12 @@ mod_graph_server <- function(id,
     })
 
 
-    # Filter Data -----
+    # Query Data -----
     rval_data <- reactive({
       req(input$search_x, input$search_y)
+      
+      print(input$search_x)
+      print(input$search_y)
       
       # Lookup table to get variable names (used in db) from metric names (inputs)
       xvar <- unique(metric_lookup$`Variable Name`[metric_lookup$Metric == input$search_x])
@@ -366,67 +370,30 @@ mod_graph_server <- function(id,
     
     ## Output metric_info -----
     output$metric_info <- renderUI({
-      
+
       # If no inputs, display message saying to select metric
       if (input$search_x == '' && input$search_y == '') {
         tags$p('Select metrics above to see details.')
-        
+
       # Else if one or both are selected, display info
       } else if (input$search_x != '' || input$search_y != '') {
+
+        tag_list <- tagList()
+
+          # Use utility function to create metric info display
+          if (input$search_x != '') {
+            tag_list[[length(tag_list) + 1]] <- global_data$metadata %>%
+              dplyr::filter(Metric == input$search_x) %>%
+              get_metric_info()
+          }
+          if (input$search_y != '') {
+            tag_list[[length(tag_list) + 1]] <- global_data$metadata %>%
+              dplyr::filter(Metric == input$search_y) %>%
+              get_metric_info()
+          }
         
-        # Empty HTML output to add to
-        html_output <- ''
-        
-        # Add x info if selected
-        if (input$search_x != '') {
-          meta_x <- global_data$metadata %>% 
-            filter(Metric == input$search_x)
-          html_output <- paste0(
-            html_output,
-            '<h4>X-Axis: ', input$search_x, '</h4>',
-            '<p><b>Definition:</b> ', meta_x$definition, '<br>',
-            '<b>Dimension:</b> ', meta_x$dimension, '<br>',
-            '<b>Index:</b> ', meta_x$index, '<br>',
-            '<b>Indicator:</b> ', meta_x$indicator, '<br>',
-            '<b>Resolution:</b> ', meta_x$resolution, '<br>',
-            '<b>Updates:</b> ', meta_x$updates, '<br>',
-            '<b>Source: </b><a href="', meta_x$url, '">', meta_x$source, '</a><br>',
-            '<b>Citation:</b> ', meta_x$citation, '</p>'
-          )
-        }
-        
-        # Add y info if selected
-        if (input$search_y != '') {
-          meta_y <- sm_data$metadata %>% 
-            filter(metric == input$search_y)
-          html_output <- paste0(
-            html_output,
-            '<br>',
-            '<h4>Y-Axis: ', input$search_y, '</h4>',
-            '<p><b>Definition:</b> ', meta_y$definition, '<br>',
-            '<b>Dimension:</b> ', meta_y$dimension, '<br>',
-            '<b>Index:</b> ', meta_y$index, '<br>',
-            '<b>Indicator:</b> ', meta_y$indicator, '<br>',
-            '<b>Resolution:</b> ', meta_y$resolution, '<br>',
-            '<b>Updates:</b> ', meta_y$updates, '<br>',
-            '<b>Source: </b><a href="', meta_y$url, '">', meta_y$source, '</a><br>',
-            '<b>Citation:</b> ', meta_y$citation, '</p>'
-          )
-        }
-        
-        # Return HTML output
-        # div(
-        #   div(
-        #     class = 'button-box',
-        #     HTML(html_output_x),
-        #   ),
-        #   div(
-        #     class = 'button-box',
-        #     HTML(html_output_y),
-        #   )
-        # )
-        HTML(html_output)
-        
+        tags$div(tag_list)
+
       } # end ifelse for HTML output
     }) # end metric_info renderUI
     
