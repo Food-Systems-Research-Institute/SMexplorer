@@ -121,39 +121,3 @@ microbenchmark(
 )
 # qs is 5 times faster than rds, 60 times faster than rda
 
-
-
-# Plan --------------------------------------------------------------------
-
-# metrics and metadata should be saved as table to duckdb in data
-# also fips key probably
-# 3 polygon files (counties 2021, 2024, and states) save to qs in data
-
-
-
-## Save to DB --------------------------------------------------------------
-
-
-# Try saving multiple to DB
-library(duckdb)
-
-dbDisconnect(con)
-dbDisconnect(con2)
-
-con <- dbConnect(duckdb::duckdb(), dbdir = 'data/appdata.duckdb')
-dbWriteTable(con, 'neast_county_metrics', neast_county_metrics)
-dbWriteTable(con, 'neast_state_metrics', neast_state_metrics)
-dbWriteTable(con, 'metadata', metadata)
-
-# Check
-dbListTables(con)
-dbGetQuery(con, 'select * from metadata')
-
-
-dbDisconnect(con)
-
-
-
-## Save spatial ------------------------------------------------------------
-
-

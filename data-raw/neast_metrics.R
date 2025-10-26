@@ -1,6 +1,6 @@
 # Wrangling all metric variations here
 
-pacman::p_load(dplyr)
+pacman::p_load(dplyr, duckdb)
 pacman::p_load_current_gh(
   'Food-Systems-Research-Institute/SMdata',
   'ChrisDonovan307/projecter'
@@ -76,3 +76,5 @@ usethis::use_data(neast_county_metrics, overwrite = TRUE)
 usethis::use_data(neast_state_metrics, overwrite = TRUE)
 
 saveRDS(SMdata::fips_key, 'data/fips_key.rds')
+
+
