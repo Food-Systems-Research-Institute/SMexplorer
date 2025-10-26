@@ -249,7 +249,7 @@ input[type="checkbox"] {
   padding: 5px !important;
 
   border-radius: 3px !important;
-  background-color: var(--theme-off-green) !important;
+  background-color: var(--theme-off-green);
   color: white !important;
   border: 1px solid #000000 !important;
 
@@ -269,15 +269,15 @@ input[type="checkbox"] {
 .bttn-unite:hover { /* this doesnt last long if at all? */
   color: white !important;
   border-color: #000000 !important;
-  background-color: #000000 !important; /* right before animation */
+  background-color: #000000; /* right before animation */
 }
 
 .bttn-unite:hover::before {
-  background: var(--theme-green) !important; /* comes in from left in animation */
+  background-color: var(--theme-dark-green) !important; /* comes in from left in animation */
 }
 
 .bttn-unite:hover::after {
-  background: var(--theme-lighter-grey) !important; /* comes in from left in animation */
+  background-color: var(--theme-grey) !important; /* comes in from left in animation */
 }
 
 .bttn-unite:active {

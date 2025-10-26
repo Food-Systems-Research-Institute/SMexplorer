@@ -133,6 +133,6 @@ names <- c(
   'neast_state_spatial'
 )
 
-map2(wrangled_layers, names, ~ {
+iwalk(wrangled_layers, ~ {
   qsave(.x, paste0('data/', .y, '.qs'))
 })

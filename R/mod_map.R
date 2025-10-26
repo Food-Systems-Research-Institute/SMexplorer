@@ -12,6 +12,8 @@
 #' @importFrom dplyr filter pull left_join %>%
 #' @importFrom stringr str_detect
 #' @importFrom shinycssloaders showPageSpinner hidePageSpinner
+#' @importFrom glue glue
+#' @importFrom qs qread
 mod_map_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -148,10 +150,8 @@ mod_map_ui <- function(id) {
     
 #' map Server Functions
 #'
-#' @param app_data Pre-loaded application data from load_app_data()
-#'
 #' @noRd
-mod_map_server <- function(id, app_data, parent_input){
+mod_map_server <- function(id, con, parent_input, global_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     
@@ -165,17 +165,10 @@ mod_map_server <- function(id, app_data, parent_input){
 
       # Only load once
       if (!map_data_loaded()) {
-        load('data/neast_county_metrics.rda', envir = parent.frame())
-        load('data/neast_state_metrics.rda', envir = parent.frame())
-
-        load('data/neast_counties_2021.rda', envir = parent.frame())
-        load('data/neast_counties_2024.rda', envir = parent.frame())
-
-        load('data/neast_county_spatial_2021.rda', envir = parent.frame())
-        load('data/neast_county_spatial_2024.rda', envir = parent.frame())
-        load('data/neast_state_spatial.rda', envir = parent.frame())
-
-        load('data/metadata.rda', envir = parent.frame())
+        # Load spatial data from qs files
+        neast_county_spatial_2021 <<- qs::qread('data/neast_county_spatial_2021.qs')
+        neast_county_spatial_2024 <<- qs::qread('data/neast_county_spatial_2024.qs')
+        neast_state_spatial <<- qs::qread('data/neast_state_spatial.qs')
 
         # Build initial map once data is loaded
         initial_map(create_base_map(neast_county_spatial_2024))
@@ -197,8 +190,8 @@ mod_map_server <- function(id, app_data, parent_input){
     # Filter to metrics
     available_metrics <- reactive({
       req(input$resolution, input$dimension, map_data_loaded())
-      
-      metadata %>%
+
+      global_data$metadata %>%
         dplyr::filter(
           stringr::str_detect(Resolution, input$resolution),
           Dimension == input$dimension
@@ -211,31 +204,41 @@ mod_map_server <- function(id, app_data, parent_input){
     available_years <- reactive({
       req(input$metric, map_data_loaded())
 
-      metadata %>%
+      global_data$metadata %>%
         dplyr::filter(Metric == input$metric) %>%
         dplyr::pull(`Year Vector`) %>%
         unlist()
-    }) %>% 
+    }) %>%
       bindCache(input$metric)
 
     # Get variable name
     selected_variable <- reactive({
       req(input$metric, map_data_loaded())
-      metadata %>%
+      global_data$metadata %>%
         dplyr::filter(Metric == input$metric) %>%
         dplyr::pull(`Variable Name`)
-    }) %>% 
+    }) %>%
       bindCache(input$metric)
 
     # Get spatial base and join with metric data
     map_data <- reactive({
       req(
-        input$metric, 
-        input$year, 
+        input$metric,
+        input$year,
         input$resolution,
-        selected_variable(), 
+        selected_variable(),
         map_data_loaded()
       )
+
+      # Query metric data from database
+      table <- paste0('neast_', tolower(input$resolution), '_metrics')
+      query <- glue::glue(
+        "SELECT *
+        FROM {table}
+        WHERE variable_name = '{selected_variable()}'
+          AND year = {input$year}"
+      )
+      metric_data <- query_db(con, query)
 
       if (input$resolution == 'County') {
         # Choose spatial base by year (CT county boundary changes)
@@ -246,27 +249,13 @@ mod_map_server <- function(id, app_data, parent_input){
         }
         # Join spatial base with metric data - retain sf class with left join
         spatial_base %>%
-          dplyr::left_join(
-            neast_county_metrics %>%
-              dplyr::filter(
-                variable_name == selected_variable(),
-                year == input$year
-              ),
-            by = 'fips'
-          )
+          dplyr::left_join(metric_data, by = 'fips')
       } else {
         # State level
         neast_state_spatial %>%
-          dplyr::left_join(
-            neast_state_metrics %>%
-              dplyr::filter(
-                variable_name == selected_variable(),
-                year == input$year
-              ),
-            by = 'fips'
-          )
+          dplyr::left_join(metric_data, by = 'fips')
       }
-    }) %>% 
+    }) %>%
       # Cache so we don't have to reload
       bindCache(input$metric, input$year, input$resolution)
 
@@ -302,10 +291,10 @@ mod_map_server <- function(id, app_data, parent_input){
       if (show_metric_info()) {
         output$metric_info <- renderUI({
           req(input$metric, input$year)
-          
-          meta <- metadata %>% 
+
+          meta <- global_data$metadata %>%
             dplyr::filter(Metric == input$metric)
-          
+
           div(
             class = 'button-box',
             style = 'background-color: #fff !important;',
@@ -318,7 +307,7 @@ mod_map_server <- function(id, app_data, parent_input){
             tags$p(tags$strong('Source:'), tags$a(meta$Source)), tags$br(),
             tags$p(tags$strong('Citation:'), meta$Citation), tags$br()
           )
-          
+
         })
       } else {
         # If show_metric_info is FALSE, clear the output or do nothing
