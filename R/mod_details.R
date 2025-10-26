@@ -100,54 +100,48 @@ mod_details_server <- function(id, con, parent_input, global_data){
       modal_construction('details_tab')
     })
 
-    # Food insecurity reactive -----
+    # Value box data reactives -----
+    # Food insecurity
     rval_food_insecurity <- reactive({
       req(input$search_location, input$select_resolution)
-
-      # Define variable
-      food_insec_var <- 'foodInsecurityRate'
-      
-      # Get FIPS code from fips_key
-      if (input$select_resolution == 'County') {
-        location_fips <- global_data$fips_key %>%
-          filter(county_name == input$search_location) %>%
-          pull(fips) %>%
-          .[1]
-      } else {
-        location_fips <- global_data$fips_key %>%
-          filter(state_name == input$search_location) %>%
-          pull(fips) %>%
-          .[nchar(.) == 2] %>%
-          .[1]
-      }
-
-      if (is.na(location_fips) || length(location_fips) == 0) {
-        return("N/A")
-      }
-
-      # Query latest food insecurity value
-      table <- paste0('neast_', tolower(input$select_resolution), '_metrics')
-      query <- glue::glue(
-        "SELECT value, year
-        FROM {table}
-        WHERE variable_name = '{food_insec_var}'
-          AND fips = '{location_fips}'
-          AND value IS NOT NULL
-        ORDER BY year DESC
-        LIMIT 1"
+      get_latest_metric_value(
+        con = con,
+        global_data = global_data,
+        variable_name = 'foodInsecurityRate',
+        location = input$search_location,
+        resolution = input$select_resolution,
+        format_type = 'percent',
+        decimal_places = 1,
+        multiplier = 100  # Convert proportion to percent
       )
+    })
 
-      result <- query_db(con, query)
+    # Gini coefficient
+    rval_gini <- reactive({
+      req(input$search_location, input$select_resolution)
+      get_latest_metric_value(
+        con = con,
+        global_data = global_data,
+        variable_name = 'gini',
+        location = input$search_location,
+        resolution = input$select_resolution,
+        format_type = 'decimal',
+        decimal_places = 2
+      )
+    })
 
-      if (nrow(result) > 0) {
-        return(list(
-          # round and make it percent (comes as proportion)
-          value = paste0(round(result$value[1] * 100, 1), "%"),
-          year = result$year[1]
-        ))
-      }
-
-      return(list(value = "N/A", year = NULL))
+    # Median household income
+    rval_income <- reactive({
+      req(input$search_location, input$select_resolution)
+      get_latest_metric_value(
+        con = con,
+        global_data = global_data,
+        variable_name = 'medHhIncome',
+        location = input$search_location,
+        resolution = input$select_resolution,
+        format_type = 'currency',
+        decimal_places = 0
+      )
     })
 
     # Value boxes -----
@@ -169,18 +163,34 @@ mod_details_server <- function(id, con, parent_input, global_data){
     })
 
     output$gini_box <- renderValueBox({
+      gini_data <- rval_gini()
+
+      subtitle <- if (!is.null(gini_data$year)) {
+        paste0('Gini Coefficient (', gini_data$year, ')')
+      } else {
+        'Gini Coefficient'
+      }
+
       valueBox(
-        value = '12',
-        subtitle = 'Gini Coefficient',
+        value = gini_data$value,
+        subtitle = subtitle,
         icon = icon('scale-unbalanced'),
         color = 'aqua'
       )
     })
 
     output$wage_box <- renderValueBox({
+      income_data <- rval_income()
+
+      subtitle <- if (!is.null(income_data$year)) {
+        paste0('Median Household Income (', income_data$year, ')')
+      } else {
+        'Median Household Income'
+      }
+
       valueBox(
-        value = 'ABC',
-        subtitle = 'Average Weekly Wage in Food Business',
+        value = income_data$value,
+        subtitle = subtitle,
         icon = icon('dollar-sign'),
         color = 'teal'
       )
