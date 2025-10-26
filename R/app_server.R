@@ -48,7 +48,9 @@ app_server <- function(input, output, session) {
   )
   mod_details_server(
     'details', 
-    parent_input = input
+    con = con,
+    parent_input = input,
+    global_data = global_data
   )
   mod_table_server(
     'table', 

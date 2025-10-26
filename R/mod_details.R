@@ -13,6 +13,8 @@
 #' @importFrom dplyr filter inner_join pull select arrange desc slice
 #' @importFrom shinyWidgets actionBttn
 #' @importFrom shinycssloaders showPageSpinner hidePageSpinner
+#' @importFrom glue glue
+#' @importFrom stringr str_detect
 mod_details_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -60,7 +62,7 @@ mod_details_ui <- function(id) {
             inputId = ns('search_location'),
             label = 'Location:',
             choices = NULL,
-            selected = 'Chittenden County, VT',
+            selected = 'Chittenden County',
             width = '100%'
           ),
 
@@ -88,7 +90,7 @@ mod_details_ui <- function(id) {
 #' details Server Functions
 #'
 #' @noRd
-mod_details_server <- function(id, parent_input){
+mod_details_server <- function(id, con, parent_input, global_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
@@ -97,71 +99,70 @@ mod_details_server <- function(id, parent_input){
       req(parent_input$tabs == 'details_tab')
       modal_construction('details_tab')
     })
-    
-    
-    # Lazy loading -----
-    details_data_loaded <- reactiveVal(FALSE)
-
-    observe({
-      req(parent_input$tabs == "details_tab")
-
-      # Load once
-      if (!details_data_loaded()) {
-        load('data/sm_data.rda', envir = parent.frame())
-        details_data_loaded(TRUE)
-      }
-    })
 
     # Food insecurity reactive -----
     rval_food_insecurity <- reactive({
-      req(input$search_location)
+      req(input$search_location, input$select_resolution)
 
-      # Get the FIPS code for the location
-      if (tolower(input$select_resolution) == 'county') {
-        location_fips <- sm_data$fips_key %>%
+      # Define variable
+      food_insec_var <- 'foodInsecurityRate'
+      
+      # Get FIPS code from fips_key
+      if (input$select_resolution == 'County') {
+        location_fips <- global_data$fips_key %>%
           filter(county_name == input$search_location) %>%
           pull(fips) %>%
-          unique()
+          .[1]
       } else {
-        location_fips <- sm_data$fips_key %>%
+        location_fips <- global_data$fips_key %>%
           filter(state_name == input$search_location) %>%
           pull(fips) %>%
-          unique() %>%
-          .[nchar(.) == 2]
+          .[nchar(.) == 2] %>%
+          .[1]
       }
 
-      # Get food insecurity variable name
-      food_insec_var <- sm_data$metadata %>%
-        filter(grepl("food insecurity", metric, ignore.case = TRUE)) %>%
-        pull(variable_name) %>%
-        unique() %>%
-        .[1]
-
-      if (length(food_insec_var) > 0 && length(location_fips) > 0) {
-        # Get latest value
-        latest_value <- sm_data$metrics %>%
-          filter(
-            variable_name == food_insec_var,
-            fips %in% location_fips
-          ) %>%
-          arrange(desc(year)) %>%
-          filter(!is.na(value)) %>%
-          slice(1) %>%
-          pull(value)
-
-        if (length(latest_value) > 0) {
-          return(paste0(round(as.numeric(latest_value), 1), "%"))
-        }
+      if (is.na(location_fips) || length(location_fips) == 0) {
+        return("N/A")
       }
 
-      return("N/A")
+      # Query latest food insecurity value
+      table <- paste0('neast_', tolower(input$select_resolution), '_metrics')
+      query <- glue::glue(
+        "SELECT value, year
+        FROM {table}
+        WHERE variable_name = '{food_insec_var}'
+          AND fips = '{location_fips}'
+          AND value IS NOT NULL
+        ORDER BY year DESC
+        LIMIT 1"
+      )
+
+      result <- query_db(con, query)
+
+      if (nrow(result) > 0) {
+        return(list(
+          # round and make it percent (comes as proportion)
+          value = paste0(round(result$value[1] * 100, 1), "%"),
+          year = result$year[1]
+        ))
+      }
+
+      return(list(value = "N/A", year = NULL))
     })
 
     # Value boxes -----
     output$food_insecurity_box <- renderValueBox({
+      food_insec_data <- rval_food_insecurity()
+
+      subtitle <- if (!is.null(food_insec_data$year)) {
+        paste0('Food Insecurity Rate (', food_insec_data$year, ')')
+      } else {
+        'Food Insecurity Rate'
+      }
+
       valueBox(
-        value = rval_food_insecurity(),
-        subtitle = 'Food Insecurity Rate',
+        value = food_insec_data$value,
+        subtitle = subtitle,
         icon = icon('utensils'),
         color = 'green'
       )
@@ -201,15 +202,16 @@ mod_details_server <- function(id, parent_input){
 
       chosen_resolution <- tolower(input$select_resolution)
 
+      # Get locations from fips_key
       if (chosen_resolution == 'county') {
-        location_options <- sm_data$fips_key %>%
+        location_options <- global_data$fips_key %>%
           filter(nchar(fips) == 5) %>%
           arrange(county_name) %>%
           pull(county_name) %>%
           unique()
-        default_location <- "Chittenden County, VT"
+        default_location <- "Chittenden County"
       } else {
-        location_options <- sm_data$fips_key %>%
+        location_options <- global_data$fips_key %>%
           filter(nchar(fips) == 2) %>%
           arrange(state_name) %>%
           pull(state_name) %>%
@@ -231,10 +233,26 @@ mod_details_server <- function(id, parent_input){
       req(input$select_resolution)
 
       chosen_resolution <- tolower(input$select_resolution)
-      metric_options <- sm_data$metrics %>%
-        inner_join(sm_data$metadata, by = 'variable_name') %>%
-        filter(resolution == chosen_resolution) %>%
-        pull(metric) %>%
+
+      # Query metrics that have > 1 data point (proper time series)
+      table <- paste0('neast_', chosen_resolution, '_metrics')
+      query <- glue::glue(
+        "SELECT m.variable_name, COUNT(DISTINCT m.year) as year_count
+        FROM {table} m
+        WHERE m.value IS NOT NULL
+        GROUP BY m.variable_name
+        HAVING COUNT(DISTINCT m.year) > 1"
+      )
+
+      time_series_vars <- query_db(con, query)$variable_name
+
+      # Get metric names from metadata for these variables
+      metric_options <- global_data$metadata %>%
+        filter(
+          `Variable Name` %in% time_series_vars,
+          stringr::str_detect(Resolution, input$select_resolution)
+        ) %>%
+        pull(Metric) %>%
         unique() %>%
         sort()
 
@@ -249,37 +267,50 @@ mod_details_server <- function(id, parent_input){
 
     # Filter data for time series -----
     rval_ts_data <- reactive({
-      req(input$search_location, input$search_metric)
+      req(input$search_location, input$search_metric, input$select_resolution)
 
       # Get the variable name from the metric
-      var_name <- sm_data$metadata %>%
-        filter(metric == input$search_metric) %>%
-        pull(variable_name) %>%
+      var_name <- global_data$metadata %>%
+        filter(Metric == input$search_metric) %>%
+        pull(`Variable Name`) %>%
         unique()
 
-      # Get the FIPS code for the location
-      if (tolower(input$select_resolution) == 'county') {
-        location_fips <- sm_data$fips_key %>%
-          filter(county_name == input$search_location) %>%
-          pull(fips) %>%
-          unique()
-      } else {
-        location_fips <- sm_data$fips_key %>%
-          filter(state_name == input$search_location) %>%
-          pull(fips) %>%
-          unique() %>%
-          .[nchar(.) == 2]
+      if (length(var_name) == 0) {
+        return(list(data = data.frame(year = numeric(), value = numeric()), var_name = ""))
       }
 
-      # Filter metrics data
-      ts_data <- sm_data$metrics %>%
-        filter(
-          variable_name == var_name,
-          fips %in% location_fips
-        ) %>%
-        select(year, value) %>%
-        arrange(year) %>%
-        filter(!is.na(value))
+      # Get FIPS code from fips_key
+      if (tolower(input$select_resolution) == 'county') {
+        location_fips <- global_data$fips_key %>%
+          filter(county_name == input$search_location) %>%
+          pull(fips) %>%
+          .[1]
+      } else {
+        location_fips <- global_data$fips_key %>%
+          filter(state_name == input$search_location) %>%
+          pull(fips) %>%
+          .[nchar(.) == 2] %>%
+          .[1]
+      }
+
+      if (is.na(location_fips) || length(location_fips) == 0) {
+        return(list(data = data.frame(year = numeric(), value = numeric()), var_name = var_name))
+      }
+
+      # Query time series data from database
+      table <- paste0('neast_', tolower(input$select_resolution), '_metrics')
+
+      # Query time series data
+      query <- glue::glue(
+        "SELECT year, value
+        FROM {table}
+        WHERE variable_name = '{var_name}'
+          AND fips = '{location_fips}'
+          AND value IS NOT NULL
+        ORDER BY year"
+      )
+
+      ts_data <- query_db(con, query)
 
       list(data = ts_data, var_name = var_name)
     })
@@ -333,6 +364,6 @@ mod_details_server <- function(id, parent_input){
     
 ## To be copied in the UI
 # mod_details_ui("details_1")
-    
+
 ## To be copied in the server
-# mod_details_server("details_1")
+# mod_details_server("details_1", con, parent_input, global_data)
