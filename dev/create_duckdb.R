@@ -23,9 +23,9 @@ load('data/metadata.rda')
 
 
 con <- dbConnect(duckdb::duckdb(), dbdir = 'data/appdata.duckdb')
-dbWriteTable(con, 'neast_county_metrics', neast_county_metrics, overwrite = TRUE)
-dbWriteTable(con, 'neast_state_metrics', neast_state_metrics, overwrite = TRUE)
-dbWriteTable(con, 'metadata', metadata, overwrite = TRUE)
+dbWriteTable(con, 'neast_county_metrics', as.data.frame(neast_county_metrics), overwrite = TRUE)
+dbWriteTable(con, 'neast_state_metrics', as.data.frame(neast_state_metrics), overwrite = TRUE)
+dbWriteTable(con, 'metadata', as.data.frame(metadata), overwrite = TRUE)
 
 # Check
 dbListTables(con)
