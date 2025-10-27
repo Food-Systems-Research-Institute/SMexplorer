@@ -57,13 +57,26 @@ mod_details_ui <- function(id) {
             width = '100%'
           ),
 
-          ### Search Location -----
+          ### Select State -----
           selectizeInput(
-            inputId = ns('search_location'),
-            label = 'Location:',
+            inputId = ns('select_state'),
+            label = 'State:',
             choices = NULL,
-            selected = 'Chittenden County',
+            selected = 'Vermont',
             width = '100%'
+          ),
+
+          ### Search County (conditional on County resolution) -----
+          conditionalPanel(
+            condition = "input.select_resolution == 'County'",
+            ns = ns,
+            selectizeInput(
+              inputId = ns('search_county'),
+              label = 'County:',
+              choices = NULL,
+              selected = 'Chittenden County',
+              width = '100%'
+            )
           ),
 
           ### Search Metric -----
@@ -71,7 +84,7 @@ mod_details_ui <- function(id) {
             inputId = ns('search_metric'),
             label = 'Metric:',
             choices = NULL,
-            selected = NULL,
+            selected = 'Overall food insecurity rate',
             width = '100%'
           ),
 
@@ -100,15 +113,26 @@ mod_details_server <- function(id, con, parent_input, global_data){
       modal_construction('details_tab')
     })
 
+    # Combined location reactive -----
+    selected_location <- reactive({
+      if (input$select_resolution == 'County') {
+        req(input$search_county)
+        return(input$search_county)
+      } else {
+        req(input$select_state)
+        return(input$select_state)
+      }
+    })
+
     # Value box data reactives -----
     # Food insecurity
     rval_food_insecurity <- reactive({
-      req(input$search_location, input$select_resolution)
+      req(selected_location(), input$select_resolution)
       get_latest_metric_value(
         con = con,
         global_data = global_data,
         variable_name = 'foodInsecurityRate',
-        location = input$search_location,
+        location = selected_location(),
         resolution = input$select_resolution,
         format_type = 'percent',
         decimal_places = 1,
@@ -118,12 +142,12 @@ mod_details_server <- function(id, con, parent_input, global_data){
 
     # Gini coefficient
     rval_gini <- reactive({
-      req(input$search_location, input$select_resolution)
+      req(selected_location(), input$select_resolution)
       get_latest_metric_value(
         con = con,
         global_data = global_data,
         variable_name = 'gini',
-        location = input$search_location,
+        location = selected_location(),
         resolution = input$select_resolution,
         format_type = 'decimal',
         decimal_places = 2
@@ -132,12 +156,12 @@ mod_details_server <- function(id, con, parent_input, global_data){
 
     # Median household income
     rval_income <- reactive({
-      req(input$search_location, input$select_resolution)
+      req(selected_location(), input$select_resolution)
       get_latest_metric_value(
         con = con,
         global_data = global_data,
         variable_name = 'medHhIncome',
-        location = input$search_location,
+        location = selected_location(),
         resolution = input$select_resolution,
         format_type = 'currency',
         decimal_places = 0
@@ -206,34 +230,50 @@ mod_details_server <- function(id, con, parent_input, global_data){
       )
     })
 
-    # Location options -----
+    # State options -----
     observe({
-      req(input$select_resolution)
+      # Populate state dropdown with all states
+      state_options <- global_data$fips_key %>%
+        filter(nchar(fips) == 2) %>%
+        arrange(state_name) %>%
+        pull(state_name) %>%
+        unique()
 
-      chosen_resolution <- tolower(input$select_resolution)
+      updateSelectizeInput(
+        session,
+        'select_state',
+        choices = c('', state_options),
+        selected = "Vermont",
+        server = TRUE
+      )
+    })
 
-      # Get locations from fips_key
-      if (chosen_resolution == 'county') {
-        location_options <- global_data$fips_key %>%
-          filter(nchar(fips) == 5) %>%
-          arrange(county_name) %>%
-          pull(county_name) %>%
-          unique()
-        default_location <- "Chittenden County"
+    # County options (filtered by selected state) -----
+    observe({
+      req(input$select_state)
+
+      # Filter counties by selected state
+      county_options <- global_data$fips_key %>%
+        filter(
+          nchar(fips) == 5,
+          state_name == input$select_state
+        ) %>%
+        arrange(county_name) %>%
+        pull(county_name) %>%
+        unique()
+
+      # Default to Chittenden County if Vermont is selected
+      default_county <- if (input$select_state == "Vermont") {
+        "Chittenden County"
       } else {
-        location_options <- global_data$fips_key %>%
-          filter(nchar(fips) == 2) %>%
-          arrange(state_name) %>%
-          pull(state_name) %>%
-          unique()
-        default_location <- "Vermont"
+        county_options[1]  # First county in the list
       }
 
       updateSelectizeInput(
         session,
-        'search_location',
-        choices = c('', location_options),
-        selected = default_location,
+        'search_county',
+        choices = c('', county_options),
+        selected = default_county,
         server = TRUE
       )
     })
@@ -266,18 +306,25 @@ mod_details_server <- function(id, con, parent_input, global_data){
         unique() %>%
         sort()
 
+      # Default to "Overall food insecurity rate" if available
+      default_metric <- if ("Overall food insecurity rate" %in% metric_options) {
+        "Overall food insecurity rate"
+      } else {
+        metric_options[1]
+      }
+
       updateSelectizeInput(
         session,
         'search_metric',
         choices = c('', metric_options),
-        selected = NULL,
+        selected = default_metric,
         server = TRUE
       )
     })
 
     # Filter data for time series -----
     rval_ts_data <- reactive({
-      req(input$search_location, input$search_metric, input$select_resolution)
+      req(selected_location(), input$search_metric, input$select_resolution)
 
       # Get the variable name from the metric
       var_name <- global_data$metadata %>%
@@ -292,12 +339,12 @@ mod_details_server <- function(id, con, parent_input, global_data){
       # Get FIPS code from fips_key
       if (tolower(input$select_resolution) == 'county') {
         location_fips <- global_data$fips_key %>%
-          filter(county_name == input$search_location) %>%
+          filter(county_name == selected_location()) %>%
           pull(fips) %>%
           .[1]
       } else {
         location_fips <- global_data$fips_key %>%
-          filter(state_name == input$search_location) %>%
+          filter(state_name == selected_location()) %>%
           pull(fips) %>%
           .[nchar(.) == 2] %>%
           .[1]
@@ -327,7 +374,14 @@ mod_details_server <- function(id, con, parent_input, global_data){
 
     # Time series plot -----
     output$time_series_plot <- renderPlotly({
-      if (input$search_location == "" || input$search_metric == "") {
+      # Check if location and metric are selected
+      location_check <- if (input$select_resolution == 'County') {
+        !is.null(input$search_county) && input$search_county != ""
+      } else {
+        !is.null(input$select_state) && input$select_state != ""
+      }
+
+      if (!location_check || is.null(input$search_metric) || input$search_metric == "") {
         # Empty plot if no selections
         plot_ly() %>%
           layout(
@@ -361,7 +415,7 @@ mod_details_server <- function(id, con, parent_input, global_data){
           line = list(color = '#154734', width = 2)
         ) %>%
           layout(
-            title = paste0(input$search_metric, " - ", input$search_location),
+            title = paste0(input$search_metric, " - ", selected_location()),
             xaxis = list(title = "Year"),
             yaxis = list(title = input$search_metric),
             hovermode = 'x unified'
