@@ -174,7 +174,7 @@ div.link-block:hover {
   flex-direction: column;
   justify-content: center;
   align-items: left;
-  margin: 0 auto 10px auto; /* outsides: top side bottom side */
+  margin: 0 auto 10px auto; /* outsides: top left bottom right */
   width: 100%;
   border-width: 1px;
 }

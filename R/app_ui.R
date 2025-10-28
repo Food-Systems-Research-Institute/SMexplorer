@@ -54,7 +54,7 @@ app_ui <- function(request) {
           menuItem('Home', tabName = 'welcome_tab', icon = icon('house')),
           
           # map_tab
-          menuItem("Interactive Map", tabName = "map_tab", icon = icon("map")),
+          menuItem("Map", tabName = "map_tab", icon = icon("map")),
           
           # graph_tab
           menuItem("Metric Comparisons", tabName = "graph_tab", icon = icon("chart-simple")),

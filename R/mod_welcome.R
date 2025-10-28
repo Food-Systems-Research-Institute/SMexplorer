@@ -31,14 +31,10 @@ mod_welcome_server <- function(id){
           tags$p(
             tags$img(
               src = 'www/SMexplorer.png',
-              style = 'float: right; width: 250px; margin-left: 10px; margin-bottom: 10px;',
+              style = 'float: right; width: 200px; margin-left: 10px; margin-bottom: 10px;',
               alt = ''
             ),
-            'Welcome! This page pretends to be a nice welcome page that directs you to where you want to go.',
-            'Really it\'s only here to buy time for other pages to load before you click on them though.',
-            tags$br(),
-            tags$br(),
-            'This dashboard helps you explore secondary data collected for the',
+            'Welcome! This dashboard lets you explore secondary data collected for the',
             tags$a(
               'Sustainability Metrics', 
               href = 'https://www.uvm.edu/ovpr/food-systems-research/sustainability-metrics-project',
@@ -91,8 +87,8 @@ mod_welcome_server <- function(id){
           fluidRow(
             link_block(
               id = 'go_to_details_tab',
-              title = 'County Details',
-              text = 'Dig deeper into county statistics and time series.',
+              title = 'Details',
+              text = 'Dig deeper into county and state statistics and time series.',
               image = 'www/thumbnail_details.png'
             ),
             link_block(
@@ -103,7 +99,6 @@ mod_welcome_server <- function(id){
             )
           )
         )
-        
       )
     })
   })

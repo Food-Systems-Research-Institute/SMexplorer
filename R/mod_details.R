@@ -107,11 +107,11 @@ mod_details_server <- function(id, con, parent_input, global_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    # Construction sign -----
-    observeEvent(parent_input$tabs, {
-      req(parent_input$tabs == 'details_tab')
-      modal_construction('details_tab')
-    })
+    # # Construction sign -----
+    # observeEvent(parent_input$tabs, {
+    #   req(parent_input$tabs == 'details_tab')
+    #   modal_construction('details_tab')
+    # })
 
     # Combined location reactive -----
     selected_location <- reactive({
@@ -373,54 +373,53 @@ mod_details_server <- function(id, con, parent_input, global_data){
     })
 
     # Time series plot -----
+    # Reactive values to store plot data and metadata
+    plot_data <- reactiveVal(NULL)
+    plot_location <- reactiveVal(NULL)
+    plot_metric <- reactiveVal(NULL)
+
+    # Initialize plot on first load
+    observe({
+      req(selected_location(), input$search_metric)
+
+      # Only run once on initialization
+      if (is.null(plot_data())) {
+        plot_data(rval_ts_data()$data)
+        plot_location(selected_location())
+        plot_metric(input$search_metric)
+      }
+    })
+
+    # Update plot data only when button is clicked
+    observeEvent(input$update_plot, {
+      req(selected_location(), input$search_metric)
+
+      plot_data(rval_ts_data()$data)
+      plot_location(selected_location())
+      plot_metric(input$search_metric)
+    })
+
     output$time_series_plot <- renderPlotly({
-      # Check if location and metric are selected
-      location_check <- if (input$select_resolution == 'County') {
-        !is.null(input$search_county) && input$search_county != ""
-      } else {
-        !is.null(input$select_state) && input$select_state != ""
-      }
+      req(plot_data(), plot_location(), plot_metric())
 
-      if (!location_check || is.null(input$search_metric) || input$search_metric == "") {
-        # Empty plot if no selections
-        plot_ly() %>%
-          layout(
-            title = list(
-              text = "Select a location and metric\nto display time series",
-              x = 0.5,
-              y = 0.6
-            ),
-            xaxis = list(
-              showgrid = FALSE,
-              showline = TRUE,
-              range = c(0, 10)
-            ),
-            yaxis = list(
-              showgrid = FALSE,
-              showline = TRUE,
-              range = c(0, 10)
-            )
-          )
-      } else {
-        ts_data <- rval_ts_data()$data
+      ts_data <- plot_data()
 
-        # Create plotly time series
-        plot_ly(
-          ts_data,
-          x = ~year,
-          y = ~value,
-          type = 'scatter',
-          mode = 'lines+markers',
-          marker = list(size = 8, color = '#154734'),
-          line = list(color = '#154734', width = 2)
-        ) %>%
-          layout(
-            title = paste0(input$search_metric, " - ", selected_location()),
-            xaxis = list(title = "Year"),
-            yaxis = list(title = input$search_metric),
-            hovermode = 'x unified'
-          )
-      }
+      # Create plotly time series
+      plot_ly(
+        ts_data,
+        x = ~year,
+        y = ~value,
+        type = 'scatter',
+        mode = 'lines+markers',
+        marker = list(size = 8, color = '#154734'),
+        line = list(color = '#154734', width = 2)
+      ) %>%
+        layout(
+          title = paste0(plot_metric(), " - ", plot_location()),
+          xaxis = list(title = "Year"),
+          yaxis = list(title = plot_metric()),
+          hovermode = 'x unified'
+        )
     })
 
   })

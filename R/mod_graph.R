@@ -195,92 +195,96 @@ mod_graph_server <- function(id,
     
     
     # Plotly Graph -----
+    plot_to_render <- eventReactive(input$update_graph, {
+      req(input$search_x, input$search_y)
+      # TODO: check if we even need to do this
+      plot_dat <- rval_data()$data
+      xvar <- rval_data()$xvar
+      yvar <- rval_data()$yvar
+
+      # Generate x and y labels
+      x_label <- unique(metric_lookup$`Axis Name`[metric_lookup$`Variable Name` == xvar])
+      y_label <- unique(metric_lookup$`Axis Name`[metric_lookup$`Variable Name` == yvar])
+
+      # Create the ggplot
+      plot <- plot_dat %>%
+        ggplot(aes(
+          x = !!sym(xvar),
+          y = !!sym(yvar),
+          color = state_name,
+          key = fips,
+          # Popup - this sucks but it works. Can't use function because we
+          # need to call it within aes()
+          text = ifelse(
+            # !is.na(county_name),
+            'county_name' %in% names(plot_dat),
+            paste0(
+              '<b>', county_name, ', ', state_name, '</b>\n',
+              x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
+              y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
+            ),
+            paste0(
+              '<b>', state_name, '</b>\n',
+              x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
+              y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
+            )
+          )
+        )) +
+        geom_point(size = 1.5, alpha = 0.7) +
+        labs(
+          x = x_label,
+          y = y_label,
+          title = paste0('"', y_label, '" by "', x_label, '"'),
+          color = 'State'
+        ) +
+        theme_classic()
+
+      # Optionally add LOESS smooth
+      if (input$loess == TRUE) {
+        plot <- plot + geom_smooth(aes(group = 1))
+      }
+
+      # Convert ggplot to plotly and return
+      ggplotly(plot, tooltip = 'text') %>%
+        layout(
+          hoverlabel = list(
+            bgcolor = "#154732",
+            bordercolor = 'white',
+            align = 'auto',
+            font = list(
+              size = 14,
+              color = 'white'
+            )
+          )
+        ) %>%
+        event_register('plotly_click')
+    })
+
     output$graph <- renderPlotly({
-      if (input$search_x == "" || input$search_y == "") {
-        # Empty plot if no variables selected
+      # Show empty plot on initial load (before button is clicked)
+      if (input$update_graph == 0) {
         plot_ly() %>%
           layout(
             title = list(
-              text = "Select two metrics in the box on\nthe right to display a graph", 
+              text = "Select two metrics in the box on\nthe right to display a graph",
               x = 0.5,
               y = 0.6
             ),
             xaxis = list(
-              showgrid = FALSE, 
-              showline = TRUE, 
+              showgrid = FALSE,
+              showline = TRUE,
               range = c(0, 10)
             ),
             yaxis = list(
-              showgrid = FALSE, 
+              showgrid = FALSE,
               showline = TRUE,
               range = c(0, 10)
             )
-          ) %>% 
-          event_register('plotly_click')
-      } else {
-
-        # Get the filtered data and variables from the reactive function
-        # TODO: check if we even need to do this
-        plot_dat <- rval_data()$data
-        xvar <- rval_data()$xvar
-        yvar <- rval_data()$yvar
-        
-        # Generate x and y labels
-        x_label <- unique(metric_lookup$`Axis Name`[metric_lookup$`Variable Name` == xvar])
-        y_label <- unique(metric_lookup$`Axis Name`[metric_lookup$`Variable Name` == yvar])
-
-        # Create the ggplot
-        plot <- plot_dat %>%
-          ggplot(aes(
-            x = !!sym(xvar),
-            y = !!sym(yvar),
-            color = state_name,
-            key = fips,
-            # Popup - this sucks but it works. Can't use function because we 
-            # need to call it within aes()
-            text = ifelse(
-              # !is.na(county_name),
-              'county_name' %in% names(plot_dat),
-              paste0(
-                '<b>', county_name, ', ', state_name, '</b>\n',
-                x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
-                y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
-              ),
-              paste0(
-                '<b>', state_name, '</b>\n',
-                x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
-                y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
-              )
-            )
-          )) +
-          geom_point(size = 1.5, alpha = 0.7) +
-          labs(
-            x = x_label,
-            y = y_label,
-            title = paste0('"', y_label, '" by "', x_label, '"'),
-            color = 'State'
-          ) +
-          theme_classic()
-        
-        # Optionally add LOESS smooth
-        if (input$loess == TRUE) {
-          plot <- plot + geom_smooth(aes(group = 1))
-        }
-
-        # Convert ggplot to plotly and return
-        ggplotly(plot, tooltip = 'text') %>%
-          layout(
-            hoverlabel = list(
-              bgcolor = "#154732", 
-              bordercolor = 'white',
-              align = 'auto',
-              font = list(
-                size = 14,
-                color = 'white'
-              )
-            )
           ) %>%
           event_register('plotly_click')
+      } else {
+        # After button click, render the plot
+        plot_to_render()
       }
     })
     

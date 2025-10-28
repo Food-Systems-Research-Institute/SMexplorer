@@ -7,7 +7,6 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @import DT
 #' @import dplyr
 #' @import reactable
 #' @import stringr

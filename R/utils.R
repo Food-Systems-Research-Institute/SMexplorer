@@ -40,7 +40,8 @@ modal_construction <- function(tab) {
       tags$div(
         class = 'button-box',
         tags$p(
-          "This page is under construction! Head to the",
+          "This page is under construction! Nothing works right yet.",
+          "Head to the",
           tags$a(
             'FSRI GitHub Page',
             href = 'https://www.github.com/Food-Systems-Research-Institute/SMexplorer/issues',
