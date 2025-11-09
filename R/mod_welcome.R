@@ -95,7 +95,7 @@ mod_welcome_server <- function(id){
               id = 'go_to_database_tab',
               title = 'Database',
               text = 'Explore and download secondary metrics.',
-              image = 'www/thumbnail_table.png'
+              image = 'www/thumbnail_database.png'
             )
           ),
           fluidRow(
