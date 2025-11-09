@@ -101,6 +101,14 @@ remove <- c(
 )
 metadata <- metadata[-remove, ]
 
+# Remove anything with Util in dimension, index, or indicator
+metadata <- metadata %>% 
+  dplyr::filter(
+    str_detect(Dimension, 'Util', negate = TRUE),
+    str_detect(Index, 'Util', negate = TRUE),
+    str_detect(Indicator, 'Util', negate = TRUE)
+  )
+
 # Save
 usethis::use_data(metadata, overwrite = TRUE)
 saveRDS(metadata, 'data/metadata.rds')

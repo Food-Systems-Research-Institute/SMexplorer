@@ -62,6 +62,9 @@ app_ui <- function(request) {
           # details_tab
           menuItem("Details", tabName = "details_tab", icon = icon("circle-info")),
           
+          # database_tab
+          menuItem("Database", tabName = "database_tab", icon = icon("database")),
+          
           # table_tab
           menuItem("Metadata", tabName = "table_tab", icon = icon("table"))
           # conditionalPanel(
@@ -97,16 +100,16 @@ app_ui <- function(request) {
             mod_graph_ui("graph")
           ),
           tabItem(
-            tabName = 'tree_tab',
-            mod_tree_ui('tree')
+            tabName = 'details_tab',
+            mod_details_ui('details')
+          ),
+          tabItem(
+            tabName = 'database_tab',
+            mod_database_ui('database')
           ),
           tabItem(
             tabName = 'table_tab',
             mod_table_ui('table')
-          ),
-          tabItem(
-            tabName = 'details_tab',
-            mod_details_ui('details')
           )
         )
       )

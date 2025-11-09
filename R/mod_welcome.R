@@ -92,6 +92,14 @@ mod_welcome_server <- function(id){
               image = 'www/thumbnail_details.png'
             ),
             link_block(
+              id = 'go_to_database_tab',
+              title = 'Database',
+              text = 'Explore and download secondary metrics.',
+              image = 'www/thumbnail_table.png'
+            )
+          ),
+          fluidRow(
+            link_block(
               id = 'go_to_table_tab',
               title = 'Metadata',
               text = 'Explore and download metadata and source information.',

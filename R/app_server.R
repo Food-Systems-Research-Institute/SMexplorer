@@ -20,6 +20,9 @@ app_server <- function(input, output, session) {
   shinyjs::onclick("go_to_table_tab", {
     updateTabItems(session, "tabs", "table_tab")
   })
+  shinyjs::onclick("go_to_database_tab", {
+    updateTabItems(session, "tabs", "database_tab")
+  })
   
   # Contains small DFs that are used across all (or most) modules
   global_data <- load_global_data()
@@ -54,6 +57,12 @@ app_server <- function(input, output, session) {
   )
   mod_table_server(
     'table', 
+    parent_input = input,
+    global_data = global_data
+  )
+  mod_database_server(
+    'database', 
+    con = con,
     parent_input = input,
     global_data = global_data
   )

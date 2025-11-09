@@ -299,3 +299,90 @@ input[type="checkbox"] {
 .bttn-unite:focus::after {
   background: var(--theme-dark-green) !important;
 }
+
+
+/* Slider Input ------------------------------------------ */
+/* Change slider from blue to theme off-green */
+/* Using high specificity selectors to override Shiny defaults */
+
+body .irs--shiny .irs-bar,
+body .irs .irs-bar,
+.content .irs .irs-bar {
+  background: var(--theme-off-green) !important;
+  border-top: 1px solid var(--theme-off-green) !important;
+  border-bottom: 1px solid var(--theme-off-green) !important;
+}
+
+body .irs--shiny .irs-from,
+body .irs--shiny .irs-to,
+body .irs--shiny .irs-single,
+body .irs .irs-from,
+body .irs .irs-to,
+body .irs .irs-single,
+.content .irs .irs-from,
+.content .irs .irs-to,
+.content .irs .irs-single {
+  background: var(--theme-off-green) !important;
+}
+
+body .irs--shiny .irs-from:before,
+body .irs--shiny .irs-to:before,
+body .irs--shiny .irs-single:before,
+body .irs .irs-from:before,
+body .irs .irs-to:before,
+body .irs .irs-single:before,
+.content .irs .irs-from:before,
+.content .irs .irs-to:before,
+.content .irs .irs-single:before {
+  border-top-color: var(--theme-off-green) !important;
+}
+
+body .irs--shiny .irs-handle,
+body .irs .irs-handle,
+.content .irs .irs-handle {
+  border: 2px solid var(--theme-off-green) !important;
+  background: white !important;
+}
+
+body .irs--shiny .irs-handle:hover,
+body .irs .irs-handle:hover,
+.content .irs .irs-handle:hover {
+  background: var(--theme-light-green) !important;
+}
+
+body .irs--shiny .irs-handle.state_hover,
+body .irs--shiny .irs-handle:hover,
+body .irs .irs-handle.state_hover,
+body .irs .irs-handle:hover,
+.content .irs .irs-handle.state_hover,
+.content .irs .irs-handle:hover {
+  border-color: var(--theme-dark-green) !important;
+}
+
+
+/* Download Button ------------------------------------------ */
+/* Style download button to match theme */
+.btn-primary {
+  font-size: 16px !important;
+  padding: 8px 16px !important;
+  border-radius: 3px !important;
+  background-color: var(--theme-off-green) !important;
+  color: white !important;
+  border: 1px solid #000000 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: var(--theme-dark-green) !important;
+  color: white !important;
+  border-color: #000000 !important;
+}
+
+.btn-primary:disabled,
+.btn-primary[disabled] {
+  background-color: var(--theme-light-grey) !important;
+  color: #666 !important;
+  border-color: #999 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
