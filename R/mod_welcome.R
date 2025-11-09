@@ -102,7 +102,7 @@ mod_welcome_server <- function(id){
             link_block(
               id = 'go_to_table_tab',
               title = 'Metadata',
-              text = 'Explore and download metadata and source information.',
+              text = 'Explore metadata and source information.',
               image = 'www/thumbnail_table.png'
             )
           )
