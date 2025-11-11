@@ -18,6 +18,10 @@ mod_table_ui <- function(id) {
       class = 'button-box',
       style = 'background: #fff !important;',
       uiOutput(ns('header')),
+    ),
+    div(
+      class = 'button-box',
+      style = 'background: #fff !important;',
       with_spinner(
         reactable::reactableOutput(ns('metrics_table'))
       )

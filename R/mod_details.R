@@ -18,6 +18,23 @@
 mod_details_ui <- function(id) {
   ns <- NS(id)
   tagList(
+    # Title ----
+    div(
+      class = 'button-box',
+      style = 'background: #fff !important;',
+      tagList(
+        tags$h2(
+          'State and County Details', 
+          style = 'text-align: left !important; margin-top: 10px !important;'
+        ),
+        tags$p(
+          'Use the box on the right to select a resolution, state or county, and metric.',
+          'Highlights in the data boxes will adjust to suit, and a time series plot will be shown that visualizes the metric over time.',
+          'This page could benefit from a metric information dropdown which will be added soon.'
+        )
+      )
+    ),
+    
     uiOutput(ns('boxes')),
 
     fluidRow(
@@ -25,16 +42,7 @@ mod_details_ui <- function(id) {
         width = 8,
 
         ## Time series box -----
-        box(
-          width = 12,
-          title = 'Metric Time Series',
-          solidHeader = TRUE,
-          status = 'primary',
-          collapsible = TRUE,
-          with_spinner(
-            plotlyOutput(ns('time_series_plot'))
-          )
-        )
+        uiOutput(ns('time_series_box'))
       ),
 
       # Right Column - Controls
@@ -106,12 +114,6 @@ mod_details_ui <- function(id) {
 mod_details_server <- function(id, con, parent_input, global_data){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-
-    # # Construction sign -----
-    # observeEvent(parent_input$tabs, {
-    #   req(parent_input$tabs == 'details_tab')
-    #   modal_construction('details_tab')
-    # })
 
     # Combined location reactive -----
     selected_location <- reactive({
@@ -226,6 +228,20 @@ mod_details_server <- function(id, con, parent_input, global_data){
           valueBoxOutput(ns('food_insecurity_box')),
           valueBoxOutput(ns('gini_box')),
           valueBoxOutput(ns('wage_box'))
+        )
+      )
+    })
+
+    # Time series box ----
+    output$time_series_box <- renderUI({
+      box(
+        width = 12,
+        title = plot_location(),
+        solidHeader = TRUE,
+        status = 'primary',
+        collapsible = TRUE,
+        with_spinner(
+          plotlyOutput(ns('time_series_plot'))
         )
       )
     })

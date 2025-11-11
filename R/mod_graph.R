@@ -24,9 +24,26 @@ mod_graph_ui <- function(id) {
   ns <- NS(id)
   tagList(
     
+    # Title ----
+    div(
+      class = 'button-box',
+      style = 'background: #fff !important;',
+      tagList(
+        tags$h2(
+          'Metric Comparisons', 
+          style = 'text-align: left !important; margin-top: 10px !important;'
+        ),
+        tags$p(
+          'Use the box on the right to select metrics to compare in the plot below.',
+          'Only the latest time point available for each metric will be compared.',
+          'You can also add stat outputs for Pearson correlations among the metrics and a locally estimated regression (LOESS) curve to visualize trends.',
+          'This page is currently limited to county-level metrics, but state-level data will soon be added.'
+        )
+      )
+    ),
+    
     fluidRow(
-      
-      # Left Column -----
+      # Left Column ----
       column(
         width = 7,
         with_spinner(
@@ -36,7 +53,7 @@ mod_graph_ui <- function(id) {
         uiOutput(ns('click_box'))
       ),
       
-      # Right Column -----
+      # Right Column ----
       column(
         width = 5,
         box(
@@ -215,20 +232,23 @@ mod_graph_server <- function(id,
           key = fips,
           # Popup - this sucks but it works. Can't use function because we
           # need to call it within aes()
-          text = ifelse(
+          
+          # text = ifelse(
             # !is.na(county_name),
-            'county_name' %in% names(plot_dat),
+            # 'county_name' %in% names(plot_dat),
+          text = 
             paste0(
               '<b>', county_name, ', ', state_name, '</b>\n',
               x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
               y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
-            ),
-            paste0(
-              '<b>', state_name, '</b>\n',
-              x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
-              y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
             )
-          )
+            # paste0(
+            #   '<b>', state_name, '</b>\n',
+            #   x_label, ': ', format(round(!!sym(xvar), 3), big.mark = ','), '\n',
+            #   y_label, ': ', format(round(!!sym(yvar), 3), big.mark = ',')
+            # )
+          # )
+          
         )) +
         geom_point(size = 1.5, alpha = 0.7) +
         labs(
@@ -241,7 +261,11 @@ mod_graph_server <- function(id,
 
       # Optionally add LOESS smooth
       if (input$loess == TRUE) {
-        plot <- plot + geom_smooth(aes(group = 1))
+        plot <- plot + geom_smooth(
+          aes(group = 1), 
+          color = 'black',
+          alpha = 0.3
+        )
       }
 
       # Convert ggplot to plotly and return

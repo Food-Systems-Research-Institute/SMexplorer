@@ -17,7 +17,10 @@ mod_database_ui <- function(id) {
     div(
       class = 'button-box',
       style = 'background: #fff !important;',
-      tags$h2('Metric Database', style = 'text-align: left !important;'),
+      tags$h2(
+        'Metric Database', 
+        style = 'text-align: left !important; margin-top: 10px !important',
+      ),
       tags$p(
         'Use the fields below to query metric data from the database',
         'After querying, you can further filter and explore the data in the table.',
