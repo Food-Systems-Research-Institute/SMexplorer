@@ -8,28 +8,36 @@ License: GPL (>= 3)
 Imports:
     broom,
     bslib,
+    collapsibleTree,
     config,
     conflicted,
     dashboardthemes,
     DBI,
     dplyr,
+    DT,
     duckdb,
     ggplot2,
+    glue,
     golem,
+    htmltools,
     leaflet,
     leaflet.extras,
+    pacman,
     pkgload,
     plotly,
     purrr,
+    qs,
     reactable,
     rlang,
     sf,
     shiny,
     shinycssloaders,
     shinydashboard,
+    shinydashboardPlus,
     shinyjs,
     shinyWidgets,
     snakecase,
+    stringr,
     tidyr
 Suggests: 
     testthat (>= 3.0.0),
@@ -41,3 +49,4 @@ LazyData: true
 RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.5)
+Config/Needs/website: false
