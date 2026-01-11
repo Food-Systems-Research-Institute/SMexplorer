@@ -87,7 +87,7 @@ get_metric_info <- function(meta) {
 }
 
 
-# Cascading Filter Utility Functions ==========================================
+# Cascading Filter Functions ----------------------------------------------
 
 #' Get Available Years Range
 #'
@@ -108,9 +108,17 @@ get_available_years_range <- function(metadata, resolution = NULL) {
       dplyr::filter(stringr::str_detect(Resolution, resolution))
   }
 
-  # Extract all years from Year Vector column (which is a list column)
+  # Extract all years from Year vector
+  assertthat::assert_that(
+    is.list(filtered_meta$`Year Vector`), 
+    msg = 'Year Vector column was not a list'
+  )
   all_years <- unlist(filtered_meta$`Year Vector`)
-
+  assertthat::assert_that(
+    is.integer(all_years), 
+    msg = 'Extracted years were not integers'
+  )
+  
   if (length(all_years) == 0) {
     return(c(min = 2000, max = 2024))  # Default fallback
   }

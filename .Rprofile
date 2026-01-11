@@ -5,11 +5,8 @@ options(
 
 Sys.setenv(R_CHECK_QUARTO = "false")
 
-# Activate renv
-source("renv/activate.R")
-
 # Shortcut to vim configuration
-# try(vim <- function() rstudiovim::rsvim_exec_file(rstudiovim::rsvim_default_path()))
+try(vim <- function() rstudiovim::rsvim_exec_file(rstudiovim::rsvim_default_path()))
 
 # Load package devtools::load_all()
 
@@ -20,3 +17,6 @@ source("renv/activate.R")
 #       SMexplorer::run_app()
 #     }
 # )
+
+# Activate renv
+source("renv/activate.R")
