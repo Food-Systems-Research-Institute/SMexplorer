@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.5.2",
+    "Version": "4.5.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -276,7 +276,8 @@
       "Description": "Provides color schemes for maps (and other graphics) designed by Cynthia Brewer as described at http://colorbrewer2.org.",
       "License": "Apache License 2.0",
       "NeedsCompilation": "no",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "Rcpp": {
       "Package": "Rcpp",
@@ -418,7 +419,7 @@
       "Roxygen": "list(markdown = TRUE)",
       "RoxygenNote": "7.3.3",
       "Depends": [
-        "R (>= 3.5)"
+        "R (>= 4.1.0)"
       ],
       "LazyData": "true",
       "Imports": [
@@ -432,14 +433,16 @@
         "testthat (>= 3.0.0)"
       ],
       "Config/testthat/edition": "3",
-      "Author": "Christopher Donovan [aut, cre]",
-      "Maintainer": "Christopher Donovan <christopher.donovan@uvm.edu>",
       "RemoteType": "github",
-      "RemoteUsername": "Food-Systems-Research-Institute",
+      "RemoteHost": "api.github.com",
       "RemoteRepo": "SMdata",
-      "RemoteRef": "main",
+      "RemoteUsername": "Food-Systems-Research-Institute",
+      "RemotePkgRef": "Food-Systems-Research-Institute/SMdata@3a43a7d21368541c0d9e8be595e34e3ede45a10b",
+      "RemoteRef": "3a43a7d21368541c0d9e8be595e34e3ede45a10b",
       "RemoteSha": "3a43a7d21368541c0d9e8be595e34e3ede45a10b",
-      "RemoteHost": "api.github.com"
+      "NeedsCompilation": "no",
+      "Author": "Christopher Donovan [aut, cre]",
+      "Maintainer": "Christopher Donovan <christopher.donovan@uvm.edu>"
     },
     "V8": {
       "Package": "V8",
@@ -591,7 +594,8 @@
       "License": "GPL-2 | GPL-3",
       "URL": "http://www.rforge.net/base64enc",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "bit": {
       "Package": "bit",
@@ -3078,7 +3082,8 @@
         "testthat"
       ],
       "NeedsCompilation": "no",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "isoband": {
       "Package": "isoband",
@@ -3323,7 +3328,8 @@
         "stats",
         "graphics"
       ],
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "later": {
       "Package": "later",
@@ -3964,7 +3970,8 @@
       "NeedsCompilation": "no",
       "Author": "Tyler Rinker [aut, cre, ctb], Dason Kurkiewicz [aut, ctb], Keith Hughitt [ctb], Albert Wang [ctb], Garrick Aden-Buie [ctb], Albert Wang [ctb], Lukas Burk [ctb]",
       "Maintainer": "Tyler Rinker <tyler.rinker@gmail.com>",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "pillar": {
       "Package": "pillar",
@@ -7108,7 +7115,8 @@
       "URL": "https://www.rforge.net/uuid",
       "BugReports": "https://github.com/s-u/uuid/issues",
       "NeedsCompilation": "yes",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "vctrs": {
       "Package": "vctrs",
@@ -7374,7 +7382,8 @@
       ],
       "RoxygenNote": "6.1.1",
       "NeedsCompilation": "no",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "withr": {
       "Package": "withr",

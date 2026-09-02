@@ -31,12 +31,14 @@ renv::restore()
 - `tests/`: Test suite with `testthat` and `shinytest2`
 
 ## Workflow
-- Load package with `devtools::load_all()` (`ctrl+shift+l`)
+
+> Default RStudio commands shown in parentheses
+
+- Load package with `devtools::load_all()` (`ctrl + shift + l`)
 - Run app with `SMexplorer::run_app()` 
-  - A shortcut for `load_all()` and `run_app()` is `r()`. This is convenient when making and checking changes.
-- Run tests with `ctrl+shift+t`
-- Render documentation with `ctrl+shift+d`
-- Run check with `ctrl+shift+e`
+- Run tests with `ctrl + shift + t`
+- Render documentation with `ctrl + shift + d`
+- Run check with `ctrl + shift + e`
 
 ## Database
 - DuckDB database file saved in `data/`. This is not checked into git.

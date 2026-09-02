@@ -22,20 +22,15 @@ create_base_map <- function(spatial_data, resolution = 'County') {
   
   leaflet::leaflet(spatial_data) %>%
     leaflet::addProviderTiles(
-      leaflet::providers$OpenStreetMap.Mapnik,
-      group = 'OpenStreetMap.Mapnik'
-    ) %>%
-    leaflet::addProviderTiles(
       leaflet::providers$USGS.USImagery,
       group = 'USGS.USImagery'
     ) %>%
     leaflet::addProviderTiles(
-      leaflet::providers$CartoDB.Positron,
-      group = 'CartoDB.Positron'
+      leaflet::providers$OpenStreetMap.Mapnik,
+      group = 'OpenStreetMap.Mapnik'
     ) %>%
     leaflet::addLayersControl(
       baseGroups = c(
-        'CartoDB.Positron',
         'OpenStreetMap.Mapnik',
         'USGS.USImagery'
       ),
