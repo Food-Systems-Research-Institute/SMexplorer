@@ -45,3 +45,7 @@ renv::restore()
 - Script to create database from `SMdocs` package is `dev/create_duckdb.R`. Run this after pulling to update local database.
 - `R/db_utils.R` contains functions for connecting and querying database. 
 - `create_db_connection()` is called in the `R/app_server.R` script and the `con` is passed to all servers from there. 
+
+## Issues
+- App is deployed on `4.5.1`. It uses some packages, like `qs` which are not compatible with newer versions of R. Will have to migrate these properly at some point.
+- Need `.renv` profiles to separate production packages from dev.
