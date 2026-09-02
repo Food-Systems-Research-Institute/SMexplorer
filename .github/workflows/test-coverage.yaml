@@ -15,18 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RENV_CONFIG_PAK_ENABLED: false
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-r@v2
         with:
+          r-version: '4.5.1'
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::covr, any::xml2
-          needs: coverage
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Install extra packages for coverage
+        run: renv::install(c("covr", "xml2"))
+        shell: Rscript {0}
 
       - name: Test coverage
         run: |

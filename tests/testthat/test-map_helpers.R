@@ -13,7 +13,7 @@ test_that("create_base_map creates valid leaflet map object", {
 
   # Check that provider tiles were added (should have multiple addProviderTiles calls)
   tile_calls <- sapply(map$x$calls, function(x) x$method == "addProviderTiles")
-  expect_true(sum(tile_calls) >= 3)  # OpenStreetMap, USGS, CartoDB
+  expect_true(sum(tile_calls) == 2)  # OpenStreetMap, USGS
 
   # Check that polygons were added
   polygon_calls <- sapply(map$x$calls, function(x) x$method == "addPolygons")
