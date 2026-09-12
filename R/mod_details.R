@@ -47,7 +47,7 @@ mod_details_ui <- function(id) {
       column(
         width = 4,
         ## Selection box -----
-        box(
+        labeled_box(
           title = "Select Location & Metric",
           width = 12,
           status = "primary",
@@ -55,43 +55,55 @@ mod_details_ui <- function(id) {
           collapsible = TRUE,
 
           ### Choose Resolution -----
-          selectizeInput(
-            inputId = ns("select_resolution"),
-            label = "Choose resolution:",
-            choices = c("County", "State"),
-            selected = "County",
-            width = "100%"
+          add_select_label(
+            selectizeInput(
+              inputId = ns("select_resolution"),
+              label = "Choose resolution:",
+              choices = c("County", "State"),
+              selected = "County",
+              width = "100%"
+            ),
+            "Choose resolution"
           ),
 
           ### Select State -----
-          selectizeInput(
-            inputId = ns("select_state"),
-            label = "State:",
-            choices = NULL,
-            selected = "Vermont",
-            width = "100%"
+          add_select_label(
+            selectizeInput(
+              inputId = ns("select_state"),
+              label = "State:",
+              choices = NULL,
+              selected = "Vermont",
+              width = "100%"
+            ),
+            "State"
           ),
 
           ### Search County (conditional on County resolution) -----
           conditionalPanel(
             condition = "input.select_resolution == 'County'",
             ns = ns,
-            selectizeInput(
-              inputId = ns("search_county"),
-              label = "County:",
-              choices = NULL,
-              selected = "Chittenden County",
-              width = "100%"
+            add_select_label(
+              selectizeInput(
+                inputId = ns("search_county"),
+                label = "County:",
+                choices = NULL,
+                selected = "Chittenden County",
+                width = "100%"
+              ),
+              "County"
             )
           ),
 
           ### Search Metric -----
-          selectizeInput(
-            inputId = ns("search_metric"),
-            label = "Metric:",
-            choices = NULL,
-            selected = "Overall food insecurity rate",
-            width = "100%"
+          add_select_label(
+            selectizeInput(
+              inputId = ns("search_metric"),
+              label = "Metric:",
+              choices = NULL,
+              selected = "Overall food insecurity rate",
+              width = "100%"
+            ),
+            "Metric"
           ),
           actionBttn(
             ns("update_plot"),
@@ -231,7 +243,7 @@ mod_details_server <- function(id, con, parent_input, global_data) {
 
     # Time series box ----
     output$time_series_box <- renderUI({
-      box(
+      labeled_box(
         width = 12,
         title = plot_location(),
         solidHeader = TRUE,

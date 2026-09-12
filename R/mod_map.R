@@ -47,27 +47,33 @@ mod_map_ui <- function(id) {
             column(
               width = 6,
               # Select resolution -----
-              selectInput(
-                inputId = ns("resolution"),
-                label = "Select resolution:",
-                choices = c("County", "State"),
-                selected = "County"
+              add_select_label(
+                selectInput(
+                  inputId = ns("resolution"),
+                  label = "Select resolution:",
+                  choices = c("County", "State"),
+                  selected = "County"
+                ),
+                "Select resolution"
               )
             ),
             column(
               width = 6,
               # Select dimension -----
-              selectInput(
-                inputId = ns("dimension"),
-                label = "Select dimension:",
-                choices = c(
-                  "Economics",
-                  "Environment",
-                  "Production",
-                  "Health",
-                  "Social"
+              add_select_label(
+                selectInput(
+                  inputId = ns("dimension"),
+                  label = "Select dimension:",
+                  choices = c(
+                    "Economics",
+                    "Environment",
+                    "Production",
+                    "Health",
+                    "Social"
+                  ),
+                  selected = "Economics"
                 ),
-                selected = "Economics"
+                "Select dimension"
               )
             )
           ), # end top row
@@ -77,23 +83,29 @@ mod_map_ui <- function(id) {
             column(
               width = 6,
               # Select metric -----
-              selectizeInput(
-                inputId = ns("metric"),
-                label = "Select metric:",
-                choices = NULL,
-                selected = NULL,
-                width = "100%"
+              add_select_label(
+                selectizeInput(
+                  inputId = ns("metric"),
+                  label = "Select metric:",
+                  choices = NULL,
+                  selected = NULL,
+                  width = "100%"
+                ),
+                "Select metric"
               )
             ),
             column(
               width = 6,
               # Select year -----
-              selectizeInput(
-                inputId = ns("year"),
-                label = "Select year:",
-                choices = NULL,
-                selected = NULL,
-                width = "100%"
+              add_select_label(
+                selectizeInput(
+                  inputId = ns("year"),
+                  label = "Select year:",
+                  choices = NULL,
+                  selected = NULL,
+                  width = "100%"
+                ),
+                "Select year"
               )
             )
           )
@@ -109,7 +121,6 @@ mod_map_ui <- function(id) {
               ns("show_metric_info"),
               "Metric Info",
               class = "action-button",
-              # block = TRUE,
               icon = icon("circle-info")
             )
           ),

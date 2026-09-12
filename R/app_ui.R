@@ -8,7 +8,7 @@
 #' @noRd
 #'
 app_ui <- function(request) {
-  shiny::tagList(
+  ui <- shiny::tagList(
     golem_add_external_resources(),
     shinydashboard::dashboardPage(
       skin = "green",
@@ -17,6 +17,11 @@ app_ui <- function(request) {
       mod_body_ui("body")
     )
   )
+
+  # Sets <html lang="en">; shinydashboard::dashboardPage() has no lang
+  # argument of its own, so apply the same attribute shiny::bootstrapPage()
+  # uses internally.
+  shiny:::setLang(ui, "en")
 }
 
 #' Add external Resources to the Application

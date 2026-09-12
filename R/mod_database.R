@@ -31,58 +31,69 @@ mod_database_ui <- function(id) {
     # Framework filters ----
     div(
       class = "button-box",
-      style = "background: #fff !important;",
       tags$h4("Indicator Framework"),
       tags$p("Select one or more from each category", style = "font-size: 0.9em; color: #666;"),
       fluidRow(
         column(
           width = 6,
-          selectizeInput(
-            inputId = ns("dimension"),
-            label = "Dimension:",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            width = "100%",
-            options = list(placeholder = "Select dimension(s)...")
+          add_select_label(
+            selectizeInput(
+              inputId = ns("dimension"),
+              label = "Dimension:",
+              choices = NULL,
+              selected = NULL,
+              multiple = TRUE,
+              width = "100%",
+              options = list(placeholder = "Select dimension(s)...")
+            ),
+            "Dimension"
           )
         ),
         column(
           width = 6,
-          selectizeInput(
-            inputId = ns("index"),
-            label = "Index:",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            width = "100%",
-            options = list(placeholder = "Select index(es)...")
+          add_select_label(
+            selectizeInput(
+              inputId = ns("index"),
+              label = "Index:",
+              choices = NULL,
+              selected = NULL,
+              multiple = TRUE,
+              width = "100%",
+              options = list(placeholder = "Select index(es)...")
+            ),
+            "Index"
           )
         )
       ),
       fluidRow(
         column(
           width = 6,
-          selectizeInput(
-            inputId = ns("indicator"),
-            label = "Indicator:",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            width = "100%",
-            options = list(placeholder = "Select indicator(s)...")
+          add_select_label(
+            selectizeInput(
+              inputId = ns("indicator"),
+              label = "Indicator:",
+              choices = NULL,
+              selected = NULL,
+              multiple = TRUE,
+              width = "100%",
+              options = list(placeholder = "Select indicator(s)...")
+            ),
+            "Indicator"
           )
         ),
         column(
           width = 6,
-          selectizeInput(
-            inputId = ns("metric"),
-            label = "Metric:",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            width = "100%",
-            options = list(placeholder = "Select metric(s)...")
+          add_select_label(
+            selectizeInput(
+              inputId = ns("metric"),
+              label = "Metric:",
+              choices = NULL,
+              selected = NULL,
+              multiple = TRUE,
+              width = "100%",
+              options = list(placeholder = "Select metric(s)...")
+            ),
+            "Metric"
           )
         )
       )
@@ -100,12 +111,11 @@ mod_database_ui <- function(id) {
       fluidRow(
         column(
           width = 6,
-          shinyWidgets::radioGroupButtons(
+          radioButtons(
             inputId = ns("resolution"),
             label = "Resolution:",
             choices = c("County", "State"),
             selected = "County",
-            justified = TRUE,
             width = "100%"
           )
         ),
@@ -117,26 +127,32 @@ mod_database_ui <- function(id) {
       fluidRow(
         column(
           width = 6,
-          selectizeInput(
-            inputId = ns("state"),
-            label = "State:",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            width = "100%",
-            options = list(placeholder = "Select state(s)...")
+          add_select_label(
+            selectizeInput(
+              inputId = ns("state"),
+              label = "State:",
+              choices = NULL,
+              selected = NULL,
+              multiple = TRUE,
+              width = "100%",
+              options = list(placeholder = "Select state(s)...")
+            ),
+            "State"
           )
         ),
         column(
           width = 6,
-          selectizeInput(
-            inputId = ns("county"),
-            label = "County:",
-            choices = NULL,
-            selected = NULL,
-            multiple = TRUE,
-            width = "100%",
-            options = list(placeholder = "Select county/counties...")
+          add_select_label(
+            selectizeInput(
+              inputId = ns("county"),
+              label = "County:",
+              choices = NULL,
+              selected = NULL,
+              multiple = TRUE,
+              width = "100%",
+              options = list(placeholder = "Select county/counties...")
+            ),
+            "County"
           )
         )
       )
@@ -154,12 +170,18 @@ mod_database_ui <- function(id) {
           style = "unite",
           icon = icon("database")
         ),
-        shinyWidgets::downloadBttn(
-          ns("download_csv"),
-          "Download CSV",
-          icon = icon("download"),
-          style = "unite"
-        )
+        htmltools::tagQuery(
+          shinyWidgets::downloadBttn(
+            ns("download_csv"),
+            "Download CSV",
+            icon = icon("download"),
+            style = "unite"
+          )
+        )$find("a")$addAttrs(
+          `aria-hidden` = "true",
+          tabindex = "-1",
+          `aria-label` = "Download CSV"
+        )$allTags()
       )
     ),
 
@@ -172,32 +194,7 @@ mod_database_ui <- function(id) {
       with_spinner(
         reactable::reactableOutput(ns("results_table"))
       )
-    ),
-
-    # Inline CSS for slider which is gross
-    tags$style(HTML("
-      .irs-bar {
-        background: #72826d !important;
-        border-top: 1px solid #72826d !important;
-        border-bottom: 1px solid #72826d !important;
-      }
-      .irs-from, .irs-to, .irs-single {
-        background: #72826d !important;
-      }
-      .irs-from:before, .irs-to:before, .irs-single:before {
-        border-top-color: #72826d !important;
-      }
-      .irs-handle {
-        border: 2px solid #72826d !important;
-        background: white !important;
-      }
-      .irs-handle:hover {
-        background: #DAE0D7 !important;
-      }
-      .irs-handle.state_hover, .irs-handle:hover {
-        border-color: #2a2e2d !important;
-      }
-    "))
+    )
   )
 }
 

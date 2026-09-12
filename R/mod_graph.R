@@ -54,33 +54,42 @@ mod_graph_ui <- function(id) {
       # Right Column ----
       column(
         width = 5,
-        box(
+        labeled_box(
           title = "Select Metrics",
           width = 12,
           status = "primary",
           solidHeader = TRUE,
           collapsible = TRUE,
-          selectInput(
-            inputId = ns("select_resolution"),
-            label = "Choose resolution:",
-            # TODO: Fix issues with state so we can choose that also
-            choices = c("County"),
-            selected = NULL,
-            width = "100%"
+          add_select_label(
+            selectInput(
+              inputId = ns("select_resolution"),
+              label = "Choose resolution:",
+              # TODO: Fix issues with state so we can choose that also
+              choices = c("County"),
+              selected = NULL,
+              width = "100%"
+            ),
+            "Choose resolution"
           ),
-          selectizeInput(
-            inputId = ns("search_x"),
-            label = "Metric one:",
-            choices = NULL,
-            selected = NULL,
-            width = "100%"
+          add_select_label(
+            selectizeInput(
+              inputId = ns("search_x"),
+              label = "Metric one:",
+              choices = NULL,
+              selected = NULL,
+              width = "100%"
+            ),
+            "Metric one"
           ),
-          selectizeInput(
-            inputId = ns("search_y"),
-            label = "Metric two:",
-            choices = NULL,
-            selected = NULL,
-            width = "100%"
+          add_select_label(
+            selectizeInput(
+              inputId = ns("search_y"),
+              label = "Metric two:",
+              choices = NULL,
+              selected = NULL,
+              width = "100%"
+            ),
+            "Metric two"
           ),
           conditionalPanel(
             condition = "input.select_resolution == 'County'",
@@ -189,7 +198,7 @@ mod_graph_server <- function(id,
 
     # Graph box -----
     output$graph_box <- renderUI({
-      box(
+      labeled_box(
         width = 12,
         title = "Metric Comparison",
         solidHeader = TRUE,
@@ -321,7 +330,7 @@ mod_graph_server <- function(id,
         paste("Details for", location)
       }
 
-      box(
+      labeled_box(
         title = box_title,
         width = 12,
         status = "primary",
@@ -373,7 +382,7 @@ mod_graph_server <- function(id,
 
     # Output info_box -----
     output$info_box <- renderUI({
-      box(
+      labeled_box(
         title = "Metric Details",
         width = 12,
         status = "primary",
@@ -418,7 +427,7 @@ mod_graph_server <- function(id,
         input$select_resolution
       )
 
-      box(
+      labeled_box(
         title = "Pearson Correlation",
         width = 12,
         collapsible = TRUE,

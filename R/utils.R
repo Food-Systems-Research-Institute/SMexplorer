@@ -1,3 +1,49 @@
+#' Add aria-label to a select(ize) input's underlying <select>
+#'
+#' @description
+#' selectizeInput()/selectInput() render a <label for="id">, but once
+#' selectize.js initializes, Shiny retargets that label to a separate
+#' "id-selectized" widget, leaving the original (now display:none) <select>
+#' with no accessible name of its own. Some accessibility checkers scan the
+#' raw DOM and flag that hidden <select> regardless of visibility. This adds
+#' an aria-label directly to it so the underlying element is labeled too.
+#'
+#' @param input_tag The tag object returned by selectizeInput()/selectInput()
+#' @param label Text to use as the select's aria-label
+#' @importFrom htmltools tagQuery
+#' @noRd
+add_select_label <- function(input_tag, label) {
+  htmltools::tagQuery(input_tag)$find("select")$addAttrs(`aria-label` = label)$allTags()
+}
+
+#' shinydashboard::box() with an aria-label on its collapse toggle button
+#'
+#' @description
+#' shinydashboard::box(collapsible = TRUE) generates an icon-only
+#' <button class="btn btn-box-tool" data-widget="collapse"> with no
+#' accessible name. This wraps box() and adds an aria-label built from the
+#' box's own title, so each toggle button announces which box it controls
+#' instead of being silently unlabeled (or generically identical to every
+#' other box's toggle button).
+#'
+#' @param ... Arguments passed to shinydashboard::box()
+#' @importFrom htmltools tagQuery
+#' @importFrom shinydashboard box
+#' @noRd
+labeled_box <- function(...) {
+  args <- list(...)
+  label <- if (!is.null(args$title) && is.character(args$title)) {
+    paste("Toggle", args$title)
+  } else {
+    "Toggle box"
+  }
+
+  htmltools::tagQuery(shinydashboard::box(...))$
+    find(".btn-box-tool")$
+    addAttrs(`aria-label` = label)$
+    allTags()
+}
+
 #' With Spinner
 #'
 #' @description Wrap a UI element in a formatted spinner
