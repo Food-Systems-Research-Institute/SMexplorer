@@ -7,10 +7,10 @@ pacman::p_load(
   purrr,
   stringr,
   dplyr,
-  qs
+  qs2
 )
 
-pacman::p_load_current_gh(
+pacman::p_load_gh(
   'Food-Systems-Research-Institute/SMdata',
   'ChrisDonovan307/projecter'
 )
@@ -55,8 +55,8 @@ map(layers_simple, get_size)
 
 # Remove some columns and keep only the good stuff in a familiar format
 get_str(layers_simple)
-get_str(fips_key)
-crosswalk <- fips_key %>% 
+get_str(SMdata::fips_key)
+crosswalk <- SMdata::fips_key %>% 
   select(fips, county_name, state_name)
 
 wrangled_layers <- imap(layers_simple, \(layer, name) {
@@ -127,12 +127,13 @@ wrangled_layers <- list(
   neast_state_spatial
 )
 
-names <- c(
+names(wrangled_layers) <- c(
   'neast_county_spatial_2021',
   'neast_county_spatial_2024',
   'neast_state_spatial'
 )
 
 iwalk(wrangled_layers, ~ {
-  qsave(.x, paste0('data/', .y, '.qs'))
+  path <- paste0('data/', .y, '.qs2')
+  qs_save(.x, path)
 })

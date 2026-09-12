@@ -6,11 +6,6 @@
 \usage{
 link_block(title = NULL, text = NULL, image = NULL, id = NULL)
 }
-\arguments{
-\item{text}{}
-
-\item{image}{}
-}
 \description{
 Convenience function for formatting four link blocks on welcome page
 }

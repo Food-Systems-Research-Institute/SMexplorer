@@ -13,7 +13,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom shinycssloaders showPageSpinner hidePageSpinner
 #' @importFrom glue glue
-#' @importFrom qs qread
+#' @importFrom qs2 qs_read
 mod_map_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -163,9 +163,9 @@ mod_map_server <- function(id, con, parent_input, global_data){
       # Only load once
       if (!map_data_loaded()) {
         # Load spatial data from qs files
-        neast_county_spatial_2021 <<- qs::qread('data/neast_county_spatial_2021.qs')
-        neast_county_spatial_2024 <<- qs::qread('data/neast_county_spatial_2024.qs')
-        neast_state_spatial <<- qs::qread('data/neast_state_spatial.qs')
+        neast_county_spatial_2021 <<- qs2::qs_read('data/neast_county_spatial_2021.qs2')
+        neast_county_spatial_2024 <<- qs2::qs_read('data/neast_county_spatial_2024.qs2')
+        neast_state_spatial <<- qs2::qs_read('data/neast_state_spatial.qs2')
 
         # Build initial map once data is loaded
         initial_map(create_base_map(neast_county_spatial_2024))

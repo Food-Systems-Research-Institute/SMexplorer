@@ -9,7 +9,7 @@ pacman::p_load(
   arrow,
   RSQLite,
   fst,
-  qs,
+  qs2,
   sfarrow
 )
 
@@ -111,11 +111,11 @@ results
 
 
 saveRDS(neast_county_spatial_2024, 'dev/neast_county_spatial.rds')
-qsave(neast_county_spatial_2024, 'dev/neast_county_spatial.qs')
+qs_save(neast_county_spatial_2024, 'dev/neast_county_spatial.qs')
 
 microbenchmark(
   'rds' = readRDS('dev/neast_county_spatial.rds'),
-  'qs' = qread('dev/neast_county_spatial.qs'),
+  'qs' = qs_read('dev/neast_county_spatial.qs'),
   'rda' = load('data/neast_county_spatial_2024.rda'),
   times = 5
 )

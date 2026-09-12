@@ -19,97 +19,127 @@ import(reactable)
 import(shiny)
 import(shinydashboard)
 import(stringr)
-importFrom(DBI,dbConnect)
-importFrom(DBI,dbDisconnect)
-importFrom(DBI,dbGetQuery)
+importFrom(DBI,
+  dbConnect,
+  dbDisconnect,
+  dbGetQuery
+)
 importFrom(broom,tidy)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,across)
-importFrom(dplyr,arrange)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,desc)
-importFrom(dplyr,distinct)
-importFrom(dplyr,filter)
-importFrom(dplyr,inner_join)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,pull)
-importFrom(dplyr,right_join)
-importFrom(dplyr,select)
-importFrom(dplyr,slice)
-importFrom(dplyr,where)
+importFrom(dplyr,
+  "%>%",
+  across,
+  arrange,
+  bind_rows,
+  desc,
+  distinct,
+  filter,
+  inner_join,
+  left_join,
+  mutate,
+  pull,
+  right_join,
+  select,
+  slice,
+  where
+)
 importFrom(duckdb,duckdb)
-importFrom(ggplot2,aes)
-importFrom(ggplot2,geom_line)
-importFrom(ggplot2,geom_point)
-importFrom(ggplot2,geom_smooth)
-importFrom(ggplot2,ggplot)
-importFrom(ggplot2,labs)
-importFrom(ggplot2,sym)
-importFrom(ggplot2,theme_classic)
-importFrom(glue,glue)
-importFrom(glue,glue_collapse)
-importFrom(golem,activate_js)
-importFrom(golem,add_resource_path)
-importFrom(golem,bundle_resources)
-importFrom(golem,favicon)
-importFrom(golem,with_golem_options)
-importFrom(plotly,event_data)
-importFrom(plotly,event_register)
-importFrom(plotly,ggplotly)
-importFrom(plotly,layout)
-importFrom(plotly,plot_ly)
-importFrom(plotly,plotlyOutput)
-importFrom(plotly,renderPlotly)
-importFrom(purrr,map)
-importFrom(purrr,map_lgl)
-importFrom(qs,qread)
-importFrom(reactable,colDef)
-importFrom(reactable,reactable)
-importFrom(reactable,reactableOutput)
-importFrom(reactable,renderReactable)
+importFrom(ggplot2,
+  aes,
+  geom_line,
+  geom_point,
+  geom_smooth,
+  ggplot,
+  labs,
+  sym,
+  theme_classic
+)
+importFrom(glue,
+  glue,
+  glue_collapse
+)
+importFrom(golem,
+  activate_js,
+  add_resource_path,
+  bundle_resources,
+  favicon,
+  with_golem_options
+)
+importFrom(plotly,
+  event_data,
+  event_register,
+  ggplotly,
+  layout,
+  plot_ly,
+  plotlyOutput,
+  renderPlotly
+)
+importFrom(purrr,
+  map,
+  map_lgl
+)
+importFrom(qs2,qs_read)
+importFrom(reactable,
+  colDef,
+  reactable,
+  reactableOutput,
+  renderReactable
+)
 importFrom(rlang,.data)
-importFrom(shiny,HTML)
-importFrom(shiny,NS)
-importFrom(shiny,column)
-importFrom(shiny,conditionalPanel)
-importFrom(shiny,div)
-importFrom(shiny,downloadHandler)
-importFrom(shiny,fluidRow)
-importFrom(shiny,img)
-importFrom(shiny,moduleServer)
-importFrom(shiny,observe)
-importFrom(shiny,reactive)
-importFrom(shiny,reactiveVal)
-importFrom(shiny,renderText)
-importFrom(shiny,renderUI)
-importFrom(shiny,req)
-importFrom(shiny,selectInput)
-importFrom(shiny,selectizeInput)
-importFrom(shiny,shinyApp)
-importFrom(shiny,sliderInput)
-importFrom(shiny,span)
-importFrom(shiny,tagAppendAttributes)
-importFrom(shiny,tagList)
-importFrom(shiny,tags)
-importFrom(shiny,uiOutput)
-importFrom(shiny,updateSelectizeInput)
-importFrom(shinyWidgets,actionBttn)
-importFrom(shinyWidgets,awesomeCheckbox)
-importFrom(shinyWidgets,downloadBttn)
-importFrom(shinycssloaders,hidePageSpinner)
-importFrom(shinycssloaders,showPageSpinner)
-importFrom(shinycssloaders,withSpinner)
-importFrom(shinydashboard,box)
-importFrom(shinydashboard,renderValueBox)
-importFrom(shinydashboard,updateTabItems)
-importFrom(shinydashboard,valueBox)
-importFrom(shinydashboard,valueBoxOutput)
-importFrom(shinyjs,onclick)
-importFrom(shinyjs,useShinyjs)
+importFrom(shiny,
+  HTML,
+  NS,
+  column,
+  conditionalPanel,
+  div,
+  downloadHandler,
+  fluidRow,
+  img,
+  moduleServer,
+  observe,
+  reactive,
+  reactiveVal,
+  renderText,
+  renderUI,
+  req,
+  selectInput,
+  selectizeInput,
+  shinyApp,
+  sliderInput,
+  span,
+  tagAppendAttributes,
+  tagList,
+  tags,
+  uiOutput,
+  updateSelectizeInput
+)
+importFrom(shinyWidgets,
+  actionBttn,
+  awesomeCheckbox,
+  downloadBttn
+)
+importFrom(shinycssloaders,
+  hidePageSpinner,
+  showPageSpinner,
+  withSpinner
+)
+importFrom(shinydashboard,
+  box,
+  renderValueBox,
+  updateTabItems,
+  valueBox,
+  valueBoxOutput
+)
+importFrom(shinyjs,
+  onclick,
+  useShinyjs
+)
 importFrom(snakecase,to_title_case)
 importFrom(stats,cor.test)
-importFrom(stringr,str_detect)
-importFrom(stringr,str_subset)
-importFrom(tidyr,pivot_wider)
-importFrom(tidyr,unnest)
+importFrom(stringr,
+  str_detect,
+  str_subset
+)
+importFrom(tidyr,
+  pivot_wider,
+  unnest
+)
