@@ -43,7 +43,7 @@ h1, h2, h3, h4, h5 {
 /* Link Blocks -------------------------------------------- */
 /* for welcome page links */
 div.link-block {
-  background-color: var(--theme-white) !important;
+  background-color: var(--theme-white);
   transition: all 0.2s ease-in-out;
   cursor: pointer;
   border: 1px solid #000000;

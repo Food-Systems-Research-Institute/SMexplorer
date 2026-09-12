@@ -26,7 +26,7 @@ test_that("mod_map_server updates metric choices based on resolution and dimensi
     mod_map_server,
     args = list(
       con = mock_con,
-      parent_input = shiny::reactiveValues(tabs = "map_tab"),
+      parent_input = shiny::reactiveValues(tabs = "other_tab"),
       global_data = global_data
     ),
     {
@@ -67,7 +67,7 @@ test_that("mod_map_server filters metrics by dimension", {
     mod_map_server,
     args = list(
       con = NULL,
-      parent_input = shiny::reactiveValues(tabs = "map_tab"),
+      parent_input = shiny::reactiveValues(tabs = "other_tab"),
       global_data = global_data
     ),
     {
@@ -101,7 +101,7 @@ test_that("mod_map_server extracts available years for selected metric", {
     mod_map_server,
     args = list(
       con = NULL,
-      parent_input = shiny::reactiveValues(tabs = "map_tab"),
+      parent_input = shiny::reactiveValues(tabs = "other_tab"),
       global_data = global_data
     ),
     {
@@ -134,7 +134,7 @@ test_that("mod_map_server extracts correct variable name", {
     mod_map_server,
     args = list(
       con = NULL,
-      parent_input = shiny::reactiveValues(tabs = "map_tab"),
+      parent_input = shiny::reactiveValues(tabs = "other_tab"),
       global_data = global_data
     ),
     {
@@ -148,16 +148,3 @@ test_that("mod_map_server extracts correct variable name", {
     }
   )
 })
-
-
-# Note: Testing map_data() reactive would require:
-# 1. Mock database connection with query_db() function
-# 2. Mock spatial data (neast_county_spatial_2024, etc.)
-# 3. More complex setup
-# Consider this if database logic needs testing
-
-# Note: Testing observeEvent(input$update_map) would require:
-# 1. All of the above
-# 2. Mocking leafletProxy
-# 3. Testing that validation runs correctly
-# This might be better suited for integration tests with shinytest2

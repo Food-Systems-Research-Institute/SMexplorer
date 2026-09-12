@@ -306,7 +306,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
 
     # Available states (works independently of metrics)
     available_states <- reactive({
-      req(input$resolution, current_year_range())
+      req(con, input$resolution, current_year_range())
 
       get_available_states(
         con = con,
@@ -318,7 +318,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
 
     # Available counties (also independent of framework)
     available_counties <- reactive({
-      req(input$state, current_year_range())
+      req(con, input$state, current_year_range())
 
       get_available_counties(
         con = con,

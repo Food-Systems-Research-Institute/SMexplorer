@@ -195,7 +195,7 @@ mod_map_server <- function(id, con, parent_input, global_data){
         ) %>%
         dplyr::pull(Metric) %>%
         sort()
-    }) %>% bindCache(input$resolution, input$dimension)
+    })
 
     # Get years for metric
     available_years <- reactive({
@@ -205,8 +205,7 @@ mod_map_server <- function(id, con, parent_input, global_data){
         dplyr::filter(Metric == input$metric) %>%
         dplyr::pull(`Year Vector`) %>%
         unlist()
-    }) %>%
-      bindCache(input$metric)
+    })
 
     # Get variable name
     selected_variable <- reactive({
@@ -214,8 +213,7 @@ mod_map_server <- function(id, con, parent_input, global_data){
       global_data$metadata %>%
         dplyr::filter(Metric == input$metric) %>%
         dplyr::pull(`Variable Name`)
-    }) %>%
-      bindCache(input$metric)
+    })
 
     # Get spatial base and join with metric data
     map_data <- reactive({
