@@ -4,7 +4,7 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
 #' @import leaflet
 #' @importFrom shiny NS tagList
@@ -19,11 +19,11 @@ mod_map_ui <- function(id) {
   tagList(
     div(
       id = 'map_container',
-      
+
       with_spinner(
         leafletOutput(ns('map_plot'), height = '90vh', width = '100%'),
       ),
-      
+
       # Absolute Panel -----
       absolutePanel(
         id = "controls",
@@ -36,15 +36,15 @@ mod_map_ui <- function(id) {
         bottom = "auto",
         width = 500,
         height = "auto",
-        
+
         style = "z-index: 5001; background-color: rgba(255,255,255,0.8);
           padding: 15px; border-radius: 8px; max-width: 500; 
-          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",        
-        
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",
+
         h3('Select Metrics'),
         div(
           class = 'button-box',
-          
+
           # Top row
           fluidRow(
             column(
@@ -63,12 +63,18 @@ mod_map_ui <- function(id) {
               selectInput(
                 inputId = ns('dimension'),
                 label = 'Select dimension:',
-                choices = c('Economics', 'Environment', 'Production', 'Health', 'Social'),
+                choices = c(
+                  'Economics',
+                  'Environment',
+                  'Production',
+                  'Health',
+                  'Social'
+                ),
                 selected = 'Economics'
               )
             )
           ), # end top row
-          
+
           # Bottom row
           fluidRow(
             column(
@@ -95,13 +101,12 @@ mod_map_ui <- function(id) {
             )
           )
         ),
-        
-        
+
         # Metric info and full screen buttons
         fluidRow(
           column(
             width = 6,
-            
+
             # Metric Info Button -----
             actionBttn(
               ns('show_metric_info'),
@@ -113,7 +118,7 @@ mod_map_ui <- function(id) {
           ),
           column(
             width = 6,
-            
+
             # Full Screen Button -----
             actionBttn(
               ns('full_screen'),
@@ -124,7 +129,7 @@ mod_map_ui <- function(id) {
             ),
           )
         ), # fluidRow
-        
+
         # Update Map Button -----
         actionBttn(
           ns('update_map'),
@@ -132,29 +137,30 @@ mod_map_ui <- function(id) {
           style = 'unite',
           icon = icon('arrows-rotate')
         ),
-        
+
         # Show Metric Info ----
         uiOutput(ns('metric_info'))
-        
-    ), # end absolute panel div
-      
-    # JS function for full screen button
-    tags$script(HTML(js))
-        
+      ), # end absolute panel div
+
+      # JS function for full screen button
+      tags$script(HTML(js))
     ) # end full div
   ) # end tag list
 }
-    
+
 #' map Server Functions
 #'
 #' @noRd
-mod_map_server <- function(id, con, parent_input, global_data){
-  moduleServer(id, function(input, output, session){
+mod_map_server <- function(id, con, parent_input, global_data) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # Load module data lazily when map tab is active ----
     map_data_loaded <- reactiveVal(FALSE)
     initial_map <- reactiveVal(NULL)
+    county_spatial_2021 <- reactiveVal(NULL)
+    county_spatial_2024 <- reactiveVal(NULL)
+    state_spatial <- reactiveVal(NULL)
 
     observe({
       # Load map data when user goes to map tab
@@ -163,26 +169,24 @@ mod_map_server <- function(id, con, parent_input, global_data){
       # Only load once
       if (!map_data_loaded()) {
         # Load spatial data from qs files
-        neast_county_spatial_2021 <<- qs2::qs_read('data/neast_county_spatial_2021.qs2')
-        neast_county_spatial_2024 <<- qs2::qs_read('data/neast_county_spatial_2024.qs2')
-        neast_state_spatial <<- qs2::qs_read('data/neast_state_spatial.qs2')
+        county_spatial_2021(qs2::qs_read('data/neast_county_spatial_2021.qs2'))
+        county_spatial_2024(qs2::qs_read('data/neast_county_spatial_2024.qs2'))
+        state_spatial(qs2::qs_read('data/neast_state_spatial.qs2'))
 
         # Build initial map once data is loaded
-        initial_map(create_base_map(neast_county_spatial_2024))
+        initial_map(create_base_map(county_spatial_2024()))
 
         # Set indicator to true so it doesn't happen again
         map_data_loaded(TRUE)
       }
     })
 
-    
     # Render initial map -----
     output$map_plot <- renderLeaflet({
       req(initial_map())
       initial_map()
     })
 
-    
     # Data filters -----
     # Filter to metrics
     available_metrics <- reactive({
@@ -212,7 +216,8 @@ mod_map_server <- function(id, con, parent_input, global_data){
       req(input$metric, map_data_loaded())
       global_data$metadata %>%
         dplyr::filter(Metric == input$metric) %>%
-        dplyr::pull(`Variable Name`)
+        dplyr::pull(`Variable Name`) %>%
+        unique()
     })
 
     # Get spatial base and join with metric data
@@ -238,17 +243,19 @@ mod_map_server <- function(id, con, parent_input, global_data){
       if (input$resolution == 'County') {
         # Choose spatial base by year (CT county boundary changes)
         spatial_base <- if (input$year >= 2023) {
-          neast_county_spatial_2024
+          county_spatial_2024()
         } else {
-          neast_county_spatial_2021
+          county_spatial_2021()
         }
-        # Join spatial base with metric data - retain sf class with left join
+        # Join spatial base with metric data and names - retain sf class with left join
         spatial_base %>%
-          dplyr::left_join(metric_data, by = 'fips')
+          dplyr::left_join(metric_data, by = c('GEOID' = 'fips')) %>%
+          dplyr::left_join(global_data$fips_key, by = c('GEOID' = 'fips'))
       } else {
         # State level
-        neast_state_spatial %>%
-          dplyr::left_join(metric_data, by = 'fips')
+        state_spatial() %>%
+          dplyr::left_join(metric_data, by = c('GEOID' = 'fips')) %>%
+          dplyr::left_join(global_data$fips_key, by = c('GEOID' = 'fips'))
       }
     }) %>%
       # Cache so we don't have to reload
@@ -277,16 +284,14 @@ mod_map_server <- function(id, con, parent_input, global_data){
         server = TRUE
       )
     })
-    
-    
+
     # Metric Info -----
     show_metric_info <- reactiveVal(FALSE)
     # TODO: Why is this an if else? Should it just appear on observeEvent?
     observeEvent(input$show_metric_info, {
-      
       # What does this even do
       show_metric_info(!show_metric_info())
-      
+
       if (show_metric_info()) {
         output$metric_info <- renderUI({
           req(input$metric, input$year)
@@ -297,16 +302,23 @@ mod_map_server <- function(id, con, parent_input, global_data){
           div(
             class = 'button-box',
             style = 'background-color: #fff !important;',
-            tags$p(tags$strong('Metric:'), meta$Metric), tags$br(),
-            tags$p(tags$strong('Definition:'), meta$Definition), tags$br(),
-            tags$p(tags$strong('Units:'), meta$Units), tags$br(),
-            tags$p(tags$strong('Dimension:'), meta$Dimension), tags$br(),
-            tags$p(tags$strong('Indicator:'), meta$Indicator), tags$br(),
-            tags$p(tags$strong('Resolution:'), meta$Resolution), tags$br(),
-            tags$p(tags$strong('Source:'), tags$a(meta$Source)), tags$br(),
-            tags$p(tags$strong('Citation:'), meta$Citation), tags$br()
+            tags$p(tags$strong('Metric:'), meta$Metric),
+            tags$br(),
+            tags$p(tags$strong('Definition:'), meta$Definition),
+            tags$br(),
+            tags$p(tags$strong('Units:'), meta$Units),
+            tags$br(),
+            tags$p(tags$strong('Dimension:'), meta$Dimension),
+            tags$br(),
+            tags$p(tags$strong('Indicator:'), meta$Indicator),
+            tags$br(),
+            tags$p(tags$strong('Resolution:'), meta$Resolution),
+            tags$br(),
+            tags$p(tags$strong('Source:'), tags$a(meta$Source)),
+            tags$br(),
+            tags$p(tags$strong('Citation:'), meta$Citation),
+            tags$br()
           )
-
         })
       } else {
         # If show_metric_info is FALSE, clear the output or do nothing
@@ -314,10 +326,8 @@ mod_map_server <- function(id, con, parent_input, global_data){
           NULL
         })
       }
-      
     })
-    
-    
+
     # Update Map -----
     observeEvent(input$update_map, {
       req(map_data())
@@ -355,7 +365,6 @@ mod_map_server <- function(id, con, parent_input, global_data){
       # Get popup and label formulas based on resolution
       formulas <- get_map_formulas(input$resolution, input$metric)
 
-      
       # Leaflet Proxy -----
       leafletProxy(
         ns("map_plot"),
@@ -370,7 +379,7 @@ mod_map_server <- function(id, con, parent_input, global_data){
           smoothFactor = 1.0,
           opacity = 1.0,
           fillOpacity = 0.8,
-          fillColor = ~pal(value),
+          fillColor = ~ pal(value),
           highlightOptions = highlightOptions(
             color = "white",
             weight = 2,
@@ -391,12 +400,11 @@ mod_map_server <- function(id, con, parent_input, global_data){
           opacity = 1
         )
     })
-    
   })
 }
-    
+
 ## To be copied in the UI
 # mod_map_ui("map_1")
-    
+
 ## To be copied in the server
 # mod_map_server("map_1")

@@ -51,3 +51,23 @@ renv::restore()
 source('data-raw/craete_duckdb.R')
 source('data-raw/spatial_data.R')
 ```
+
+## Containers and Deployment
+
+Clone, then build image and run:
+
+```sh
+podman build -f Dockerfile --progress=plain -t smexplorer:latest .
+podman run -p 80:80 smexplorer:latest
+# with -d on VM?
+```
+
+Reference:
+
+```sh
+# enter
+podman run --rm -it --entrypoint bash smexplorer:latest
+```
+To do:
+
+- Deploy with GitHub actions

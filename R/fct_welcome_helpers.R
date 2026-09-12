@@ -2,9 +2,9 @@
 #'
 #' @description
 #' Convenience function for formatting four link blocks on welcome page
-#' 
-#' @param text 
-#' @param image 
+#'
+#' @param text
+#' @param image
 #' @importFrom shiny fluidRow column div span img
 #' @returns
 #' @export
@@ -15,30 +15,32 @@ link_block <- function(title = NULL,
                        image = NULL,
                        id = NULL) {
   column(
-    id = id,
     width = 6,
     div(
-      class = 'link-block',
-      div(
-        style = 'display: flex; align-items: center; justify-content: space-between; min-height: 100px;',
+      class = "link-block",
+      tags$button(
+        id = id,
+        type = "button",
+        class = "link-block-btn",
+        style = "display: flex; align-items: center; justify-content: space-between; min-height: 100px; width: 100%; border: none; background: none; padding: 0; cursor: pointer; text-align: inherit;",
+        `aria-label` = title,
         div(
-          style = 'flex: 1; display: flex; justify-content: center; align-items: center; text-align: center; padding: 10px;',
+          style = "flex: 1; display: flex; justify-content: center; align-items: center; text-align: center; padding: 10px;",
           tags$span(
-            style = 'display: inline-block; vertical-align: middle; line-height: normal;',
+            style = "display: inline-block; vertical-align: middle; line-height: normal;",
             tags$h5(title),
             tags$p(text)
           )
         ),
         div(
-          style = 'flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px;',
+          style = "flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px;",
           tags$img(
             src = image,
-            style = 'height: 100px; margin: 0px;',
-            alt = ''
+            style = "height: 100px; margin: 0px;",
+            alt = ""
           )
         )
       )
     )
   )
-
 }

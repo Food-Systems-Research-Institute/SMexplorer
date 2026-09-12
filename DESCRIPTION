@@ -5,31 +5,27 @@ Authors@R:
     person("Christopher", "Donovan", , "christopher.donovan@uvm.edu", role = c("aut", "cre"))
 Description: This is the description.
 License: GPL (>= 3)
+Depends: 
+    R (>= 3.5)
 Imports:
     assertthat,
     broom,
-    bslib,
-    collapsibleTree,
     config,
-    conflicted,
-    dashboardthemes,
     DBI,
+    devtools,
     dplyr,
-    DT,
     duckdb,
     ggplot2,
     glue,
     golem,
     htmltools,
     leaflet,
-    leaflet.extras,
     pacman,
-    pkgload,
     plotly,
     purrr,
+    qs2,
     reactable,
     rlang,
-    sf,
     shiny,
     shinycssloaders,
     shinydashboard,
@@ -37,17 +33,17 @@ Imports:
     shinyjs,
     shinyWidgets,
     snakecase,
+    stats,
     stringr,
     tidyr
 Suggests: 
-    testthat (>= 3.0.0),
+    sf,
+    shinytest2,
     spelling,
-    shinytest2
+    testthat (>= 3.0.0)
+Config/Needs/website: false
+Config/roxygen2/version: 8.1.0
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 LazyData: true
-Depends: 
-    R (>= 3.5)
-Config/Needs/website: false
-Config/roxygen2/version: 8.1.0
