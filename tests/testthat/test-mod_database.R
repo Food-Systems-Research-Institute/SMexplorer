@@ -49,7 +49,7 @@ test_that("mod_database_server filters indexes based on dimension selection", {
       session$setInputs(
         resolution = "County",
         year_range = c(2015, 2023),
-        dimension = c("Economics")  # Select only Economics
+        dimension = c("Economics") # Select only Economics
       )
       session$flushReact()
 
@@ -128,7 +128,10 @@ test_that("mod_database_server filters metrics through full cascade", {
   all_years <- unlist(econ_data$`Year Vector`)
   test_year_range <- c(min(all_years, na.rm = TRUE), max(all_years, na.rm = TRUE))
 
-  test_index <- econ_data |> dplyr::pull(Index) |> unique() |> head(1)
+  test_index <- econ_data |>
+    dplyr::pull(Index) |>
+    unique() |>
+    head(1)
   test_indicator <- econ_data |>
     dplyr::filter(Index == test_index) |>
     dplyr::pull(Indicator) |>
@@ -169,7 +172,9 @@ test_that("mod_database_server extracts variable names from metrics", {
   mock_metadata <- get_mock_metadata()
 
   # Get some actual metrics from the metadata
-  test_metrics <- mock_metadata |> dplyr::pull(Metric) |> head(2)
+  test_metrics <- mock_metadata |>
+    dplyr::pull(Metric) |>
+    head(2)
   expected_vars <- mock_metadata |>
     dplyr::filter(Metric %in% test_metrics) |>
     dplyr::pull(`Variable Name`)
@@ -219,7 +224,7 @@ test_that("mod_database_server handles multiple dimension selection", {
       session$setInputs(
         resolution = "County",
         year_range = c(2015, 2023),
-        dimension = c("Economics", "Health")  # Multiple selections
+        dimension = c("Economics", "Health") # Multiple selections
       )
       session$flushReact()
 
@@ -268,7 +273,7 @@ test_that("mod_database_server returns empty when no metrics match filters", {
       session$setInputs(
         resolution = "County",
         year_range = c(2015, 2020),
-        dimension = "Health"  # No metrics with this dimension
+        dimension = "Health" # No metrics with this dimension
       )
       session$flushReact()
 
@@ -322,4 +327,3 @@ test_that("mod_database_server handles State resolution filtering", {
     }
   )
 })
-

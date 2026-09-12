@@ -7,13 +7,11 @@
 #' @importFrom shinycssloaders showPageSpinner
 #' @noRd
 #'
-# source('R/my_theme.R')
 app_ui <- function(request) {
   shiny::tagList(
     golem_add_external_resources(),
     shinydashboard::dashboardPage(
       skin = "green",
-
       mod_header_ui("header"),
       mod_sidebar_ui("sidebar"),
       mod_body_ui("body")

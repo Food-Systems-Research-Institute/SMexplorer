@@ -1,4 +1,3 @@
-
 # Housekeeping ------------------------------------------------------------
 
 pacman::p_load(
@@ -8,116 +7,116 @@ pacman::p_load(
   purrr
 )
 pacman::p_load_current_gh(
- 'Food-Systems-Research-Institute/SMdata',
- 'ChrisDonovan307/projecter'
+  "Food-Systems-Research-Institute/SMdata",
+  "ChrisDonovan307/projecter"
 )
 
 
 # Metadata ----------------------------------------------------------------
 
-metadata <- SMdata::metadata %>% 
+metadata <- SMdata::metadata %>%
   mutate(across(
     c(metric, dimension, index, indicator, resolution, units),
     ~ str_to_sentence(.x)
-  )) %>% 
+  )) %>%
   setNames(c(
-    names(.) %>% 
-      snakecase::to_title_case() %>% 
-      stringr::str_replace('Url', 'URL')
-  )) %>% 
+    names(.) %>%
+      snakecase::to_title_case() %>%
+      stringr::str_replace("Url", "URL")
+  )) %>%
   select(-c(Fips, Value))
 get_str(metadata)
 
 # Fix bad metrics where resolution isn't appropriate
-bad_metrics <- readRDS('dev/bad_metrics.rds')
-out <- metadata %>% 
+bad_metrics <- readRDS("dev/bad_metrics.rds")
+out <- metadata %>%
   filter(
-    !(Metric %in% bad_metrics[[1]] & 'county|County' %in% Resolution),
-    !(Metric %in% bad_metrics[[2]] & 'state|State' %in% Resolution)
+    !(Metric %in% bad_metrics[[1]] & "county|County" %in% Resolution),
+    !(Metric %in% bad_metrics[[2]] & "state|State" %in% Resolution)
   )
 dim(metadata)
 dim(out)
 
-metadata %>% 
-  filter(Metric %in% bad_metrics[[1]]) %>% 
+metadata %>%
+  filter(Metric %in% bad_metrics[[1]]) %>%
   select(Metric, Resolution)
 
 # If axis name is not present, use metric name instead
-metadata <- metadata %>% 
-  mutate('Axis Name' = case_when(
+metadata <- metadata %>%
+  mutate("Axis Name" = case_when(
     is.na(`Axis Name`) ~ Metric,
     .default = `Axis Name`
   ))
 get_str(metadata)
 
 # If metric name is not present, use variable name instead
-metadata <- metadata %>% 
-  mutate('Metric' = case_when(
+metadata <- metadata %>%
+  mutate("Metric" = case_when(
     is.na(Metric) ~ snakecase::to_sentence_case(`Variable Name`),
-    .default = Metric 
+    .default = Metric
   ))
 get_str(metadata)
 
 # For now, remove anything with NAICS or yield. Pretty janky
-metadata <- metadata %>% 
+metadata <- metadata %>%
   dplyr::filter(
     stringr::str_detect(
-      `Variable Name`, 
-      '^lq|NAICS|MeasuredIn|soilOrganicCarbon|nProducersAreaOperated.|availableWaterStorage', 
+      `Variable Name`,
+      "^lq|NAICS|MeasuredIn|soilOrganicCarbon|nProducersAreaOperated.|availableWaterStorage",
       negate = TRUE
     )
   )
 get_str(metadata)
-metadata$`Variable Name` %>% sort
+metadata$`Variable Name` %>% sort()
 
 # New column with years as a vector, so we don't have to split by comma later
-metadata <- metadata %>% 
-  mutate(`Year Vector` = str_split(Year, ', ') %>% 
-           map(as.integer) %>% 
-           map(~ sort(.x, decreasing = TRUE)))
+metadata <- metadata %>%
+  mutate(`Year Vector` = str_split(Year, ", ") %>%
+    map(as.integer) %>%
+    map(~ sort(.x, decreasing = TRUE)))
 get_str(metadata)
 
 # New column with booleans for state and county resolution so we don't have to
 # do string operations in module
-metadata <- metadata %>% 
+metadata <- metadata %>%
   mutate(
-    'RES_Northeast' = ifelse(grepl('northeast', Resolution, ignore.case = TRUE), TRUE, FALSE),
-    'RES_State' = ifelse(grepl('state', Resolution, ignore.case = TRUE), TRUE, FALSE),
-    'RES_County' = ifelse(grepl('county', Resolution, ignore.case = TRUE), TRUE, FALSE)
+    "RES_Northeast" = ifelse(grepl("northeast", Resolution, ignore.case = TRUE), TRUE, FALSE),
+    "RES_State" = ifelse(grepl("state", Resolution, ignore.case = TRUE), TRUE, FALSE),
+    "RES_County" = ifelse(grepl("county", Resolution, ignore.case = TRUE), TRUE, FALSE)
   )
-metadata %>% 
-  select(starts_with('RES'), Resolution)
+metadata %>%
+  select(starts_with("RES"), Resolution)
 
 # Remove bad vars (identified in data-raw/neast_metrics.R)
-bad_vars <- readRDS('dev/bad_vars.rds')
-metadata <- metadata %>% 
+bad_vars <- readRDS("dev/bad_vars.rds")
+metadata <- metadata %>%
   filter(!`Variable Name` %in% bad_vars)
 
 # Removing duplicate median household value vars
 remove <- c(
-  which(metadata$`Variable Name` == 'medHhIncome')[-1],
-  which(metadata$`Variable Name` == 'medHhIncomePercState')[-1],
-  which(metadata$`Variable Name` == 'medianHouseholdIncome')
+  which(metadata$`Variable Name` == "medHhIncome")[-1],
+  which(metadata$`Variable Name` == "medHhIncomePercState")[-1],
+  which(metadata$`Variable Name` == "medianHouseholdIncome")
 )
 metadata <- metadata[-remove, ]
 
 # Remove anything with Util in dimension, index, or indicator
-metadata <- metadata %>% 
+metadata <- metadata %>%
   dplyr::filter(
-    str_detect(Dimension, 'Util', negate = TRUE),
-    str_detect(Index, 'Util', negate = TRUE),
-    str_detect(Indicator, 'Util', negate = TRUE)
+    str_detect(Dimension, "Util", negate = TRUE),
+    str_detect(Index, "Util", negate = TRUE),
+    str_detect(Indicator, "Util", negate = TRUE)
   )
 
 # Save
 usethis::use_data(metadata, overwrite = TRUE)
-saveRDS(metadata, 'data/metadata.rds')
+saveRDS(metadata, "data/metadata.rds")
 
 
 ## Table Metadata ----------------------------------------------------------
 
 # Slimmer set for table mod
-table_metadata <- metadata %>% 
+table_metadata <- metadata %>%
   select(
     Metric,
     Definition,
@@ -131,34 +130,33 @@ table_metadata <- metadata %>%
     Resolution,
     URL
   )
-saveRDS(table_metadata, 'data/table_metadata.rds')
-
+saveRDS(table_metadata, "data/table_metadata.rds")
 
 
 # Lookup Tables -----------------------------------------------------------
 
 # Smaller df to translate between names within modules
-metric_lookup <- metadata %>% 
-  select(Metric, 'Variable Name', 'Axis Name')
+metric_lookup <- metadata %>%
+  select(Metric, "Variable Name", "Axis Name")
 get_str(metric_lookup)
 usethis::use_data(metric_lookup, overwrite = TRUE)
-saveRDS(metric_lookup, 'data/metric_lookup.rds')
+saveRDS(metric_lookup, "data/metric_lookup.rds")
 
 # Named vector for one-way metric to years
-metric_to_years <- split(metadata[['Year Vector']], metadata$Metric) %>% 
+metric_to_years <- split(metadata[["Year Vector"]], metadata$Metric) %>%
   purrr::flatten()
 head(metric_to_years)
-metric_to_years[['Acres drained by tile']]
+metric_to_years[["Acres drained by tile"]]
 usethis::use_data(metric_to_years, overwrite = TRUE)
 
 # Resolution lookup table
-metric_resolution_lookup <- metadata %>% 
+metric_resolution_lookup <- metadata %>%
   select(
-    Dimension, 
-    Metric, 
-    'Variable Name', 
-    Resolution, 
-    starts_with('RES'),
-    'Year Vector'
+    Dimension,
+    Metric,
+    "Variable Name",
+    Resolution,
+    starts_with("RES"),
+    "Year Vector"
   )
 usethis::use_data(metric_resolution_lookup, overwrite = TRUE)

@@ -41,8 +41,8 @@ test_that("mod_map_server updates metric choices based on resolution and dimensi
       metrics <- available_metrics()
 
       expect_type(metrics, "character")
-      expect_true("Metric A" %in% metrics)  # County + Economics
-      expect_true("Metric C" %in% metrics)  # County, State + Economics (matches both)
+      expect_true("Metric A" %in% metrics) # County + Economics
+      expect_true("Metric C" %in% metrics) # County, State + Economics (matches both)
       expect_false("Metric B" %in% metrics) # State only (no County match)
       expect_false("Metric D" %in% metrics) # Health dimension (wrong dimension)
     }

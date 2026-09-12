@@ -8,12 +8,11 @@
 #'
 #' @import dplyr
 load_global_data <- function() {
-
   # Load small data files (large files in duckdb, spatial as qs only in mod map)
   list(
-    metadata = readRDS('data/metadata.rds'),
-    fips_key = readRDS('data/fips_key.rds'),
-    metric_options = readRDS('data/metric_options.rds'),
-    metric_lookup = readRDS('data/metric_lookup.rds')
+    metadata = readRDS("data/metadata.rds"),
+    fips_key = readRDS("data/fips_key.rds"),
+    metric_options = readRDS("data/metric_options.rds"),
+    metric_lookup = readRDS("data/metric_lookup.rds")
   )
 }

@@ -4,8 +4,10 @@ test_that("{shinytest2} recording: launch", {
   skip("Integration test - run manually with testthat::test_file()")
 
   local_app_support(test_path("../.."))
-  app <- AppDriver$new(test_path("../.."), variant = platform_variant(), name = "SMexplorer",
-      height = 854, width = 1529)
+  app <- AppDriver$new(test_path("../.."),
+    variant = platform_variant(), name = "SMexplorer",
+    height = 854, width = 1529
+  )
   app$set_inputs(`details-select_state` = "Vermont")
   app$set_inputs(`details-search_metric` = "Overall food insecurity rate")
   app$set_inputs(`details-search_county` = "Chittenden County")
@@ -26,4 +28,3 @@ test_that("{shinytest2} recording: mod_map", {
   app$set_inputs(`map_plot-year` = "2025")
   app$expect_values()
 })
-

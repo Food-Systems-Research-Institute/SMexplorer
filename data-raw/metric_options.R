@@ -1,5 +1,5 @@
 # For dropdown menus
-metric_options <- SMdata::metadata %>% 
+metric_options <- SMdata::metadata %>%
   pull(metric)
 
 # Reorder metrics options, put NAICS last cause they are unfortunate

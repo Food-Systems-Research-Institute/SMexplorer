@@ -4,7 +4,7 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
 #' @importFrom shiny NS tagList
 mod_header_ui <- function(id) {
@@ -27,25 +27,24 @@ mod_header_ui <- function(id) {
         `aria-label` = "Food Systems Research Institute website",
         tags$img(
           src = "www/fsri_spirit_marker.png",
-          alt = 'Food Systems Research Institute logo'
+          alt = "Food Systems Research Institute logo"
         ),
       )
     )
   )
 }
-    
+
 #' header Server Functions
 #'
-#' @noRd 
-mod_header_server <- function(id){
-  moduleServer(id, function(input, output, session){
+#' @noRd
+mod_header_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
- 
   })
 }
-    
+
 ## To be copied in the UI
 # mod_header_ui("header_1")
-    
+
 ## To be copied in the server
 # mod_header_server("header_1")

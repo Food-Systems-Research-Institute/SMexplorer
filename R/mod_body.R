@@ -4,9 +4,9 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
+#' @importFrom shiny NS tagList
 #' @importFrom shinydashboard dashboardBody tabItems tabItem
 mod_body_ui <- function(id) {
   dashboardBody(
@@ -38,19 +38,18 @@ mod_body_ui <- function(id) {
     )
   )
 }
-    
+
 #' body Server Functions
 #'
-#' @noRd 
-mod_body_server <- function(id){
-  moduleServer(id, function(input, output, session){
+#' @noRd
+mod_body_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
- 
   })
 }
-    
+
 ## To be copied in the UI
 # mod_body_ui("body_1")
-    
+
 ## To be copied in the server
 # mod_body_server("body_1")

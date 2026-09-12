@@ -8,8 +8,8 @@
 #' @noRd
 with_spinner <- function(ui_element,
                          type = 6,
-                         color = color_palette['theme_green'],
-                         caption = 'Loading...',
+                         color = color_palette["theme_green"],
+                         caption = "Loading...",
                          left_offset = NULL) {
   spinner <- shinycssloaders::withSpinner(
     ui_element = ui_element,
@@ -20,7 +20,7 @@ with_spinner <- function(ui_element,
 
   if (!is.null(left_offset)) {
     shiny::tags$div(
-      style = paste0('margin-left: ', left_offset, ';'),
+      style = paste0("margin-left: ", left_offset, ";"),
       spinner
     )
   } else {
@@ -38,14 +38,14 @@ modal_construction <- function(tab) {
   showModal(modalDialog(
     tagList(
       tags$div(
-        class = 'button-box',
+        class = "button-box",
         tags$p(
           "This page is under construction! Nothing works right yet.",
           "Head to the",
           tags$a(
-            'FSRI GitHub Page',
-            href = 'https://www.github.com/Food-Systems-Research-Institute/SMexplorer/issues',
-            target = '_blank'
+            "FSRI GitHub Page",
+            href = "https://www.github.com/Food-Systems-Research-Institute/SMexplorer/issues",
+            target = "_blank"
           ),
           "for issues and pull requests."
         )
@@ -54,7 +54,6 @@ modal_construction <- function(tab) {
     title = "Under Construction",
     easyClose = TRUE
   ))
-
 }
 
 #' Create Metric Information Display
@@ -73,16 +72,16 @@ get_metric_info <- function(meta) {
   # TODO: Why are we getting doubles in the first place?
   meta <- meta[1, ]
   div(
-    class = 'button-box',
-    style = 'background-color: #fff !important;',
-    tags$p(tags$strong('Metric:'), meta$Metric), tags$br(),
-    tags$p(tags$strong('Definition:'), meta$Definition), tags$br(),
-    tags$p(tags$strong('Units:'), meta$Units), tags$br(),
-    tags$p(tags$strong('Dimension:'), meta$Dimension), tags$br(),
-    tags$p(tags$strong('Indicator:'), meta$Indicator), tags$br(),
-    tags$p(tags$strong('Resolution:'), meta$Resolution), tags$br(),
-    tags$p(tags$strong('Source:'), tags$a(meta$Source)), tags$br(),
-    tags$p(tags$strong('Citation:'), meta$Citation)
+    class = "button-box",
+    style = "background-color: #fff !important;",
+    tags$p(tags$strong("Metric:"), meta$Metric), tags$br(),
+    tags$p(tags$strong("Definition:"), meta$Definition), tags$br(),
+    tags$p(tags$strong("Units:"), meta$Units), tags$br(),
+    tags$p(tags$strong("Dimension:"), meta$Dimension), tags$br(),
+    tags$p(tags$strong("Indicator:"), meta$Indicator), tags$br(),
+    tags$p(tags$strong("Resolution:"), meta$Resolution), tags$br(),
+    tags$p(tags$strong("Source:"), tags$a(meta$Source)), tags$br(),
+    tags$p(tags$strong("Citation:"), meta$Citation)
   )
 }
 
@@ -110,17 +109,17 @@ get_available_years_range <- function(metadata, resolution = NULL) {
 
   # Extract all years from Year vector
   assertthat::assert_that(
-    is.list(filtered_meta$`Year Vector`), 
-    msg = 'Year Vector column was not a list'
+    is.list(filtered_meta$`Year Vector`),
+    msg = "Year Vector column was not a list"
   )
   all_years <- unlist(filtered_meta$`Year Vector`)
   assertthat::assert_that(
-    is.integer(all_years), 
-    msg = 'Extracted years were not integers'
+    is.integer(all_years),
+    msg = "Extracted years were not integers"
   )
-  
+
   if (length(all_years) == 0) {
-    return(c(min = 2000, max = 2024))  # Default fallback
+    return(c(min = 2000, max = 2024)) # Default fallback
   }
 
   c(min = min(all_years, na.rm = TRUE), max = max(all_years, na.rm = TRUE))
@@ -144,7 +143,9 @@ filter_metadata_by_year <- function(metadata, year_range) {
 
   # Check if any year in Year Vector falls within the range
   has_year_in_range <- purrr::map_lgl(metadata$`Year Vector`, function(years) {
-    if (is.null(years) || length(years) == 0) return(FALSE)
+    if (is.null(years) || length(years) == 0) {
+      return(FALSE)
+    }
     any(years >= year_range[1] & years <= year_range[2])
   })
 
@@ -171,7 +172,8 @@ get_available_dimensions <- function(metadata, resolution = NULL, year_range = N
   if (!is.null(resolution)) {
     filtered_meta <- filtered_meta %>%
       dplyr::filter(
-        stringr::str_detect(Resolution, resolution))
+        stringr::str_detect(Resolution, resolution)
+      )
   }
 
   # Apply year range filter
@@ -243,7 +245,7 @@ get_available_indexes <- function(metadata, resolution = NULL, year_range = NULL
 #' @importFrom stringr str_detect
 #' @noRd
 get_available_indicators <- function(metadata, resolution = NULL, year_range = NULL,
-                                    dimensions = NULL, indexes = NULL) {
+                                     dimensions = NULL, indexes = NULL) {
   filtered_meta <- metadata
 
   # Apply resolution filter
@@ -293,7 +295,7 @@ get_available_indicators <- function(metadata, resolution = NULL, year_range = N
 #' @importFrom stringr str_detect
 #' @noRd
 get_available_metrics <- function(metadata, resolution = NULL, year_range = NULL,
-                                 dimensions = NULL, indexes = NULL, indicators = NULL) {
+                                  dimensions = NULL, indexes = NULL, indicators = NULL) {
   filtered_meta <- metadata
 
   # Apply resolution filter
@@ -369,7 +371,7 @@ get_variable_names <- function(metadata, metrics) {
 #' @importFrom glue glue glue_collapse
 #' @noRd
 get_available_states <- function(con, resolution, variable_names = NULL, year_range) {
-  table <- paste0('neast_', tolower(resolution), '_metrics')
+  table <- paste0("neast_", tolower(resolution), "_metrics")
 
   # Build WHERE clause
   where_clauses <- c(
@@ -398,7 +400,7 @@ get_available_states <- function(con, resolution, variable_names = NULL, year_ra
   }
 
   # Load fips_key to get state names
-  fips_key <- readRDS('data/fips_key.rds')
+  fips_key <- readRDS("data/fips_key.rds")
 
   # Get unique state names from state FIPS codes
   state_fips_codes <- unique(result$state_fips)
@@ -433,7 +435,7 @@ get_available_counties <- function(con, states, variable_names = NULL, year_rang
   }
 
   # Load fips_key to get FIPS codes for selected states
-  fips_key <- readRDS('data/fips_key.rds')
+  fips_key <- readRDS("data/fips_key.rds")
 
   state_fips <- fips_key %>%
     dplyr::filter(state_name %in% states) %>%
@@ -500,15 +502,15 @@ get_available_counties <- function(con, states, variable_names = NULL, year_rang
 #' @importFrom glue glue
 #' @importFrom dplyr filter
 #' @noRd
-query_metric_data_bulk <- function(con, 
-                                   variable_names = NULL, 
-                                   resolution, 
+query_metric_data_bulk <- function(con,
+                                   variable_names = NULL,
+                                   resolution,
                                    year_range,
-                                   states = NULL, 
+                                   states = NULL,
                                    counties = NULL) {
   # Determine which table to query from
   # TODO: probably worth combining these into one?
-  table <- paste0('neast_', tolower(resolution), '_metrics')
+  table <- paste0("neast_", tolower(resolution), "_metrics")
 
   # Build WHERE clauses - start with year filter
   where_clauses <- c(
@@ -523,7 +525,7 @@ query_metric_data_bulk <- function(con,
 
   # Add geography filter if provided
   if (!is.null(states) || !is.null(counties)) {
-    fips_key <- readRDS('data/fips_key.rds')
+    fips_key <- readRDS("data/fips_key.rds")
 
     if (!is.null(counties) && length(counties) > 0) {
       # Filter by specific counties

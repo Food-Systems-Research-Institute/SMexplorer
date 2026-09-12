@@ -9,8 +9,7 @@
 #' @export
 #'
 #' @examples
-create_base_map <- function(spatial_data, resolution = 'County') {
-
+create_base_map <- function(spatial_data, resolution = "County") {
   # Create initial popup showing area info
   initial_popup <- paste0(
     "<div style='text-align: center;'>",
@@ -19,24 +18,24 @@ create_base_map <- function(spatial_data, resolution = 'County') {
     "<strong>Water Area:</strong> ", format(round(spatial_data$AWATER / 1e6, 2), big.mark = ","), " km²",
     "</div>"
   )
-  
+
   leaflet::leaflet(spatial_data) %>%
     leaflet::addProviderTiles(
       leaflet::providers$USGS.USImagery,
-      group = 'USGS.USImagery'
+      group = "USGS.USImagery"
     ) %>%
     leaflet::addProviderTiles(
       leaflet::providers$OpenStreetMap.Mapnik,
-      group = 'OpenStreetMap.Mapnik'
+      group = "OpenStreetMap.Mapnik"
     ) %>%
     leaflet::addLayersControl(
       baseGroups = c(
-        'OpenStreetMap.Mapnik',
-        'USGS.USImagery'
+        "OpenStreetMap.Mapnik",
+        "USGS.USImagery"
       ),
-      overlayGroups = 'Boundaries',
+      overlayGroups = "Boundaries",
       options = leaflet::layersControlOptions(collapsed = TRUE),
-      position = 'topleft'
+      position = "topleft"
     ) %>%
     leaflet::setView(
       lng = -67.44604,
@@ -49,15 +48,15 @@ create_base_map <- function(spatial_data, resolution = 'County') {
       smoothFactor = 1,
       opacity = 0.7,
       fillOpacity = 0.5,
-      fillColor = 'lightgray',
+      fillColor = "lightgray",
       highlightOptions = leaflet::highlightOptions(
-        color = color_palette[['theme_green']],
+        color = color_palette[["theme_green"]],
         weight = 3,
         bringToFront = TRUE
       ),
       popup = initial_popup,
       popupOptions = leaflet::popupOptions(closeButton = FALSE),
-      group = 'Boundaries'
+      group = "Boundaries"
     )
 }
 
@@ -68,11 +67,11 @@ create_base_map <- function(spatial_data, resolution = 'County') {
 #' this currently relies on logic in mod_map based on `input$resolution` to
 #' account for when state data is used and there is no county_name. That should
 #' probably be rolled into this function at some point
-#' 
-#' @param county_name 
-#' @param state_name 
-#' @param variable_name 
-#' @param value 
+#'
+#' @param county_name
+#' @param state_name
+#' @param variable_name
+#' @param value
 #' @param metric User `input$metric`, passed through `get_map_formulas()`.
 #'
 #' @returns
@@ -108,14 +107,14 @@ custom_popup <- function(county_name, state_name, variable_name, value, metric) 
 #'
 #' @examples
 get_map_formulas <- function(resolution, metric) {
-  if (resolution == 'County') {
+  if (resolution == "County") {
     list(
-      popup = ~custom_popup(county_name, state_name, variable_name, value, metric),
+      popup = ~ custom_popup(county_name, state_name, variable_name, value, metric),
       label = ~county_name
     )
   } else {
     list(
-      popup = ~custom_popup(NA, state_name, variable_name, value, metric),
+      popup = ~ custom_popup(NA, state_name, variable_name, value, metric),
       label = ~state_name
     )
   }
@@ -142,12 +141,11 @@ get_map_formulas <- function(resolution, metric) {
 #' @export
 #'
 #' @examples
-validate_map_data <- function(data, 
-                              metric_name, 
-                              year, 
-                              resolution, 
+validate_map_data <- function(data,
+                              metric_name,
+                              year,
+                              resolution,
                               warn_threshold = 0.2) {
-
   # Check if value column exists
   if (!"value" %in% names(data)) {
     return(list(

@@ -15,76 +15,74 @@ mod_database_ui <- function(id) {
   tagList(
     # Page Header
     div(
-      class = 'button-box',
-      style = 'background: #fff !important;',
+      class = "button-box",
+      style = "background: #fff !important;",
       tags$h2(
-        'Metric Database', 
-        style = 'text-align: left !important; margin-top: 10px !important',
+        "Metric Database",
+        style = "text-align: left !important; margin-top: 10px !important",
       ),
       tags$p(
-        'Use the fields below to query metric data from the database',
-        'After querying, you can further filter and explore the data in the table.',
-        'The download button will render a .csv file of the current subset of data.'
+        "Use the fields below to query metric data from the database",
+        "After querying, you can further filter and explore the data in the table.",
+        "The download button will render a .csv file of the current subset of data."
       )
     ),
 
     # Framework filters ----
     div(
-      class = 'button-box',
-      style = 'background: #fff !important;',
-      tags$h4('Indicator Framework'),
-      tags$p('Select one or more from each category', style = 'font-size: 0.9em; color: #666;'),
-
+      class = "button-box",
+      style = "background: #fff !important;",
+      tags$h4("Indicator Framework"),
+      tags$p("Select one or more from each category", style = "font-size: 0.9em; color: #666;"),
       fluidRow(
         column(
           width = 6,
           selectizeInput(
-            inputId = ns('dimension'),
-            label = 'Dimension:',
+            inputId = ns("dimension"),
+            label = "Dimension:",
             choices = NULL,
             selected = NULL,
             multiple = TRUE,
-            width = '100%',
-            options = list(placeholder = 'Select dimension(s)...')
+            width = "100%",
+            options = list(placeholder = "Select dimension(s)...")
           )
         ),
         column(
           width = 6,
           selectizeInput(
-            inputId = ns('index'),
-            label = 'Index:',
+            inputId = ns("index"),
+            label = "Index:",
             choices = NULL,
             selected = NULL,
             multiple = TRUE,
-            width = '100%',
-            options = list(placeholder = 'Select index(es)...')
+            width = "100%",
+            options = list(placeholder = "Select index(es)...")
           )
         )
       ),
-
       fluidRow(
         column(
           width = 6,
           selectizeInput(
-            inputId = ns('indicator'),
-            label = 'Indicator:',
+            inputId = ns("indicator"),
+            label = "Indicator:",
             choices = NULL,
             selected = NULL,
             multiple = TRUE,
-            width = '100%',
-            options = list(placeholder = 'Select indicator(s)...')
+            width = "100%",
+            options = list(placeholder = "Select indicator(s)...")
           )
         ),
         column(
           width = 6,
           selectizeInput(
-            inputId = ns('metric'),
-            label = 'Metric:',
+            inputId = ns("metric"),
+            label = "Metric:",
             choices = NULL,
             selected = NULL,
             multiple = TRUE,
-            width = '100%',
-            options = list(placeholder = 'Select metric(s)...')
+            width = "100%",
+            options = list(placeholder = "Select metric(s)...")
           )
         )
       )
@@ -92,55 +90,53 @@ mod_database_ui <- function(id) {
 
     # Geography filters ----
     div(
-      class = 'button-box',
-      style = 'background: #fff !important;',
-      tags$h4('Geography and Year'),
+      class = "button-box",
+      style = "background: #fff !important;",
+      tags$h4("Geography and Year"),
       tags$p(
-        'Filter by data resolution, time period, and location',
-        style = 'font-size: 0.9em; color: #666;'
+        "Filter by data resolution, time period, and location",
+        style = "font-size: 0.9em; color: #666;"
       ),
-
       fluidRow(
         column(
           width = 6,
           shinyWidgets::radioGroupButtons(
-            inputId = ns('resolution'),
-            label = 'Resolution:',
-            choices = c('County', 'State'),
-            selected = 'County',
+            inputId = ns("resolution"),
+            label = "Resolution:",
+            choices = c("County", "State"),
+            selected = "County",
             justified = TRUE,
-            width = '100%'
+            width = "100%"
           )
         ),
         column(
           width = 6,
-          uiOutput(ns('year_slider_ui'))
+          uiOutput(ns("year_slider_ui"))
         )
       ),
-
       fluidRow(
         column(
           width = 6,
           selectizeInput(
-            inputId = ns('state'),
-            label = 'State:',
+            inputId = ns("state"),
+            label = "State:",
             choices = NULL,
             selected = NULL,
             multiple = TRUE,
-            width = '100%',
-            options = list(placeholder = 'Select state(s)...')
+            width = "100%",
+            options = list(placeholder = "Select state(s)...")
           )
         ),
         column(
           width = 6,
           selectizeInput(
-            inputId = ns('county'),
-            label = 'County:',
+            inputId = ns("county"),
+            label = "County:",
             choices = NULL,
             selected = NULL,
             multiple = TRUE,
-            width = '100%',
-            options = list(placeholder = 'Select county/counties...')
+            width = "100%",
+            options = list(placeholder = "Select county/counties...")
           )
         )
       )
@@ -148,33 +144,33 @@ mod_database_ui <- function(id) {
 
     # Query and Download ----
     div(
-      class = 'button-box',
-      style = 'background: #fff !important; text-align: center;',
+      class = "button-box",
+      style = "background: #fff !important; text-align: center;",
       fluidRow(
-        style = 'display: flex; justify-content: center; gap: 20px;',
+        style = "display: flex; justify-content: center; gap: 20px;",
         actionBttn(
-          ns('query_button'),
-          'Query Database',
-          style = 'unite',
-          icon = icon('database')
+          ns("query_button"),
+          "Query Database",
+          style = "unite",
+          icon = icon("database")
         ),
         shinyWidgets::downloadBttn(
-          ns('download_csv'),
-          'Download CSV',
-          icon = icon('download'),
-          style = 'unite'
+          ns("download_csv"),
+          "Download CSV",
+          icon = icon("download"),
+          style = "unite"
         )
       )
     ),
 
     # Results Table ----
     div(
-      class = 'button-box',
-      style = 'background: #fff !important;',
-      tags$h4('Results'),
-      uiOutput(ns('result_summary')),
+      class = "button-box",
+      style = "background: #fff !important;",
+      tags$h4("Results"),
+      uiOutput(ns("result_summary")),
       with_spinner(
-        reactable::reactableOutput(ns('results_table'))
+        reactable::reactableOutput(ns("results_table"))
       )
     ),
 
@@ -208,8 +204,8 @@ mod_database_ui <- function(id) {
 #' database Server Functions
 #'
 #' @noRd
-mod_database_server <- function(id, con, parent_input, global_data){
-  moduleServer(id, function(input, output, session){
+mod_database_server <- function(id, con, parent_input, global_data) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     # Initialize reactive values
@@ -220,14 +216,14 @@ mod_database_server <- function(id, con, parent_input, global_data){
       year_range <- get_available_years_range(global_data$metadata, input$resolution)
 
       sliderInput(
-        inputId = ns('year_range'),
-        label = 'Year Range:',
-        min = year_range['min'],
-        max = year_range['max'],
-        value = c(year_range['min'], year_range['max']),
+        inputId = ns("year_range"),
+        label = "Year Range:",
+        min = year_range["min"],
+        max = year_range["max"],
+        value = c(year_range["min"], year_range["max"]),
         step = 1,
-        sep = '',
-        width = '100%'
+        sep = "",
+        width = "100%"
       )
     })
 
@@ -301,7 +297,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
       get_variable_names(global_data$metadata, input$metric)
     })
 
-    
+
     # Geography filters ---------------------------------------------------------
 
     # Available states (works independently of metrics)
@@ -311,7 +307,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
       get_available_states(
         con = con,
         resolution = input$resolution,
-        variable_names = selected_variable_names(),  # Can be NULL
+        variable_names = selected_variable_names(), # Can be NULL
         year_range = current_year_range()
       )
     })
@@ -323,134 +319,152 @@ mod_database_server <- function(id, con, parent_input, global_data){
       get_available_counties(
         con = con,
         states = input$state,
-        variable_names = selected_variable_names(),  # Can be NULL
+        variable_names = selected_variable_names(), # Can be NULL
         year_range = current_year_range()
       )
     })
 
-    
+
     # Update filter dropdowns ---------------------------------------------------
 
     # Update dimension choices (triggered by resolution or year range)
-    observeEvent(list(input$resolution, input$year_range), {
-      choices <- available_dimensions()
-      # Preserve selection if still valid, otherwise clear
-      current_selection <- isolate(input$dimension)
-      new_selection <- if (!is.null(current_selection)) {
-        intersect(current_selection, choices)
-      } else {
-        NULL
-      }
+    observeEvent(list(input$resolution, input$year_range),
+      {
+        choices <- available_dimensions()
+        # Preserve selection if still valid, otherwise clear
+        current_selection <- isolate(input$dimension)
+        new_selection <- if (!is.null(current_selection)) {
+          intersect(current_selection, choices)
+        } else {
+          NULL
+        }
 
-      updateSelectizeInput(
-        session,
-        'dimension',
-        choices = choices,
-        selected = new_selection,
-        server = FALSE
-      )
-    }, ignoreNULL = FALSE)
+        updateSelectizeInput(
+          session,
+          "dimension",
+          choices = choices,
+          selected = new_selection,
+          server = FALSE
+        )
+      },
+      ignoreNULL = FALSE
+    )
 
     # Update index choices (triggered by dimension selection)
-    observeEvent(list(input$dimension, input$resolution, input$year_range), {
-      choices <- available_indexes()
-      current_selection <- isolate(input$index)
-      new_selection <- if (!is.null(current_selection)) {
-        intersect(current_selection, choices)
-      } else {
-        NULL
-      }
+    observeEvent(list(input$dimension, input$resolution, input$year_range),
+      {
+        choices <- available_indexes()
+        current_selection <- isolate(input$index)
+        new_selection <- if (!is.null(current_selection)) {
+          intersect(current_selection, choices)
+        } else {
+          NULL
+        }
 
-      updateSelectizeInput(
-        session,
-        'index',
-        choices = choices,
-        selected = new_selection,
-        server = FALSE
-      )
-    }, ignoreNULL = FALSE)
+        updateSelectizeInput(
+          session,
+          "index",
+          choices = choices,
+          selected = new_selection,
+          server = FALSE
+        )
+      },
+      ignoreNULL = FALSE
+    )
 
     # Update indicator choices (triggered by index selection)
-    observeEvent(list(input$dimension, input$index, input$resolution, input$year_range), {
-      choices <- available_indicators()
-      current_selection <- isolate(input$indicator)
-      new_selection <- if (!is.null(current_selection)) {
-        intersect(current_selection, choices)
-      } else {
-        NULL
-      }
+    observeEvent(list(input$dimension, input$index, input$resolution, input$year_range),
+      {
+        choices <- available_indicators()
+        current_selection <- isolate(input$indicator)
+        new_selection <- if (!is.null(current_selection)) {
+          intersect(current_selection, choices)
+        } else {
+          NULL
+        }
 
-      updateSelectizeInput(
-        session,
-        'indicator',
-        choices = choices,
-        selected = new_selection,
-        server = FALSE
-      )
-    }, ignoreNULL = FALSE)
+        updateSelectizeInput(
+          session,
+          "indicator",
+          choices = choices,
+          selected = new_selection,
+          server = FALSE
+        )
+      },
+      ignoreNULL = FALSE
+    )
 
     # Update metric choices (triggered by indicator selection)
-    observeEvent(list(input$dimension, input$index, input$indicator, input$resolution, input$year_range), {
-      choices <- available_metrics()
-      current_selection <- isolate(input$metric)
-      new_selection <- if (!is.null(current_selection)) {
-        intersect(current_selection, choices)
-      } else {
-        NULL
-      }
+    observeEvent(list(input$dimension, input$index, input$indicator, input$resolution, input$year_range),
+      {
+        choices <- available_metrics()
+        current_selection <- isolate(input$metric)
+        new_selection <- if (!is.null(current_selection)) {
+          intersect(current_selection, choices)
+        } else {
+          NULL
+        }
 
-      updateSelectizeInput(
-        session,
-        'metric',
-        choices = choices,
-        selected = new_selection,
-        server = FALSE
-      )
-    }, ignoreNULL = FALSE)
+        updateSelectizeInput(
+          session,
+          "metric",
+          choices = choices,
+          selected = new_selection,
+          server = FALSE
+        )
+      },
+      ignoreNULL = FALSE
+    )
 
     # Update state choices (works independently)
-    observeEvent(list(input$resolution, input$year_range, input$metric), {
-      req(input$resolution, input$year_range)
+    observeEvent(list(input$resolution, input$year_range, input$metric),
+      {
+        req(input$resolution, input$year_range)
 
-      states <- available_states()
-      current_selection <- isolate(input$state)
-      new_selection <- if (!is.null(current_selection)) {
-        intersect(current_selection, states)
-      } else {
-        NULL
-      }
+        states <- available_states()
+        current_selection <- isolate(input$state)
+        new_selection <- if (!is.null(current_selection)) {
+          intersect(current_selection, states)
+        } else {
+          NULL
+        }
 
-      updateSelectizeInput(
-        session,
-        'state',
-        choices = states,
-        selected = new_selection,
-        server = FALSE
-      )
-    }, ignoreNULL = FALSE)
+        updateSelectizeInput(
+          session,
+          "state",
+          choices = states,
+          selected = new_selection,
+          server = FALSE
+        )
+      },
+      ignoreNULL = FALSE
+    )
 
     # Update county choices (only when states selected)
-    observeEvent(list(input$state, input$metric, input$year_range), {
-      req(input$state)
+    observeEvent(list(input$state, input$metric, input$year_range),
+      {
+        req(input$state)
 
-      counties <- available_counties()
-      current_selection <- isolate(input$county)
-      new_selection <- if (!is.null(current_selection)) {
-        intersect(current_selection, counties)
-      } else {
-        NULL
-      }
+        counties <- available_counties()
+        current_selection <- isolate(input$county)
+        new_selection <- if (!is.null(current_selection)) {
+          intersect(current_selection, counties)
+        } else {
+          NULL
+        }
 
-      updateSelectizeInput(
-        session,
-        'county',
-        choices = counties,
-        selected = new_selection,
-        server = FALSE
-      )
-    }, ignoreNULL = FALSE)
+        updateSelectizeInput(
+          session,
+          "county",
+          choices = counties,
+          selected = new_selection,
+          server = FALSE
+        )
+      },
+      ignoreNULL = FALSE
+    )
 
-    
+
     # Query Database Button -----------------------------------------------------
     observeEvent(input$query_button, {
       req(current_year_range())
@@ -461,8 +475,8 @@ mod_database_server <- function(id, con, parent_input, global_data){
         # User explicitly selected metrics - use those
         var_names <- get_variable_names(global_data$metadata, input$metric)
       } else if (!is.null(input$dimension) && length(input$dimension) > 0 ||
-                 !is.null(input$index) && length(input$index) > 0 ||
-                 !is.null(input$indicator) && length(input$indicator) > 0) {
+        !is.null(input$index) && length(input$index) > 0 ||
+        !is.null(input$indicator) && length(input$indicator) > 0) {
         # No explicit metrics, but classification filters selected
         # Get all metrics matching the current filters
         matching_metrics <- available_metrics()
@@ -472,8 +486,8 @@ mod_database_server <- function(id, con, parent_input, global_data){
         } else {
           # No metrics match the filters
           showNotification(
-            'No metrics match the selected filters',
-            type = 'error',
+            "No metrics match the selected filters",
+            type = "error",
             duration = 5
           )
           return()
@@ -486,19 +500,19 @@ mod_database_server <- function(id, con, parent_input, global_data){
       # Warn if querying all data (no filters)
       if (is.null(var_names) && is.null(input$state) && is.null(input$county)) {
         showNotification(
-          HTML('Warning: Querying all metrics for all locations.<br/>This may return a large dataset and take some time.'),
-          type = 'warning',
+          HTML("Warning: Querying all metrics for all locations.<br/>This may return a large dataset and take some time."),
+          type = "warning",
           duration = 5
         )
       }
 
       # Show loading notification
       showNotification(
-        'Querying database...',
-        id = 'query_loading',
+        "Querying database...",
+        id = "query_loading",
         duration = NULL,
         closeButton = FALSE,
-        type = 'message'
+        type = "message"
       )
 
       # Query the database
@@ -512,13 +526,13 @@ mod_database_server <- function(id, con, parent_input, global_data){
       )
 
       # Remove loading notification
-      removeNotification('query_loading')
+      removeNotification("query_loading")
 
       # Check if results are empty
       if (nrow(results) == 0) {
         showNotification(
-          'No data found for the selected filters',
-          type = 'warning',
+          "No data found for the selected filters",
+          type = "warning",
           duration = 5
         )
         query_results(NULL)
@@ -528,7 +542,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
       # Join with fips_key to get readable location names
       fips_key <- global_data$fips_key
       results <- results %>%
-        dplyr::left_join(fips_key, by = 'fips')
+        dplyr::left_join(fips_key, by = "fips")
 
       # Join with metadata to add classification columns
       metadata_subset <- global_data$metadata %>%
@@ -538,7 +552,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
       results <- results %>%
         dplyr::left_join(
           metadata_subset,
-          by = c('variable_name' = 'Variable Name')
+          by = c("variable_name" = "Variable Name")
         )
 
       # Reorder columns for better display
@@ -554,34 +568,35 @@ mod_database_server <- function(id, con, parent_input, global_data){
 
       # Success notification
       showNotification(
-        paste0('Found ', nrow(results), ' rows'),
-        type = 'message',
+        paste0("Found ", nrow(results), " rows"),
+        type = "message",
         duration = 3
       )
     })
 
-    
+
     # Display Results Summary ---------------------------------------------------
     output$result_summary <- renderUI({
       results <- query_results()
 
       if (is.null(results)) {
         tags$p('No results yet. Configure filters and click "Query Database".',
-               style = 'color: #666; font-style: italic;')
+          style = "color: #666; font-style: italic;"
+        )
       } else {
         tags$p(
           paste0(
-            'Displaying ', nrow(results), ' rows | ',
-            length(unique(results$Metric)), ' unique metric(s) | ',
-            length(unique(results$fips)), ' location(s) | ',
-            length(unique(results$year)), ' year(s)'
+            "Displaying ", nrow(results), " rows | ",
+            length(unique(results$Metric)), " unique metric(s) | ",
+            length(unique(results$fips)), " location(s) | ",
+            length(unique(results$year)), " year(s)"
           ),
-          style = 'font-weight: bold; color: #2c5f2d;'
+          style = "font-weight: bold; color: #2c5f2d;"
         )
       }
     })
 
-    
+
     # Render Results Table ------------------------------------------------------
     output$results_table <- reactable::renderReactable({
       results <- query_results()
@@ -672,31 +687,31 @@ mod_database_server <- function(id, con, parent_input, global_data){
           if (!is.null(input$metric) && length(input$metric) > 0) {
             var_names <- get_variable_names(global_data$metadata, input$metric)
           } else if (!is.null(input$dimension) && length(input$dimension) > 0 ||
-                     !is.null(input$index) && length(input$index) > 0 ||
-                     !is.null(input$indicator) && length(input$indicator) > 0) {
+            !is.null(input$index) && length(input$index) > 0 ||
+            !is.null(input$indicator) && length(input$indicator) > 0) {
             # Get all metrics matching the current filters
             matching_metrics <- available_metrics()
             var_names <- get_variable_names(global_data$metadata, matching_metrics)
           } else {
-            var_names <- NULL  # All metrics
+            var_names <- NULL # All metrics
           }
 
           # Show appropriate notification
           if (is.null(var_names) && is.null(input$state) && is.null(input$county)) {
             showNotification(
-              'Downloading entire dataset (all metrics, all locations)...',
-              id = 'download_loading',
+              "Downloading entire dataset (all metrics, all locations)...",
+              id = "download_loading",
               duration = NULL,
               closeButton = FALSE,
-              type = 'message'
+              type = "message"
             )
           } else {
             showNotification(
-              'Downloading filtered data...',
-              id = 'download_loading',
+              "Downloading filtered data...",
+              id = "download_loading",
               duration = NULL,
               closeButton = FALSE,
-              type = 'message'
+              type = "message"
             )
           }
 
@@ -713,7 +728,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
           # Join with fips_key
           fips_key <- global_data$fips_key
           results <- results %>%
-            dplyr::left_join(fips_key, by = 'fips')
+            dplyr::left_join(fips_key, by = "fips")
 
           # Join with metadata
           metadata_subset <- global_data$metadata %>%
@@ -723,7 +738,7 @@ mod_database_server <- function(id, con, parent_input, global_data){
           results <- results %>%
             dplyr::left_join(
               metadata_subset,
-              by = c('variable_name' = 'Variable Name')
+              by = c("variable_name" = "Variable Name")
             ) %>%
             dplyr::select(
               state_name, county_name, fips, year,
@@ -731,18 +746,18 @@ mod_database_server <- function(id, con, parent_input, global_data){
               value, Units
             )
 
-          removeNotification('download_loading')
+          removeNotification("download_loading")
 
           showNotification(
-            paste0('Downloaded ', nrow(results), ' rows'),
-            type = 'message',
+            paste0("Downloaded ", nrow(results), " rows"),
+            type = "message",
             duration = 3
           )
         } else {
           # Use filtered results
           showNotification(
-            paste0('Downloading ', nrow(results), ' filtered rows...'),
-            type = 'message',
+            paste0("Downloading ", nrow(results), " filtered rows..."),
+            type = "message",
             duration = 2
           )
         }
@@ -751,7 +766,6 @@ mod_database_server <- function(id, con, parent_input, global_data){
         write.csv(results, file, row.names = FALSE)
       }
     )
-
   })
 }
 

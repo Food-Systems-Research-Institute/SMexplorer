@@ -18,8 +18,7 @@
 #' @importFrom dplyr mutate filter pull bind_rows %>%
 #' @importFrom purrr map
 #' @importFrom rlang .data
-get_latest_year <- function(df, var_col = 'variable_name', year_col = 'year'){
-
+get_latest_year <- function(df, var_col = "variable_name", year_col = "year") {
   # Make sure year column is numeric
   df <- dplyr::mutate(df, {{ year_col }} := as.numeric(.data[[year_col]]))
 
@@ -29,7 +28,6 @@ get_latest_year <- function(df, var_col = 'variable_name', year_col = 'year'){
   # Get new df with only the latest year of each variable
   # Map over each variable_name
   filtered_df <- purrr::map(vars, \(var) {
-
     # Get all unique years
     unique_years <- df %>%
       dplyr::filter(.data[[var_col]] == var) %>%
@@ -41,10 +39,8 @@ get_latest_year <- function(df, var_col = 'variable_name', year_col = 'year'){
       dplyr::filter(.data[[var_col]] == var, .data[[year_col]] == max(unique_years))
     return(out)
   }) %>%
-
     # Put each variable back together
     dplyr::bind_rows()
 
   return(filtered_df)
 }
-

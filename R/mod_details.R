@@ -20,29 +20,27 @@ mod_details_ui <- function(id) {
   tagList(
     # Title ----
     div(
-      class = 'button-box',
-      style = 'background: #fff !important;',
+      class = "button-box",
+      style = "background: #fff !important;",
       tagList(
         tags$h2(
-          'State and County Details', 
-          style = 'text-align: left !important; margin-top: 10px !important;'
+          "State and County Details",
+          style = "text-align: left !important; margin-top: 10px !important;"
         ),
         tags$p(
-          'Use the box on the right to select a resolution, state or county, and metric.',
-          'Highlights in the data boxes will adjust to suit, and a time series plot will be shown that visualizes the metric over time.',
-          'This page could benefit from a metric information dropdown which will be added soon.'
+          "Use the box on the right to select a resolution, state or county, and metric.",
+          "Highlights in the data boxes will adjust to suit, and a time series plot will be shown that visualizes the metric over time.",
+          "This page could benefit from a metric information dropdown which will be added soon."
         )
       )
     ),
-    
-    uiOutput(ns('boxes')),
-
+    uiOutput(ns("boxes")),
     fluidRow(
       column(
         width = 8,
 
         ## Time series box -----
-        uiOutput(ns('time_series_box'))
+        uiOutput(ns("time_series_box"))
       ),
 
       # Right Column - Controls
@@ -50,28 +48,28 @@ mod_details_ui <- function(id) {
         width = 4,
         ## Selection box -----
         box(
-          title = 'Select Location & Metric',
+          title = "Select Location & Metric",
           width = 12,
-          status = 'primary',
+          status = "primary",
           solidHeader = TRUE,
           collapsible = TRUE,
 
           ### Choose Resolution -----
           selectizeInput(
-            inputId = ns('select_resolution'),
-            label = 'Choose resolution:',
-            choices = c('County', 'State'),
-            selected = 'County',
-            width = '100%'
+            inputId = ns("select_resolution"),
+            label = "Choose resolution:",
+            choices = c("County", "State"),
+            selected = "County",
+            width = "100%"
           ),
 
           ### Select State -----
           selectizeInput(
-            inputId = ns('select_state'),
-            label = 'State:',
+            inputId = ns("select_state"),
+            label = "State:",
             choices = NULL,
-            selected = 'Vermont',
-            width = '100%'
+            selected = "Vermont",
+            width = "100%"
           ),
 
           ### Search County (conditional on County resolution) -----
@@ -79,45 +77,44 @@ mod_details_ui <- function(id) {
             condition = "input.select_resolution == 'County'",
             ns = ns,
             selectizeInput(
-              inputId = ns('search_county'),
-              label = 'County:',
+              inputId = ns("search_county"),
+              label = "County:",
               choices = NULL,
-              selected = 'Chittenden County',
-              width = '100%'
+              selected = "Chittenden County",
+              width = "100%"
             )
           ),
 
           ### Search Metric -----
           selectizeInput(
-            inputId = ns('search_metric'),
-            label = 'Metric:',
+            inputId = ns("search_metric"),
+            label = "Metric:",
             choices = NULL,
-            selected = 'Overall food insecurity rate',
-            width = '100%'
+            selected = "Overall food insecurity rate",
+            width = "100%"
           ),
-
           actionBttn(
-            ns('update_plot'),
-            'Show Time Series',
-            style = 'unite',
-            icon = icon('chart-line')
+            ns("update_plot"),
+            "Show Time Series",
+            style = "unite",
+            icon = icon("chart-line")
           )
         )
       )
     )
   )
 }
-    
+
 #' details Server Functions
 #'
 #' @noRd
-mod_details_server <- function(id, con, parent_input, global_data){
-  moduleServer(id, function(input, output, session){
+mod_details_server <- function(id, con, parent_input, global_data) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     # Combined location reactive -----
     selected_location <- reactive({
-      if (input$select_resolution == 'County') {
+      if (input$select_resolution == "County") {
         req(input$search_county)
         return(input$search_county)
       } else {
@@ -133,12 +130,12 @@ mod_details_server <- function(id, con, parent_input, global_data){
       get_latest_metric_value(
         con = con,
         global_data = global_data,
-        variable_name = 'foodInsecurityRate',
+        variable_name = "foodInsecurityRate",
         location = selected_location(),
         resolution = input$select_resolution,
-        format_type = 'percent',
+        format_type = "percent",
         decimal_places = 1,
-        multiplier = 100  # Convert proportion to percent
+        multiplier = 100 # Convert proportion to percent
       )
     })
 
@@ -148,10 +145,10 @@ mod_details_server <- function(id, con, parent_input, global_data){
       get_latest_metric_value(
         con = con,
         global_data = global_data,
-        variable_name = 'gini',
+        variable_name = "gini",
         location = selected_location(),
         resolution = input$select_resolution,
-        format_type = 'decimal',
+        format_type = "decimal",
         decimal_places = 2
       )
     })
@@ -162,10 +159,10 @@ mod_details_server <- function(id, con, parent_input, global_data){
       get_latest_metric_value(
         con = con,
         global_data = global_data,
-        variable_name = 'medHhIncome',
+        variable_name = "medHhIncome",
         location = selected_location(),
         resolution = input$select_resolution,
-        format_type = 'currency',
+        format_type = "currency",
         decimal_places = 0
       )
     })
@@ -175,16 +172,16 @@ mod_details_server <- function(id, con, parent_input, global_data){
       food_insec_data <- rval_food_insecurity()
 
       subtitle <- if (!is.null(food_insec_data$year)) {
-        paste0('Food Insecurity Rate (', food_insec_data$year, ')')
+        paste0("Food Insecurity Rate (", food_insec_data$year, ")")
       } else {
-        'Food Insecurity Rate'
+        "Food Insecurity Rate"
       }
 
       valueBox(
         value = food_insec_data$value,
         subtitle = subtitle,
-        icon = icon('utensils'),
-        color = 'green'
+        icon = icon("utensils"),
+        color = "green"
       )
     })
 
@@ -192,16 +189,16 @@ mod_details_server <- function(id, con, parent_input, global_data){
       gini_data <- rval_gini()
 
       subtitle <- if (!is.null(gini_data$year)) {
-        paste0('Gini Coefficient (', gini_data$year, ')')
+        paste0("Gini Coefficient (", gini_data$year, ")")
       } else {
-        'Gini Coefficient'
+        "Gini Coefficient"
       }
 
       valueBox(
         value = gini_data$value,
         subtitle = subtitle,
-        icon = icon('scale-unbalanced'),
-        color = 'aqua'
+        icon = icon("scale-unbalanced"),
+        color = "aqua"
       )
     })
 
@@ -209,25 +206,25 @@ mod_details_server <- function(id, con, parent_input, global_data){
       income_data <- rval_income()
 
       subtitle <- if (!is.null(income_data$year)) {
-        paste0('Median Household Income (', income_data$year, ')')
+        paste0("Median Household Income (", income_data$year, ")")
       } else {
-        'Median Household Income'
+        "Median Household Income"
       }
 
       valueBox(
         value = income_data$value,
         subtitle = subtitle,
-        icon = icon('dollar-sign'),
-        color = 'teal'
+        icon = icon("dollar-sign"),
+        color = "teal"
       )
     })
 
     output$boxes <- renderUI({
       tagList(
         fluidRow(
-          valueBoxOutput(ns('food_insecurity_box')),
-          valueBoxOutput(ns('gini_box')),
-          valueBoxOutput(ns('wage_box'))
+          valueBoxOutput(ns("food_insecurity_box")),
+          valueBoxOutput(ns("gini_box")),
+          valueBoxOutput(ns("wage_box"))
         )
       )
     })
@@ -238,10 +235,10 @@ mod_details_server <- function(id, con, parent_input, global_data){
         width = 12,
         title = plot_location(),
         solidHeader = TRUE,
-        status = 'primary',
+        status = "primary",
         collapsible = TRUE,
         with_spinner(
-          plotlyOutput(ns('time_series_plot'))
+          plotlyOutput(ns("time_series_plot"))
         )
       )
     })
@@ -257,8 +254,8 @@ mod_details_server <- function(id, con, parent_input, global_data){
 
       updateSelectizeInput(
         session,
-        'select_state',
-        choices = c('', state_options),
+        "select_state",
+        choices = c("", state_options),
         selected = "Vermont",
         server = TRUE
       )
@@ -282,13 +279,13 @@ mod_details_server <- function(id, con, parent_input, global_data){
       default_county <- if (input$select_state == "Vermont") {
         "Chittenden County"
       } else {
-        county_options[1]  # First county in the list
+        county_options[1] # First county in the list
       }
 
       updateSelectizeInput(
         session,
-        'search_county',
-        choices = c('', county_options),
+        "search_county",
+        choices = c("", county_options),
         selected = default_county,
         server = TRUE
       )
@@ -301,7 +298,7 @@ mod_details_server <- function(id, con, parent_input, global_data){
       chosen_resolution <- tolower(input$select_resolution)
 
       # Query metrics that have > 1 data point (proper time series)
-      table <- paste0('neast_', chosen_resolution, '_metrics')
+      table <- paste0("neast_", chosen_resolution, "_metrics")
       query <- glue::glue(
         "SELECT m.variable_name, COUNT(DISTINCT m.year) as year_count
         FROM {table} m
@@ -331,8 +328,8 @@ mod_details_server <- function(id, con, parent_input, global_data){
 
       updateSelectizeInput(
         session,
-        'search_metric',
-        choices = c('', metric_options),
+        "search_metric",
+        choices = c("", metric_options),
         selected = default_metric,
         server = TRUE
       )
@@ -353,7 +350,7 @@ mod_details_server <- function(id, con, parent_input, global_data){
       }
 
       # Get FIPS code from fips_key
-      if (tolower(input$select_resolution) == 'county') {
+      if (tolower(input$select_resolution) == "county") {
         location_fips <- global_data$fips_key %>%
           filter(county_name == selected_location()) %>%
           pull(fips) %>%
@@ -371,7 +368,7 @@ mod_details_server <- function(id, con, parent_input, global_data){
       }
 
       # Query time series data from database
-      table <- paste0('neast_', tolower(input$select_resolution), '_metrics')
+      table <- paste0("neast_", tolower(input$select_resolution), "_metrics")
 
       # Query time series data
       query <- glue::glue(
@@ -425,22 +422,21 @@ mod_details_server <- function(id, con, parent_input, global_data){
         ts_data,
         x = ~year,
         y = ~value,
-        type = 'scatter',
-        mode = 'lines+markers',
-        marker = list(size = 8, color = '#154734'),
-        line = list(color = '#154734', width = 2)
+        type = "scatter",
+        mode = "lines+markers",
+        marker = list(size = 8, color = "#154734"),
+        line = list(color = "#154734", width = 2)
       ) %>%
         layout(
           title = paste0(plot_metric(), " - ", plot_location()),
           xaxis = list(title = "Year"),
           yaxis = list(title = plot_metric()),
-          hovermode = 'x unified'
+          hovermode = "x unified"
         )
     })
-
   })
 }
-    
+
 ## To be copied in the UI
 # mod_details_ui("details_1")
 

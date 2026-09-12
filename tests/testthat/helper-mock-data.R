@@ -43,12 +43,12 @@ create_mock_map_data <- function(values, include_county = TRUE) {
 #'
 #' @examples
 get_mock_metadata <- function() {
-  dimensions <- c('Economics', 'Production', 'Social', 'Health', 'Environment')
+  dimensions <- c("Economics", "Production", "Social", "Health", "Environment")
   mock_metadata <- map(dimensions, ~ {
-    metadata %>% 
-      dplyr::filter(Dimension == .x) %>% 
+    metadata %>%
+      dplyr::filter(Dimension == .x) %>%
       dplyr::slice(1:10)
-  }) %>% 
+  }) %>%
     dplyr::bind_rows()
   return(mock_metadata)
 }

@@ -1,19 +1,19 @@
 # create_base_map ---------------------------------------------------------
 
 test_that("create_base_map creates valid leaflet map object", {
-  map <- create_base_map(neast_county_spatial_2024, resolution = 'County')
+  map <- create_base_map(neast_county_spatial_2024, resolution = "County")
 
   # Test object classes
-  expect_s3_class(map, 'leaflet')
-  expect_s3_class(map, 'htmlwidget')
+  expect_s3_class(map, "leaflet")
+  expect_s3_class(map, "htmlwidget")
 
   # Test that map has expected components
-  expect_true(!is.null(map$x))  # Map has configuration
-  expect_true(!is.null(map$x$calls))  # Map has layer calls
+  expect_true(!is.null(map$x)) # Map has configuration
+  expect_true(!is.null(map$x$calls)) # Map has layer calls
 
   # Check that provider tiles were added (should have multiple addProviderTiles calls)
   tile_calls <- sapply(map$x$calls, function(x) x$method == "addProviderTiles")
-  expect_true(sum(tile_calls) == 2)  # OpenStreetMap, USGS
+  expect_true(sum(tile_calls) == 2) # OpenStreetMap, USGS
 
   # Check that polygons were added
   polygon_calls <- sapply(map$x$calls, function(x) x$method == "addPolygons")
@@ -25,16 +25,16 @@ test_that("create_base_map creates valid leaflet map object", {
 })
 
 test_that("create_base_map works with County resolution", {
-  map <- create_base_map(neast_county_spatial_2024, resolution = 'County')
+  map <- create_base_map(neast_county_spatial_2024, resolution = "County")
 
-  expect_s3_class(map, 'leaflet')
+  expect_s3_class(map, "leaflet")
   expect_true(!is.null(map$x$calls))
 })
 
 test_that("create_base_map works with State resolution", {
-  map <- create_base_map(neast_county_spatial_2024, resolution = 'State')
+  map <- create_base_map(neast_county_spatial_2024, resolution = "State")
 
-  expect_s3_class(map, 'leaflet')
+  expect_s3_class(map, "leaflet")
   expect_true(!is.null(map$x$calls))
 })
 
@@ -53,7 +53,7 @@ test_that("custom_popup formats county-level data correctly", {
   expect_type(result, "character")
   expect_match(result, "Test County")
   expect_match(result, "Test Metric")
-  expect_match(result, "123.46")  # Rounded to 2 decimals
+  expect_match(result, "123.46") # Rounded to 2 decimals
 })
 
 test_that("custom_popup handles state-level data (NA county)", {
@@ -80,14 +80,14 @@ test_that("custom_popup rounds values correctly", {
     metric = "Metric"
   )
 
-  expect_match(result, "0")  # Rounds to 2 decimals
+  expect_match(result, "0") # Rounds to 2 decimals
 })
 
 
 # get_map_formulas --------------------------------------------------------
 
 test_that("get_map_formulas returns correct structure for County", {
-  formulas <- get_map_formulas('County', 'Test Metric')
+  formulas <- get_map_formulas("County", "Test Metric")
 
   expect_true(is.list(formulas))
   expect_named(formulas, c("popup", "label"))
@@ -96,7 +96,7 @@ test_that("get_map_formulas returns correct structure for County", {
 })
 
 test_that("get_map_formulas returns correct structure for State", {
-  formulas <- get_map_formulas('State', 'Test Metric')
+  formulas <- get_map_formulas("State", "Test Metric")
 
   expect_true(is.list(formulas))
   expect_named(formulas, c("popup", "label"))
@@ -105,7 +105,7 @@ test_that("get_map_formulas returns correct structure for State", {
 })
 
 test_that("get_map_formulas County uses county_name", {
-  formulas <- get_map_formulas('County', 'Test Metric')
+  formulas <- get_map_formulas("County", "Test Metric")
 
   # Label should reference county_name
   label_text <- as.character(formulas$label)
@@ -114,7 +114,7 @@ test_that("get_map_formulas County uses county_name", {
 })
 
 test_that("get_map_formulas State uses state_name", {
-  formulas <- get_map_formulas('State', 'Test Metric')
+  formulas <- get_map_formulas("State", "Test Metric")
 
   # Label should reference state_name
   label_text <- as.character(formulas$label)
@@ -175,7 +175,7 @@ test_that("validate_map_data errors when all values are NA", {
 
 test_that("validate_map_data warns when many values are NA", {
   test_data <- create_mock_map_data(
-    values = c(1, NA, NA, NA, NA, NA, NA, NA, NA, NA)  # 10% valid
+    values = c(1, NA, NA, NA, NA, NA, NA, NA, NA, NA) # 10% valid
   )
 
   result <- validate_map_data(
@@ -194,7 +194,7 @@ test_that("validate_map_data warns when many values are NA", {
 
 test_that("validate_map_data passes with exactly threshold valid data", {
   test_data <- create_mock_map_data(
-    values = c(1, 2, NA, NA, NA)  # 40% valid (above 20% threshold)
+    values = c(1, 2, NA, NA, NA) # 40% valid (above 20% threshold)
   )
 
   result <- validate_map_data(
@@ -212,7 +212,7 @@ test_that("validate_map_data passes with exactly threshold valid data", {
 
 test_that("validate_map_data respects custom warn_threshold", {
   test_data <- create_mock_map_data(
-    values = c(1, 2, 3, NA, NA, NA, NA, NA, NA, NA)  # 30% valid
+    values = c(1, 2, 3, NA, NA, NA, NA, NA, NA, NA) # 30% valid
   )
 
   result <- validate_map_data(
@@ -220,7 +220,7 @@ test_that("validate_map_data respects custom warn_threshold", {
     metric_name = "Test Metric",
     year = 2024,
     resolution = "County",
-    warn_threshold = 0.5  # Require 50% valid data
+    warn_threshold = 0.5 # Require 50% valid data
   )
 
   expect_true(result$valid)

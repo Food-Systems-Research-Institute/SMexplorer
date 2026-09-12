@@ -21,16 +21,15 @@
 #' @importFrom dplyr filter pull %>%
 #' @importFrom glue glue
 get_latest_metric_value <- function(con,
-                                     global_data,
-                                     variable_name,
-                                     location,
-                                     resolution,
-                                     format_type = "raw",
-                                     decimal_places = 2,
-                                     multiplier = 1) {
-
+                                    global_data,
+                                    variable_name,
+                                    location,
+                                    resolution,
+                                    format_type = "raw",
+                                    decimal_places = 2,
+                                    multiplier = 1) {
   # Get FIPS code from fips_key
-  if (resolution == 'County') {
+  if (resolution == "County") {
     location_fips <- global_data$fips_key %>%
       filter(county_name == location) %>%
       pull(fips) %>%
@@ -49,7 +48,7 @@ get_latest_metric_value <- function(con,
   }
 
   # Query latest value from database
-  table <- paste0('neast_', tolower(resolution), '_metrics')
+  table <- paste0("neast_", tolower(resolution), "_metrics")
   query <- glue::glue(
     "SELECT value, year
     FROM {table}
@@ -75,13 +74,12 @@ get_latest_metric_value <- function(con,
   raw_value <- raw_value * multiplier
 
   # Format value based on format_type
-  formatted_value <- switch(
-    format_type,
+  formatted_value <- switch(format_type,
     "percent" = paste0(round(raw_value, decimal_places), "%"),
     "currency" = paste0("$", format(round(raw_value, decimal_places), big.mark = ",", scientific = FALSE)),
     "decimal" = format(round(raw_value, decimal_places), nsmall = decimal_places),
     "raw" = as.character(raw_value),
-    as.character(raw_value)  # default to raw if unknown type
+    as.character(raw_value) # default to raw if unknown type
   )
 
   return(list(value = formatted_value, year = year))

@@ -11,8 +11,8 @@ pacman::p_load(
 )
 
 pacman::p_load_gh(
-  'Food-Systems-Research-Institute/SMdata',
-  'ChrisDonovan307/projecter'
+  "Food-Systems-Research-Institute/SMdata",
+  "ChrisDonovan307/projecter"
 )
 
 
@@ -30,13 +30,13 @@ neast_county_spatial_2021 <- tigris::counties(
   year = 2021
 )
 
-neast_state_spatial <- tigris::states(cb = TRUE) %>% 
+neast_state_spatial <- tigris::states(cb = TRUE) %>%
   dplyr::filter(STATEFP %in% neast_state_fips)
 
 layers <- mget(c(
-  'neast_county_spatial_2024',
-  'neast_county_spatial_2021',
-  'neast_state_spatial'
+  "neast_county_spatial_2024",
+  "neast_county_spatial_2021",
+  "neast_state_spatial"
 ))
 
 
@@ -56,32 +56,32 @@ map(layers_simple, get_size)
 # Remove some columns and keep only the good stuff in a familiar format
 get_str(layers_simple)
 get_str(SMdata::fips_key)
-crosswalk <- SMdata::fips_key %>% 
+crosswalk <- SMdata::fips_key %>%
   select(fips, county_name, state_name)
 
 wrangled_layers <- imap(layers_simple, \(layer, name) {
-  if (str_detect(name, 'county')) {
-    df <- layer %>% 
+  if (str_detect(name, "county")) {
+    df <- layer %>%
       rename(
         fips = GEOID,
         county_name = NAMELSAD
-      ) %>% 
-      left_join(crosswalk, by = 'fips')
+      ) %>%
+      left_join(crosswalk, by = "fips")
   } else {
-    df <- layer %>% 
+    df <- layer %>%
       rename(
         fips = STATEFP,
         state_name = NAME
       )
   }
-  
-  df %>% 
+
+  df %>%
     select(any_of(c(
-      'fips',
-      'county_name',
-      'state_name',
-      'ALAND',
-      'AWATER'
+      "fips",
+      "county_name",
+      "state_name",
+      "ALAND",
+      "AWATER"
     )))
 })
 get_str(wrangled_layers)
@@ -89,11 +89,11 @@ map(wrangled_layers, get_size)
 
 # Combine with fips key get put state_name into county files
 get_str(SMdata::fips_key)
-fips_key <- SMdata::fips_key %>% 
+fips_key <- SMdata::fips_key %>%
   select(-state_code)
 wrangled_layers <- imap(wrangled_layers, ~ {
-  if (str_detect(.y, 'county')) {
-    .x %>% 
+  if (str_detect(.y, "county")) {
+    .x %>%
       left_join(fips_key)
   } else {
     .x
@@ -128,12 +128,12 @@ wrangled_layers <- list(
 )
 
 names(wrangled_layers) <- c(
-  'neast_county_spatial_2021',
-  'neast_county_spatial_2024',
-  'neast_state_spatial'
+  "neast_county_spatial_2021",
+  "neast_county_spatial_2024",
+  "neast_state_spatial"
 )
 
 iwalk(wrangled_layers, ~ {
-  path <- paste0('data/', .y, '.qs2')
+  path <- paste0("data/", .y, ".qs2")
   qs_save(.x, path)
 })

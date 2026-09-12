@@ -18,10 +18,9 @@ mod_map_ui <- function(id) {
   ns <- NS(id)
   tagList(
     div(
-      id = 'map_container',
-
+      id = "map_container",
       with_spinner(
-        leafletOutput(ns('map_plot'), height = '90vh', width = '100%'),
+        leafletOutput(ns("map_plot"), height = "90vh", width = "100%"),
       ),
 
       # Absolute Panel -----
@@ -36,14 +35,12 @@ mod_map_ui <- function(id) {
         bottom = "auto",
         width = 500,
         height = "auto",
-
         style = "z-index: 5001; background-color: rgba(255,255,255,0.8);
-          padding: 15px; border-radius: 8px; max-width: 500; 
+          padding: 15px; border-radius: 8px; max-width: 500;
           box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);",
-
-        h3('Select Metrics'),
+        h3("Select Metrics"),
         div(
-          class = 'button-box',
+          class = "button-box",
 
           # Top row
           fluidRow(
@@ -51,26 +48,26 @@ mod_map_ui <- function(id) {
               width = 6,
               # Select resolution -----
               selectInput(
-                inputId = ns('resolution'),
-                label = 'Select resolution:',
-                choices = c('County', 'State'),
-                selected = 'County'
+                inputId = ns("resolution"),
+                label = "Select resolution:",
+                choices = c("County", "State"),
+                selected = "County"
               )
             ),
             column(
               width = 6,
               # Select dimension -----
               selectInput(
-                inputId = ns('dimension'),
-                label = 'Select dimension:',
+                inputId = ns("dimension"),
+                label = "Select dimension:",
                 choices = c(
-                  'Economics',
-                  'Environment',
-                  'Production',
-                  'Health',
-                  'Social'
+                  "Economics",
+                  "Environment",
+                  "Production",
+                  "Health",
+                  "Social"
                 ),
-                selected = 'Economics'
+                selected = "Economics"
               )
             )
           ), # end top row
@@ -81,11 +78,11 @@ mod_map_ui <- function(id) {
               width = 6,
               # Select metric -----
               selectizeInput(
-                inputId = ns('metric'),
-                label = 'Select metric:',
+                inputId = ns("metric"),
+                label = "Select metric:",
                 choices = NULL,
                 selected = NULL,
-                width = '100%'
+                width = "100%"
               )
             ),
             column(
@@ -96,7 +93,7 @@ mod_map_ui <- function(id) {
                 label = "Select year:",
                 choices = NULL,
                 selected = NULL,
-                width = '100%'
+                width = "100%"
               )
             )
           )
@@ -109,11 +106,11 @@ mod_map_ui <- function(id) {
 
             # Metric Info Button -----
             actionBttn(
-              ns('show_metric_info'),
-              'Metric Info',
-              class = 'action-button',
+              ns("show_metric_info"),
+              "Metric Info",
+              class = "action-button",
               # block = TRUE,
-              icon = icon('circle-info')
+              icon = icon("circle-info")
             )
           ),
           column(
@@ -121,10 +118,10 @@ mod_map_ui <- function(id) {
 
             # Full Screen Button -----
             actionBttn(
-              ns('full_screen'),
-              'Full Screen',
+              ns("full_screen"),
+              "Full Screen",
               # class = 'action-button',
-              icon = icon('expand'),
+              icon = icon("expand"),
               onclick = "openFullscreen(document.getElementById('map_container'))"
             ),
           )
@@ -132,14 +129,14 @@ mod_map_ui <- function(id) {
 
         # Update Map Button -----
         actionBttn(
-          ns('update_map'),
-          'Update Map',
-          style = 'unite',
-          icon = icon('arrows-rotate')
+          ns("update_map"),
+          "Update Map",
+          style = "unite",
+          icon = icon("arrows-rotate")
         ),
 
         # Show Metric Info ----
-        uiOutput(ns('metric_info'))
+        uiOutput(ns("metric_info"))
       ), # end absolute panel div
 
       # JS function for full screen button
@@ -169,9 +166,9 @@ mod_map_server <- function(id, con, parent_input, global_data) {
       # Only load once
       if (!map_data_loaded()) {
         # Load spatial data from qs files
-        county_spatial_2021(qs2::qs_read('data/neast_county_spatial_2021.qs2'))
-        county_spatial_2024(qs2::qs_read('data/neast_county_spatial_2024.qs2'))
-        state_spatial(qs2::qs_read('data/neast_state_spatial.qs2'))
+        county_spatial_2021(qs2::qs_read("data/neast_county_spatial_2021.qs2"))
+        county_spatial_2024(qs2::qs_read("data/neast_county_spatial_2024.qs2"))
+        state_spatial(qs2::qs_read("data/neast_state_spatial.qs2"))
 
         # Build initial map once data is loaded
         initial_map(create_base_map(county_spatial_2024()))
@@ -231,7 +228,7 @@ mod_map_server <- function(id, con, parent_input, global_data) {
       )
 
       # Query metric data from database
-      table <- paste0('neast_', tolower(input$resolution), '_metrics')
+      table <- paste0("neast_", tolower(input$resolution), "_metrics")
       query <- glue::glue(
         "SELECT *
         FROM {table}
@@ -240,7 +237,7 @@ mod_map_server <- function(id, con, parent_input, global_data) {
       )
       metric_data <- query_db(con, query)
 
-      if (input$resolution == 'County') {
+      if (input$resolution == "County") {
         # Choose spatial base by year (CT county boundary changes)
         spatial_base <- if (input$year >= 2023) {
           county_spatial_2024()
@@ -249,13 +246,13 @@ mod_map_server <- function(id, con, parent_input, global_data) {
         }
         # Join spatial base with metric data and names - retain sf class with left join
         spatial_base %>%
-          dplyr::left_join(metric_data, by = c('GEOID' = 'fips')) %>%
-          dplyr::left_join(global_data$fips_key, by = c('GEOID' = 'fips'))
+          dplyr::left_join(metric_data, by = c("GEOID" = "fips")) %>%
+          dplyr::left_join(global_data$fips_key, by = c("GEOID" = "fips"))
       } else {
         # State level
         state_spatial() %>%
-          dplyr::left_join(metric_data, by = c('GEOID' = 'fips')) %>%
-          dplyr::left_join(global_data$fips_key, by = c('GEOID' = 'fips'))
+          dplyr::left_join(metric_data, by = c("GEOID" = "fips")) %>%
+          dplyr::left_join(global_data$fips_key, by = c("GEOID" = "fips"))
       }
     }) %>%
       # Cache so we don't have to reload
@@ -300,23 +297,23 @@ mod_map_server <- function(id, con, parent_input, global_data) {
             dplyr::filter(Metric == input$metric)
 
           div(
-            class = 'button-box',
-            style = 'background-color: #fff !important;',
-            tags$p(tags$strong('Metric:'), meta$Metric),
+            class = "button-box",
+            style = "background-color: #fff !important;",
+            tags$p(tags$strong("Metric:"), meta$Metric),
             tags$br(),
-            tags$p(tags$strong('Definition:'), meta$Definition),
+            tags$p(tags$strong("Definition:"), meta$Definition),
             tags$br(),
-            tags$p(tags$strong('Units:'), meta$Units),
+            tags$p(tags$strong("Units:"), meta$Units),
             tags$br(),
-            tags$p(tags$strong('Dimension:'), meta$Dimension),
+            tags$p(tags$strong("Dimension:"), meta$Dimension),
             tags$br(),
-            tags$p(tags$strong('Indicator:'), meta$Indicator),
+            tags$p(tags$strong("Indicator:"), meta$Indicator),
             tags$br(),
-            tags$p(tags$strong('Resolution:'), meta$Resolution),
+            tags$p(tags$strong("Resolution:"), meta$Resolution),
             tags$br(),
-            tags$p(tags$strong('Source:'), tags$a(meta$Source)),
+            tags$p(tags$strong("Source:"), tags$a(meta$Source)),
             tags$br(),
-            tags$p(tags$strong('Citation:'), meta$Citation),
+            tags$p(tags$strong("Citation:"), meta$Citation),
             tags$br()
           )
         })
@@ -370,9 +367,9 @@ mod_map_server <- function(id, con, parent_input, global_data) {
         ns("map_plot"),
         data = map_data()
       ) %>%
-        clearGroup('Counties') %>%
-        clearGroup('States') %>%
-        clearGroup('Boundaries') %>%
+        clearGroup("Counties") %>%
+        clearGroup("States") %>%
+        clearGroup("Boundaries") %>%
         addPolygons(
           color = "black",
           weight = 1,
@@ -388,14 +385,14 @@ mod_map_server <- function(id, con, parent_input, global_data) {
           label = formulas$label,
           popup = formulas$popup,
           popupOptions = popupOptions(closeButton = FALSE),
-          group = 'Boundaries'
+          group = "Boundaries"
         ) %>%
         clearControls() %>%
         addLegend(
           "bottomleft",
           pal = pal,
           values = ~value,
-          title = 'Values',
+          title = "Values",
           labFormat = labelFormat(prefix = " "),
           opacity = 1
         )

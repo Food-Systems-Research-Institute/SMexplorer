@@ -4,9 +4,9 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
+#' @importFrom shiny NS tagList
 mod_sidebar_ui <- function(id) {
   shinydashboard::dashboardSidebar(
     width = "175px",
@@ -34,19 +34,18 @@ mod_sidebar_ui <- function(id) {
     )
   )
 }
-    
+
 #' sidebar Server Functions
 #'
-#' @noRd 
-mod_sidebar_server <- function(id){
-  moduleServer(id, function(input, output, session){
+#' @noRd
+mod_sidebar_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
- 
   })
 }
-    
+
 ## To be copied in the UI
 # mod_sidebar_ui("sidebar_1")
-    
+
 ## To be copied in the server
 # mod_sidebar_server("sidebar_1")

@@ -17,7 +17,7 @@
 #' @importFrom DBI dbConnect dbDisconnect
 #' @importFrom duckdb duckdb
 #' @export
-create_db_connection <- function(db_path = 'data/appdata.duckdb', read_only = TRUE) {
+create_db_connection <- function(db_path = "data/appdata.duckdb", read_only = TRUE) {
   if (!file.exists(db_path)) {
     stop(sprintf("DuckDB file not found at: %s", db_path))
   }
@@ -50,11 +50,14 @@ create_db_connection <- function(db_path = 'data/appdata.duckdb', read_only = TR
 #' @export
 close_db_connection <- function(con) {
   if (!is.null(con)) {
-    tryCatch({
-      DBI::dbDisconnect(con, shutdown = TRUE)
-    }, error = function(e) {
-      warning(sprintf("Error closing DuckDB connection: %s", e$message))
-    })
+    tryCatch(
+      {
+        DBI::dbDisconnect(con, shutdown = TRUE)
+      },
+      error = function(e) {
+        warning(sprintf("Error closing DuckDB connection: %s", e$message))
+      }
+    )
   }
   invisible(NULL)
 }
@@ -81,9 +84,12 @@ close_db_connection <- function(con) {
 #'
 #' @export
 query_db <- function(con, query) {
-  tryCatch({
-    DBI::dbGetQuery(con, query)
-  }, error = function(e) {
-    stop(sprintf("Database query failed: %s\nQuery: %s", e$message, query))
-  })
+  tryCatch(
+    {
+      DBI::dbGetQuery(con, query)
+    },
+    error = function(e) {
+      stop(sprintf("Database query failed: %s\nQuery: %s", e$message, query))
+    }
+  )
 }
