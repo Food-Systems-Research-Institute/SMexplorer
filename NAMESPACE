@@ -124,14 +124,12 @@ importFrom(shinycssloaders,
 )
 importFrom(shinydashboard,
   box,
+  dashboardBody,
   renderValueBox,
-  updateTabItems,
+  tabItem,
+  tabItems,
   valueBox,
   valueBoxOutput
-)
-importFrom(shinyjs,
-  onclick,
-  useShinyjs
 )
 importFrom(snakecase,to_title_case)
 importFrom(stats,cor.test)

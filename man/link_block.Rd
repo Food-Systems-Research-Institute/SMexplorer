@@ -6,6 +6,10 @@
 \usage{
 link_block(title = NULL, text = NULL, image = NULL, id = NULL)
 }
+\arguments{
+\item{id}{Element id, expected to be of the form 'go_to_<tab_value>_tab'
+so the target tab can be derived for the anchor's href/data-value.}
+}
 \description{
 Convenience function for formatting four link blocks on welcome page
 }

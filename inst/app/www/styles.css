@@ -41,8 +41,7 @@ h1, h2, h3, h4, h5 {
 /* note to format sidebar links with .main-sidebar a {}
 
 /* Link Blocks -------------------------------------------- */
-/* for welcome page links */
-div.link-block {
+.link-block {
   background-color: var(--theme-white);
   transition: all 0.2s ease-in-out;
   cursor: pointer;
@@ -50,39 +49,111 @@ div.link-block {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 
   border-radius: 4px;
-  padding: 10px 10px 10px 10px; /* insides */
+  padding: 10px; /* insides */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: left;
-  margin: 0 auto 10px auto; /* outsides: top side bottom side */
+  margin: 0 auto 10px auto;
   width: 100%;
+  max-height: 150px;
+
+  &:hover {
+    transform: translateY(-4px);
+    background-color: var(--theme-light-green);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  a {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    min-height: 100px; 
+    width: 100%; 
+    border: none; 
+    background: none; 
+    padding: 0; 
+    cursor: pointer; 
+    text-align: inherit; 
+    text-decoration: none !important; 
+    color: inherit !important;
+
+    .content {
+      flex: 1; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      text-align: center; 
+      padding: 10px;
+
+      span {
+        display: inline-block; 
+        vertical-align: middle; 
+        line-height: normal;
+      }
+    }
+
+    .screenshot {
+      flex: 1; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 10px;
+
+      img {
+        height: 100px; 
+        margin: 0px;
+      }
+    }
+  }
+
+  a:focus {
+    outline: 2px solid var(--theme-green);
+    outline-offset: 2px;
+  }
+
 }
 
-div.link-block:hover {
-  transform: translateY(-4px);
-  background-color: var(--theme-light-green) !important;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Thicker, darker shadow */
-}
     
 /* Header ------------------------------------------ */
-/* Main title */
-.main-header .logo {
-  font-family: 'Lora', sans-serif !important;
-  font-weight: bold;
-}
+.skin-green .main-header {
+  .navbar {
+    background-color: var(--theme-green);
 
-.main-header .logo:hover {
-  background-color: var(--theme-green) !important;
-  color: white;
+    .sidebar-toggle:hover {
+      background-color: var(--theme-dark-green);
+    }
+
+    .nav > li > a {
+      display: flex; 
+      align-items: center; 
+      max-height: 50px;
+
+      &:hover {
+        background-color: var(--theme-dark-green);
+      }
+
+      i {
+        font-size: 30px;
+      }
+
+      img {
+        height: 30px;
+      }
+    }
+  }
+
+  /* main top left title apparently */
+  .logo {
+    font-family: 'Lora', sans-serif;
+    font-weight: bold;
+    background-color: var(--theme-green);
+  }
+  .logo:hover {
+    background-color: var(--theme-dark-green);
+  }
 }
   
-.skin-green .main-header .navbar {
-  background-color: var(--theme-green);
-}
-.skin-green .main-header .logo {
-  background-color: var(--theme-green);
-}
 
 
 /* Sidebar ----------------------------------------- */

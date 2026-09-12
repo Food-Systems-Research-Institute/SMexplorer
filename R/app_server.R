@@ -3,27 +3,8 @@
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
-#' @importFrom shinyjs onclick
-#' @importFrom shinydashboard updateTabItems
 #' @noRd
 app_server <- function(input, output, session) {
-  # Turn link_block buttons on welcome module into links to tabs
-  shinyjs::onclick("go_to_map_tab", {
-    updateTabItems(session, "tabs", "map_tab")
-  })
-  shinyjs::onclick("go_to_graph_tab", {
-    updateTabItems(session, "tabs", "graph_tab")
-  })
-  shinyjs::onclick("go_to_details_tab", {
-    updateTabItems(session, "tabs", "details_tab")
-  })
-  shinyjs::onclick("go_to_table_tab", {
-    updateTabItems(session, "tabs", "table_tab")
-  })
-  shinyjs::onclick("go_to_database_tab", {
-    updateTabItems(session, "tabs", "database_tab")
-  })
-  
   # Contains small DFs that are used across all (or most) modules
   global_data <- load_global_data()
   
