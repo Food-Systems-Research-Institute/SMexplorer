@@ -23,7 +23,7 @@ create_db_connection <- function(db_path = "data/appdata.duckdb", read_only = TR
   }
 
   DBI::dbConnect(
-    duckdb::duckdb(),
+    duckdb::duckdb(shared_home = FALSE),
     dbdir = db_path,
     read_only = read_only
   )

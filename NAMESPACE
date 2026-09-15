@@ -25,6 +25,10 @@ importFrom(DBI,
   dbGetQuery
 )
 importFrom(broom,tidy)
+importFrom(dashboardthemes,
+  cssGradientThreeColors,
+  shinyDashboardThemeDIY
+)
 importFrom(dplyr,
   "%>%",
   across,
@@ -64,6 +68,7 @@ importFrom(golem,
   favicon,
   with_golem_options
 )
+importFrom(htmltools,tagQuery)
 importFrom(plotly,
   event_data,
   event_register,

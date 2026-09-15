@@ -1,0 +1,24 @@
+{
+  "name": "SMexplorer",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/src",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/src,type=bind,consistency=cached",
+  "forwardPorts": [3000],
+  "postCreateCommand": "R -s -e \"renv::restore(); for (p in c('languageserver', 'httpgd')) if (!requireNamespace(p, quietly = TRUE)) renv::install(p, prompt = FALSE)\"",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "REditorSupport.r-lsp"
+      ],
+      "settings": {
+        "r.rterm.linux": "R",
+        "r.bracketedPaste": true
+      }
+    }
+  },
+  "remoteUser": "root"
+}

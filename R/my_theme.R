@@ -1,5 +1,5 @@
-pacman::p_load(dashboardthemes)
-my_theme <- shinyDashboardThemeDIY(
+#' @importFrom dashboardthemes shinyDashboardThemeDIY cssGradientThreeColors
+my_theme <- dashboardthemes::shinyDashboardThemeDIY(
   # General -----------------------------------------------------------------
   appFontFamily = "Times New Roman",
   appFontColor = "rgb(0,0,0)",
@@ -18,7 +18,7 @@ my_theme <- shinyDashboardThemeDIY(
   headerButtonIconColor = "white",
   headerButtonBackColorHover = "rgb(210,210,210)",
   headerButtonIconColorHover = "rgb(0,0,0)",
-  headerBackColor = cssGradientThreeColors(
+  headerBackColor = dashboardthemes::cssGradientThreeColors(
     direction = "right",
     colorStart = "#154734",
     colorMiddle = "#1d6349",
@@ -33,7 +33,7 @@ my_theme <- shinyDashboardThemeDIY(
 
   # Sidebar -----------------------------------------------------------------
 
-  , sidebarBackColor = cssGradientThreeColors(
+  , sidebarBackColor = dashboardthemes::cssGradientThreeColors(
     direction = "down",
     colorStart = "#154734",
     colorMiddle = "#1d6349",
@@ -57,7 +57,7 @@ my_theme <- shinyDashboardThemeDIY(
   sidebarTabBorderStyle = "none none solid none",
   sidebarTabBorderColor = "white",
   sidebarTabBorderWidth = 1,
-  sidebarTabBackColorSelected = cssGradientThreeColors(
+  sidebarTabBackColorSelected = dashboardthemes::cssGradientThreeColors(
     direction = "right",
     colorStart = "#5cecab",
     colorMiddle = "#81edbc",
@@ -68,7 +68,7 @@ my_theme <- shinyDashboardThemeDIY(
   ),
   sidebarTabTextColorSelected = "rgb(0,0,0)",
   sidebarTabRadiusSelected = "0px 20px 20px 0px",
-  sidebarTabBackColorHover = cssGradientThreeColors(
+  sidebarTabBackColorHover = dashboardthemes::cssGradientThreeColors(
     direction = "right",
     colorStart = "#88b4a0",
     colorMiddle = "#9ab6a9",

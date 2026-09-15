@@ -3,11 +3,6 @@
 #'
 #' takes the value column and formats based on units to print nicely
 
-pacman::p_load(
-  dplyr,
-  stringr
-)
-
 format_values <- function(df,
                           units_col = "units",
                           value_col = "value") {
