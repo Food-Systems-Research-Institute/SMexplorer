@@ -20,12 +20,23 @@ COPY .Rprofile .Rprofile
 COPY renv/activate.R renv/activate.R
 COPY renv/settings.json renv/settings.json
 
-# Restore dependencies, move to src, install SMexplorer
+# Restore dependencies
 ENV RENV_PATHS_LIBRARY=renv/library
 RUN R -s -e "renv::restore()"
-COPY . .
+
+# Copy only what's needed to install the package and build data,
+# Avoid rebuilds later
+COPY DESCRIPTION NAMESPACE app.R ./
+COPY R/ R/
+COPY man/ man/
+COPY inst/ inst/
+COPY data/ data/
+COPY data-raw/ data-raw/
 RUN R -e 'options(warn = 2); renv::install(".")'
 RUN R -e 'source("data-raw/create_duckdb.R"); source("data-raw/spatial_data.R")'
+
+# Everything else (docs, tests, etc)
+COPY . .
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash shiny_user
