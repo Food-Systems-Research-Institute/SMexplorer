@@ -58,8 +58,7 @@ Clone, then build image and run:
 
 ```sh
 podman build -f Dockerfile --progress=plain -t smexplorer:latest .
-podman run --rm -p 3000:3000 smexplorer:latest
-# with -d on VM?
+podman run -d --name smexplorer -p 3005:3000 smexplorer:latest
 ```
 
 Reference:
