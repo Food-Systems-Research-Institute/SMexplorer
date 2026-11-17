@@ -57,8 +57,14 @@ source('data-raw/spatial_data.R')
 Clone, then build image and run:
 
 ```sh
+# remove old container 
+podman rm -f smexplorer 2>/dev/null
+
+# build
 podman build -f Dockerfile --progress=plain -t smexplorer:latest .
-podman run -d --name smexplorer -p 3005:3000 smexplorer:latest
+
+# run
+podman run -d --name smexplorer --restart=always -p 3005:3000 smexplorer:latest
 ```
 
 Reference:
@@ -66,7 +72,13 @@ Reference:
 ```sh
 # enter
 podman run --rm -it --entrypoint bash smexplorer:latest
+
+# check
+podman ps
+podman logs -f smexplorer
+curl -I http://localhost:3005
 ```
 To do:
 
 - Deploy with GitHub actions
+
